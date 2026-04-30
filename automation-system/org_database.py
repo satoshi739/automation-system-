@@ -605,28 +605,41 @@ def _ensure_agent_exists(agent_id: str) -> None:
     """指定されたエージェントIDがai_agentsに存在しない場合、最低限のレコードを挿入する"""
     if not agent_id:
         return
-    with get_conn() as conn:
-        row = conn.execute("SELECT id FROM ai_agents WHERE id=?", (agent_id,)).fetchone()
-        if row:
-            return
-        # users テーブルにも ai エントリが必要（FK チェーン）
-        owner_row = conn.execute("SELECT id FROM users WHERE user_type='human' LIMIT 1").fetchone()
-        user_id = _uid()
-        org_row = conn.execute("SELECT id FROM organizations LIMIT 1").fetchone()
-        org_id = org_row["id"] if org_row else ""
-        conn.execute(
-            """INSERT OR IGNORE INTO users
-               (id,organization_id,role_id,user_type,name,is_active,created_at)
-               VALUES (?,?,'ai_agent','ai',?,1,?)""",
-            (user_id, org_id or None, agent_id, _now()),
-        )
-        conn.execute(
-            """INSERT OR IGNORE INTO ai_agents
-               (id,user_id,agent_type,model,system_prompt,config,is_active,created_at)
-               VALUES (?,?,?,?,?,?,1,?)""",
-            (agent_id, user_id, agent_id, "claude-haiku-4-5-20251001", "", "{}", _now()),
-        )
-    log.info(f"エージェント自動作成: {agent_id}")
+    try:
+        with get_conn() as conn:
+            row = conn.execute("SELECT id FROM ai_agents WHERE id=?", (agent_id,)).fetchone()
+            if row:
+                return
+            # 既存 ai ユーザーを再利用するか、新規作成する
+            existing_ai = conn.execute(
+                "SELECT id FROM users WHERE user_type='ai' LIMIT 1"
+            ).fetchone()
+            if existing_ai:
+                user_id = existing_ai["id"]
+            else:
+                user_id = _uid()
+                org_row = conn.execute("SELECT id FROM organizations LIMIT 1").fetchone()
+                org_id = org_row["id"] if org_row else None
+                # role_id は NULL 許容（FK 未設定環境でも動く）
+                role_row = conn.execute(
+                    "SELECT id FROM roles WHERE slug='ai_agent' LIMIT 1"
+                ).fetchone()
+                role_id = role_row["id"] if role_row else None
+                conn.execute(
+                    """INSERT OR IGNORE INTO users
+                       (id,organization_id,role_id,user_type,name,is_active,created_at)
+                       VALUES (?,?,?,'ai',?,1,?)""",
+                    (user_id, org_id, role_id, agent_id, _now()),
+                )
+            conn.execute(
+                """INSERT OR IGNORE INTO ai_agents
+                   (id,user_id,agent_type,model,system_prompt,config,is_active,created_at)
+                   VALUES (?,?,?,?,?,?,1,?)""",
+                (agent_id, user_id, agent_id, "claude-haiku-4-5-20251001", "", "{}", _now()),
+            )
+        log.info(f"エージェント自動作成: {agent_id}")
+    except Exception as e:
+        log.warning(f"エージェント自動作成スキップ {agent_id}: {e}")
 
 
 def create_task(
