@@ -276,14 +276,14 @@ def get_ceo_priorities() -> list:
     try:
         with db.get_conn() as conn:
             row = conn.execute(
-                """SELECT output_data FROM agent_runs
+                """SELECT log FROM agent_runs
                    WHERE agent_id='ai-ceo' AND status='completed'
                    ORDER BY completed_at DESC LIMIT 1""",
             ).fetchone()
-        if not row or not row["output_data"]:
+        if not row or not row["log"]:
             return _default_priorities()
 
-        data = json.loads(row["output_data"])
+        data = json.loads(row["log"])
         decisions = data.get("decisions", [])
         if not decisions:
             return _default_priorities()
@@ -354,7 +354,7 @@ def get_pending_approvals() -> list:
     with db.get_conn() as conn:
         rows = conn.execute(
             """SELECT a.id, a.title, a.task_id, a.status, a.created_at
-               FROM agent_approvals a
+               FROM approvals a
                WHERE a.status='pending'
                ORDER BY a.created_at DESC LIMIT 10""",
         ).fetchall()

@@ -994,13 +994,13 @@ def api_ceo_status():
     try:
         with org_db.get_conn() as conn:
             row = conn.execute(
-                """SELECT output_data, completed_at, status
+                """SELECT log, completed_at, status
                    FROM agent_runs WHERE agent_id='ai-ceo'
                    ORDER BY completed_at DESC LIMIT 1""",
             ).fetchone()
         if not row:
             return jsonify({"last_run": None, "tasks_created": 0, "summary": "まだ実行されていません"})
-        data = _json.loads(row["output_data"] or "{}")
+        data = _json.loads(row["log"] or "{}")
         return jsonify({
             "last_run":      row["completed_at"],
             "status":        row["status"],

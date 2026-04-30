@@ -881,6 +881,9 @@ def _new_lead_id() -> str:
 def enqueue(data: dict) -> int:
     """投稿をキューに追加。id を返す。"""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    hashtags = data.get("hashtags")
+    if isinstance(hashtags, list):
+        hashtags = " ".join(hashtags)
     with get_conn() as conn:
         cur = conn.execute("""
             INSERT OR IGNORE INTO queue_items
@@ -894,7 +897,7 @@ def enqueue(data: dict) -> int:
             data.get("caption"), data.get("text"),
             data.get("message"), data.get("title"), data.get("content"),
             data.get("image_url"), data.get("video_url"),
-            data.get("hashtags"), data.get("scheduled_at"),
+            hashtags, data.get("scheduled_at"),
             data.get("source", "manual"), data.get("topic"),
             data.get("filename"), now,
         ))
