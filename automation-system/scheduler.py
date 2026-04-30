@@ -57,7 +57,7 @@ ALERTS_LOG     = Path(__file__).parent / "logs" / "alerts.log"
 
 
 def _alert_owner(message: str, dedup_key: str = "") -> None:
-    """Mac通知 + alerts.log への二重記録。dedup_key を指定すると初回のみ送信。"""
+    """Mac通知 + alerts.log + LINE push の三重記録。dedup_key を指定すると初回のみ送信。"""
     if dedup_key:
         flag = Path(__file__).parent / "logs" / f".alert_{dedup_key}.sent"
         if flag.exists():
@@ -84,6 +84,16 @@ def _alert_owner(message: str, dedup_key: str = "") -> None:
         )
     except Exception as exc:
         logger.error("Mac通知失敗: %s", exc)
+
+    try:
+        owner_id = os.environ.get("OWNER_LINE_USER_ID", "")
+        if owner_id:
+            from sns.line_api import LINEMessenger
+            messenger = LINEMessenger()
+            if messenger.enabled:
+                messenger.push(owner_id, f"[scheduler alert]\n{message}")
+    except Exception as exc:
+        logger.error("LINE push失敗: %s", exc)
 
     logger.warning("ALERT: %s", message)
     # TODO: LINE push notification (token pending)
@@ -287,21 +297,20 @@ def check_scheduled_posts():
         return
 
     # 各プラットフォームの初期化は使用時に行う（未使用プラットフォームでのキー不在エラーを防ぐ）
-    _poster: InstagramPoster | None = None
+    _posters: dict[str, InstagramPoster] = {}
     _messenger: LINEMessenger | None = None
 
-    def get_poster():
-        nonlocal _poster
-        if _poster is None:
+    def get_poster(brand_key: str = ""):
+        if brand_key not in _posters:
             try:
-                _poster = InstagramPoster()
+                _posters[brand_key] = InstagramPoster(brand=brand_key)
             except KeyError as exc:
                 _alert_owner(
-                    f"Instagram認証情報未設定 ({exc}) — 予約投稿をスキップ",
-                    dedup_key="instagram_key_missing",
+                    f"Instagram認証情報未設定 ({exc}) [{brand_key}] — 予約投稿をスキップ",
+                    dedup_key=f"instagram_key_missing_{brand_key}",
                 )
                 return None
-        return _poster
+        return _posters[brand_key]
 
     def get_messenger():
         nonlocal _messenger
@@ -341,7 +350,7 @@ def check_scheduled_posts():
                     logger.info(f"予約投稿実行: {brand_key}/{platform}/{f.name} (予約:{sched_str})")
 
                     if platform == "instagram":
-                        poster = get_poster()
+                        poster = get_poster(brand_key)
                         if poster is None:
                             continue  # 認証情報未設定 — アラート送信済み
                         mt = data.get("media_type", "image")

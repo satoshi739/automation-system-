@@ -17,15 +17,29 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
+BRAND_ENV_PREFIX: dict[str, str] = {
+    "bangkok-peach":  "BANGKOK_PEACH",
+    "cashflowsupport": "CASHFLOWSUPPORT",
+    "dsc-marketing":  "DSC_MARKETING",
+    "satoshi-blog":   "SATOSHI_BLOG",
+    "upjapan":        "",
+}
+
+
 class InstagramPoster:
     BASE_URL = "https://graph.facebook.com/v19.0"
 
-    def __init__(self):
-        self.access_token = os.environ.get("META_ACCESS_TOKEN", "")
-        self.account_id = os.environ.get("INSTAGRAM_BUSINESS_ACCOUNT_ID", "")
+    def __init__(self, brand: str = ""):
+        prefix = BRAND_ENV_PREFIX.get(brand, "")
+        token_key   = f"{prefix}_META_ACCESS_TOKEN"        if prefix else "META_ACCESS_TOKEN"
+        account_key = f"{prefix}_INSTAGRAM_ACCOUNT_ID"    if prefix else "INSTAGRAM_BUSINESS_ACCOUNT_ID"
+
+        self.access_token = os.environ.get(token_key, "") or os.environ.get("META_ACCESS_TOKEN", "")
+        self.account_id   = os.environ.get(account_key, "") or os.environ.get("INSTAGRAM_BUSINESS_ACCOUNT_ID", "")
         self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
         if not self.access_token or not self.account_id:
-            logger.warning("META_ACCESS_TOKEN または INSTAGRAM_BUSINESS_ACCOUNT_ID 未設定 — Instagram投稿を無効化")
+            label = f"[{brand}] " if brand else ""
+            logger.warning("%sMETA_ACCESS_TOKEN または INSTAGRAM_BUSINESS_ACCOUNT_ID 未設定 — Instagram投稿を無効化", label)
             self.enabled = False
         else:
             self.enabled = True
