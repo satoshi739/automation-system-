@@ -111,6 +111,58 @@
   </div>
 </div>
 
+<!-- ログローテーション履歴 -->
+<div class="log-section" style="margin-top:32px;">
+  <div class="log-section-hd">
+    <div class="log-section-title">🔄 ログローテーション履歴</div>
+    <span class="log-count">archive: {{ archive_snap.dirs }} dirs / {{ "%.1f"|format(archive_snap.total_mb) }} MB</span>
+  </div>
+
+  <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+    <div class="card" style="flex:1;min-width:120px;padding:10px 14px;">
+      <div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">保存中アーカイブ</div>
+      <div style="font-size:20px;font-weight:700;">{{ archive_snap.dirs }}<span style="font-size:12px;color:var(--muted2);margin-left:4px;">dirs</span></div>
+    </div>
+    <div class="card" style="flex:1;min-width:120px;padding:10px 14px;">
+      <div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">総容量</div>
+      <div style="font-size:20px;font-weight:700;">{{ "%.1f"|format(archive_snap.total_mb) }}<span style="font-size:12px;color:var(--muted2);margin-left:4px;">MB</span></div>
+    </div>
+    <div class="card" style="flex:1;min-width:120px;padding:10px 14px;">
+      <div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">保持期限</div>
+      <div style="font-size:20px;font-weight:700;">30<span style="font-size:12px;color:var(--muted2);margin-left:4px;">日</span></div>
+    </div>
+  </div>
+
+  {% if rotate_history %}
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th style="width:190px;">実行日時</th>
+          <th style="width:110px;" class="text-end">処理ファイル</th>
+          <th style="width:120px;" class="text-end">アーカイブ容量</th>
+          <th style="width:140px;" class="text-end">削除アーカイブ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rotate_history %}
+        <tr>
+          <td class="font-monospace small">{{ r.time }}</td>
+          <td class="small text-end">{{ r.files }} files</td>
+          <td class="small text-end">{{ "%.1f"|format(r.mb) }} MB</td>
+          <td class="small text-end">{{ r.deleted }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="log-empty">
+    まだローテーションが実行されていません（毎朝 04:00 に自動実行）
+  </div>
+  {% endif %}
+</div>
+
 <!-- 監査ログへの誘導 -->
 <div class="card" style="background:rgba(99,102,241,.04);border-color:rgba(99,102,241,.2);">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">

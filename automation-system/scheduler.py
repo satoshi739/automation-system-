@@ -19,6 +19,7 @@ import os
 from pathlib import Path
 
 import schedule
+import subprocess
 import time
 import yaml
 from datetime import datetime
@@ -47,10 +48,53 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-SCHEDULE_CFG  = Path(__file__).parent / "config" / "schedule.yaml"
-QUEUE_DIR     = Path(__file__).parent / "content_queue"
-SCENARIOS_PATH= Path(__file__).parent / "config" / "line_scenarios.yaml"
-PERF_LOG_PATH = Path(__file__).parent / "logs" / "performance_log.yaml"
+SCHEDULE_CFG   = Path(__file__).parent / "config" / "schedule.yaml"
+QUEUE_DIR      = Path(__file__).parent / "content_queue"
+SCENARIOS_PATH = Path(__file__).parent / "config" / "line_scenarios.yaml"
+PERF_LOG_PATH  = Path(__file__).parent / "logs" / "performance_log.yaml"
+HEARTBEAT_FILE = Path(__file__).parent / "logs" / "scheduler.heartbeat"
+ALERTS_LOG     = Path(__file__).parent / "logs" / "alerts.log"
+
+
+def _alert_owner(message: str, dedup_key: str = "") -> None:
+    """Mac通知 + alerts.log への二重記録。dedup_key を指定すると初回のみ送信。"""
+    if dedup_key:
+        flag = Path(__file__).parent / "logs" / f".alert_{dedup_key}.sent"
+        if flag.exists():
+            return
+        try:
+            flag.touch()
+        except Exception:
+            pass
+
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        with open(ALERTS_LOG, "a", encoding="utf-8") as fh:
+            fh.write(f"[{timestamp}] {message}\n")
+    except Exception as exc:
+        logger.error("alerts.log 書き込み失敗: %s", exc)
+
+    try:
+        safe_msg = message.replace('"', "'")[:100]
+        subprocess.run(
+            ["osascript", "-e",
+             f'display notification "{safe_msg}" with title "scheduler alert"'],
+            timeout=5, capture_output=True,
+        )
+    except Exception as exc:
+        logger.error("Mac通知失敗: %s", exc)
+
+    logger.warning("ALERT: %s", message)
+    # TODO: LINE push notification (token pending)
+
+
+def _touch_heartbeat() -> None:
+    """メインループが生きていることを記録する（毎分更新）。"""
+    try:
+        HEARTBEAT_FILE.write_text(datetime.now().isoformat())
+    except Exception as exc:
+        logger.error("heartbeat 書き込み失敗: %s", exc)
 
 
 def _load_schedule() -> dict:
@@ -80,6 +124,16 @@ def _mark_posted(file_path: Path):
     with open(file_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     data["posted"] = True
+    with open(file_path, "w", encoding="utf-8") as f:
+        yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+
+
+def _mark_status(file_path: Path, status: str):
+    """投稿ステータスを更新（posted / failed）"""
+    with open(file_path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    data["posted"] = (status == "posted")
+    data["status"] = status
     with open(file_path, "w", encoding="utf-8") as f:
         yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
 
@@ -232,8 +286,35 @@ def check_scheduled_posts():
     except Exception:
         return
 
-    poster    = InstagramPoster()
-    messenger = LINEMessenger()
+    # 各プラットフォームの初期化は使用時に行う（未使用プラットフォームでのキー不在エラーを防ぐ）
+    _poster: InstagramPoster | None = None
+    _messenger: LINEMessenger | None = None
+
+    def get_poster():
+        nonlocal _poster
+        if _poster is None:
+            try:
+                _poster = InstagramPoster()
+            except KeyError as exc:
+                _alert_owner(
+                    f"Instagram認証情報未設定 ({exc}) — 予約投稿をスキップ",
+                    dedup_key="instagram_key_missing",
+                )
+                return None
+        return _poster
+
+    def get_messenger():
+        nonlocal _messenger
+        if _messenger is None:
+            try:
+                _messenger = LINEMessenger()
+            except KeyError as exc:
+                _alert_owner(
+                    f"LINE認証情報未設定 ({exc}) — LINE配信をスキップ",
+                    dedup_key="line_key_missing",
+                )
+                return None
+        return _messenger
 
     # 全ブランド × 全プラットフォームをスキャン
     for brand_key in brands:
@@ -248,7 +329,7 @@ def check_scheduled_posts():
                 try:
                     with open(f, encoding="utf-8") as fh:
                         data = yaml.safe_load(fh)
-                    if not data or data.get("posted"):
+                    if not data or data.get("posted") or data.get("status") == "failed":
                         continue
                     sched_str = data.get("scheduled_at")
                     if not sched_str:
@@ -260,6 +341,9 @@ def check_scheduled_posts():
                     logger.info(f"予約投稿実行: {brand_key}/{platform}/{f.name} (予約:{sched_str})")
 
                     if platform == "instagram":
+                        poster = get_poster()
+                        if poster is None:
+                            continue  # 認証情報未設定 — アラート送信済み
                         mt = data.get("media_type", "image")
                         if mt == "reel":
                             poster.post_reel(video_url=data["video_url"], caption=data.get("caption",""), cover_url=data.get("cover_url",""))
@@ -271,6 +355,9 @@ def check_scheduled_posts():
                         logger.info(f"予約Instagram投稿完了: {f.name}")
 
                     elif platform == "line":
+                        messenger = get_messenger()
+                        if messenger is None:
+                            continue  # 認証情報未設定 — アラート送信済み
                         image_url = data.get("image_url","")
                         if image_url:
                             messenger.broadcast_with_image(message=data.get("message",""), image_url=image_url, preview_url=data.get("preview_url", image_url))
@@ -278,6 +365,29 @@ def check_scheduled_posts():
                             messenger.broadcast(data.get("message",""))
                         _mark_posted(f)
                         logger.info(f"予約LINE配信完了: {f.name}")
+
+                    elif platform == "twitter":
+                        from sns.twitter import TwitterPoster
+                        dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
+                        tw = TwitterPoster(brand=brand_key)
+                        content = data.get("content", "").strip()
+                        hashtags = " ".join(data.get("hashtags", []))
+                        full_text = f"{content}\n\n{hashtags}".strip()
+                        if dry_run:
+                            logger.info(f"[DRY_RUN] Twitter投稿: {full_text[:80]}...")
+                            logger.info(f"予約Twitter投稿完了（DRY_RUN）: {f.name}")
+                        else:
+                            try:
+                                result = tw.tweet(full_text)
+                                if result.get("status") == "posted":
+                                    _mark_status(f, "posted")
+                                    logger.info(f"予約Twitter投稿完了: {f.name}")
+                                else:
+                                    _mark_status(f, "failed")
+                                    logger.error(f"Twitter投稿失敗（応答異常）: {f.name} / result={result}")
+                            except Exception as e:
+                                _mark_status(f, "failed")
+                                logger.error(f"Twitter投稿失敗（例外）: {f.name} / error={e}")
 
                 except Exception as e:
                     logger.error(f"予約投稿エラー ({f.name}): {e}", exc_info=True)
@@ -290,6 +400,7 @@ def followup_job():
         run_followup_check()
     except Exception as e:
         logger.error(f"フォローアップエラー: {e}", exc_info=True)
+        _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
 
 
 def agent_tick_job():
@@ -301,6 +412,7 @@ def agent_tick_job():
         logger.info(f"エージェントtick完了: {summary}")
     except Exception as e:
         logger.error(f"エージェントtickエラー: {e}", exc_info=True)
+        _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
 
 
 def ceo_dispatch_job():
@@ -313,6 +425,7 @@ def ceo_dispatch_job():
         logger.info(f"サマリー: {result.get('summary', '')}")
     except Exception as e:
         logger.error(f"AI CEO ディスパッチエラー: {e}", exc_info=True)
+        _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
 
 
 def generate_weekly_calendar_job():
@@ -416,6 +529,10 @@ def setup_schedule():
     # AI CEO ディスパッチ（毎朝5:30: 全ブランド状態を分析しタスクを割り当て）
     schedule.every().day.at("05:30").do(ceo_dispatch_job)
     logger.info("AI CEO ディスパッチ: 毎朝5:30")
+
+    # 死活監視 heartbeat（毎分: logs/scheduler.heartbeat を更新）
+    schedule.every(1).minutes.do(_touch_heartbeat)
+    logger.info("heartbeat: 毎分更新")
 
 
 def story_autopilot_job():
@@ -532,13 +649,28 @@ def story_autopilot_job():
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="UPJ スケジューラー")
+    parser.add_argument("--test-once", action="store_true",
+                        help="予約投稿チェックを1回だけ実行して終了（DRY_RUN=true 推奨）")
+    args = parser.parse_args()
+
     logger.info("スケジューラー起動")
     (Path(__file__).parent / "logs").mkdir(exist_ok=True)
-    setup_schedule()
 
-    # 起動直後に1回実行
-    followup_job()
-
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
+    if args.test_once:
+        logger.info("=== --test-once モード: 予約投稿チェックを1回実行 ===")
+        check_scheduled_posts()
+        logger.info("=== --test-once 完了 ===")
+    else:
+        setup_schedule()
+        _touch_heartbeat()  # 起動時に即書き込み
+        # 起動直後に1回実行
+        followup_job()
+        while True:
+            try:
+                schedule.run_pending()
+            except Exception as exc:
+                _alert_owner(f"scheduler ループエラー: {exc}", dedup_key="loop_error")
+                logger.error("メインループエラー: %s", exc, exc_info=True)
+            time.sleep(60)

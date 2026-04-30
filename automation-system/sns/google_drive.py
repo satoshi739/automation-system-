@@ -118,8 +118,8 @@ def sync_from_drive(folder_id: str = "", caption_default: str = "") -> int:
         if "caption=" in name:
             try:
                 caption = name.split("caption=", 1)[1].rsplit(".", 1)[0].replace("_", "\n")
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("キャプション抽出失敗: %s", exc)
 
         is_video = "video" in mime
         media_type = "reel" if is_video else "image"

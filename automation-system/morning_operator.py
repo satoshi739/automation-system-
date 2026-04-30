@@ -346,10 +346,35 @@ def send_morning_summary(
     logger.info("朝のサマリー送信完了")
 
 
+def _read_unread_alerts() -> str:
+    """alerts.log の未読分を返す。マーカーを更新する。"""
+    alerts_log = Path(__file__).parent / "logs" / "alerts.log"
+    marker    = Path(__file__).parent / "logs" / ".morning_alerts_marker"
+    if not alerts_log.exists():
+        return ""
+    all_lines = alerts_log.read_text(encoding="utf-8").splitlines()
+    last_pos = 0
+    if marker.exists():
+        try:
+            last_pos = int(marker.read_text().strip())
+        except Exception:
+            last_pos = 0
+    new_alerts = all_lines[last_pos:]
+    marker.write_text(str(len(all_lines)))
+    if not new_alerts:
+        return ""
+    return f"📋 前日アラート({len(new_alerts)}件):\n" + "\n".join(new_alerts)
+
+
 def run():
     """朝のオペレーター本体"""
     logger.info("===== 朝のオペレーター開始 =====")
     (Path(__file__).parent / "logs").mkdir(exist_ok=True)
+
+    # 0. alerts.log 読み上げ
+    alert_msg = _read_unread_alerts()
+    if alert_msg:
+        logger.warning(alert_msg)
 
     # 1. Instagram投稿
     ig_posted = post_instagram_queue()

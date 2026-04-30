@@ -21,13 +21,19 @@ class InstagramPoster:
     BASE_URL = "https://graph.facebook.com/v19.0"
 
     def __init__(self):
-        self.access_token = os.environ["META_ACCESS_TOKEN"]
-        self.account_id = os.environ["INSTAGRAM_BUSINESS_ACCOUNT_ID"]
+        self.access_token = os.environ.get("META_ACCESS_TOKEN", "")
+        self.account_id = os.environ.get("INSTAGRAM_BUSINESS_ACCOUNT_ID", "")
         self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
+        if not self.access_token or not self.account_id:
+            logger.warning("META_ACCESS_TOKEN または INSTAGRAM_BUSINESS_ACCOUNT_ID 未設定 — Instagram投稿を無効化")
+            self.enabled = False
+        else:
+            self.enabled = True
 
     def _api(self, method: str, endpoint: str, **kwargs) -> dict:
         url = f"{self.BASE_URL}/{endpoint}"
         kwargs.setdefault("params", {})["access_token"] = self.access_token
+        kwargs.setdefault("timeout", 30)
         resp = requests.request(method, url, **kwargs)
         resp.raise_for_status()
         return resp.json()
@@ -39,6 +45,9 @@ class InstagramPoster:
         Returns:
             {"media_id": "...", "status": "posted"} or {"status": "dry_run"}
         """
+        if not self.enabled:
+            logger.warning("META_ACCESS_TOKEN未設定、Instagram投稿をスキップ")
+            return None
         if self.dry_run:
             logger.info(f"[DRY RUN] Instagram画像投稿: {caption[:40]}...")
             return {"status": "dry_run", "caption": caption}
@@ -76,6 +85,9 @@ class InstagramPoster:
         """
         リール投稿（video_url は公開アクセス可能なURL）
         """
+        if not self.enabled:
+            logger.warning("META_ACCESS_TOKEN未設定、Instagram投稿をスキップ")
+            return None
         if self.dry_run:
             logger.info(f"[DRY RUN] Instagramリール投稿: {caption[:40]}...")
             return {"status": "dry_run", "caption": caption}
@@ -128,6 +140,9 @@ class InstagramPoster:
         Returns:
             {"media_id": str, "status": "posted"} or {"status": "dry_run"}
         """
+        if not self.enabled:
+            logger.warning("META_ACCESS_TOKEN未設定、Instagram投稿をスキップ")
+            return None
         if self.dry_run:
             logger.info(f"[DRY RUN] Instagramカルーセル投稿: {len(slides)}枚 {caption[:40]}...")
             return {"status": "dry_run", "slide_count": len(slides)}
@@ -205,6 +220,9 @@ class InstagramPoster:
         Returns:
             {"posted": int, "status": "posted"} or {"status": "dry_run"}
         """
+        if not self.enabled:
+            logger.warning("META_ACCESS_TOKEN未設定、Instagram投稿をスキップ")
+            return None
         if self.dry_run:
             logger.info(f"[DRY RUN] Instagramストーリーズ: {len(sticker_texts)}枚")
             return {"status": "dry_run", "count": len(sticker_texts)}

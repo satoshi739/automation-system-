@@ -37,11 +37,19 @@ class EmailSender:
     def __init__(self):
         self.smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
         self.smtp_port = int(os.environ.get("SMTP_PORT", "587"))
-        self.from_email = os.environ["FROM_EMAIL"]        # 送信元メールアドレス
-        self.from_password = os.environ["FROM_EMAIL_PASSWORD"]  # Gmailアプリパスワード
+        self.from_email = os.environ.get("FROM_EMAIL", "")
+        self.from_password = os.environ.get("FROM_EMAIL_PASSWORD", "")
         self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
+        if not self.from_email or not self.from_password:
+            logger.warning("FROM_EMAIL または FROM_EMAIL_PASSWORD 未設定 — メール送信を無効化")
+            self.enabled = False
+        else:
+            self.enabled = True
 
     def send(self, to: str, subject: str, body: str, reply_to: str = "") -> bool:
+        if not self.enabled:
+            logger.warning("FROM_EMAIL未設定、メール送信をスキップ")
+            return False
         if self.dry_run:
             logger.info(f"[DRY RUN] メール送信: to={to}, subject={subject}")
             return True

@@ -9,6 +9,7 @@ import sys
 import json
 import logging
 import secrets
+import time as _time
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
@@ -20,6 +21,12 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 load_dotenv(Path(__file__).parent.parent / ".env")
+
+# MOCK_MODE=true の場合はモックデータを使う（開発・デモ用）
+if os.environ.get("MOCK_MODE", "false").lower() == "true":
+    from dashboard import mock_service as svc
+else:
+    from dashboard import real_service as svc
 
 import database as db
 from repositories.asset_repo import (
@@ -94,11 +101,21 @@ def logout():
 
 # ── ヘルスチェック ─────────────────────────────────────────
 
+_HEARTBEAT = Path(__file__).parent.parent / "logs" / "scheduler.heartbeat"
+
+
 @app.route("/health")
 def health():
     try:
         stats = db.get_stats()
-        return jsonify({"status": "ok", "db": "ok", "stats": stats})
+        hb_age, hb_status = None, "unknown"
+        if _HEARTBEAT.exists():
+            hb_age = int(_time.time() - _HEARTBEAT.stat().st_mtime)
+            hb_status = "ok" if hb_age < 600 else "dead"
+        return jsonify({
+            "status": "ok", "db": "ok", "stats": stats,
+            "scheduler": {"status": hb_status, "heartbeat_age_sec": hb_age},
+        })
     except Exception as e:
         return jsonify({"status": "error", "error": str(e)}), 500
 
@@ -111,10 +128,16 @@ def inject_globals():
         unread_count = db.count_unread_notifications()
     except Exception:
         pass
+    try:
+        hb_ok = _HEARTBEAT.exists() and (_time.time() - _HEARTBEAT.stat().st_mtime) < 600
+    except Exception:
+        hb_ok = False
     return {
         "nav_brands":              load_brands(),
         "nav_platform_icons":      PLATFORM_ICONS,
         "unread_notif_count":      unread_count,
+        "scheduler_status":        "稼働中" if hb_ok else "停止",
+        "scheduler_status_ok":     hb_ok,
     }
 
 
@@ -314,6 +337,34 @@ def anomaly_alerts():
     from dashboard.mock_service import get_anomaly_alerts
     alerts = get_anomaly_alerts()
     return render_template("anomaly_alerts.html", alerts=alerts)
+
+
+@app.route("/system-alerts")
+def system_alerts():
+    import re
+    alerts_path = Path(__file__).parent.parent / "logs" / "alerts.log"
+    lines = []
+    if alerts_path.exists():
+        lines = alerts_path.read_text(encoding="utf-8").splitlines()[-100:]
+    entries = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        m = re.match(r'\[(.+?)\] \[(.+?)\] (.+)', line)
+        if m:
+            entries.append({
+                "time": m.group(1),
+                "source": m.group(2),
+                "message": m.group(3),
+            })
+        else:
+            entries.append({
+                "time": "-",
+                "source": "-",
+                "message": line,
+            })
+    return render_template("system_alerts.html", entries=entries)
 
 
 @app.route("/performance-snapshot")
@@ -813,10 +864,42 @@ def resolve_decision_file(filename):
 
 @app.route("/logs")
 def logs_page():
+    import re as _re
+
+    alerts_path = Path(__file__).parent.parent / "logs" / "alerts.log"
+    rotate_history = []
+    if alerts_path.exists():
+        _pat = _re.compile(
+            r'\[(.+?)\] \[log_rotate\] (\d+) files rotated, ([\d.]+)MB archived, (\d+) old archives deleted'
+        )
+        for line in alerts_path.read_text(encoding="utf-8").splitlines():
+            m = _pat.search(line)
+            if m:
+                rotate_history.append({
+                    "time":    m.group(1),
+                    "files":   int(m.group(2)),
+                    "mb":      float(m.group(3)),
+                    "deleted": int(m.group(4)),
+                })
+    rotate_history = list(reversed(rotate_history[-20:]))
+
+    archive_dir = Path(__file__).parent.parent / "logs" / "archive"
+    archive_snap = {"dirs": 0, "total_mb": 0.0}
+    if archive_dir.exists():
+        dirs = [d for d in archive_dir.iterdir() if d.is_dir()]
+        archive_snap["dirs"] = len(dirs)
+        total_bytes = sum(
+            f.stat().st_size
+            for d in dirs for f in d.iterdir() if f.is_file()
+        )
+        archive_snap["total_mb"] = total_bytes / 1_048_576
+
     return render_template("logs.html",
-        scheduler_log=log_tail("scheduler.log"),
-        morning_log  =log_tail("morning.log"),
-        server_log   =log_tail("server.log"))
+        scheduler_log =log_tail("scheduler.log"),
+        morning_log   =log_tail("morning.log"),
+        server_log    =log_tail("server.log"),
+        rotate_history=rotate_history,
+        archive_snap  =archive_snap)
 
 
 @app.route("/audit-logs")

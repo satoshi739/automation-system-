@@ -31,6 +31,11 @@ from agents import orchestrator
 
 log = logging.getLogger(__name__)
 
+# 起動時に API キーの有無を確認する（実行時 KeyError を未然に防ぐ）
+_ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+if not _ANTHROPIC_KEY:
+    log.warning("ANTHROPIC_API_KEY 未設定 — エージェント機能は無効")
+
 # ── ディレクトリ定数 ──────────────────────────────────────────
 QUEUE_ROOT   = _BASE / "content_queue"
 DECISION_DIR = _BASE / "decision_queue"
@@ -38,11 +43,10 @@ LEADS_DIR    = _BASE.parent / "sales-system" / "leads"
 CALENDAR_DIR = QUEUE_ROOT / "calendar"
 
 # ── Claude クライアント ──────────────────────────────────────
-def _client() -> anthropic.Anthropic:
-    key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not key:
-        raise RuntimeError("ANTHROPIC_API_KEY が設定されていません")
-    return anthropic.Anthropic(api_key=key)
+def _client() -> anthropic.Anthropic | None:
+    if not _ANTHROPIC_KEY:
+        return None
+    return anthropic.Anthropic(api_key=_ANTHROPIC_KEY)
 
 
 # ════════════════════════════════════════════════════════════
@@ -1014,6 +1018,8 @@ def _h_multilingual_post(inp: dict, ctx: dict) -> dict:
     topic     = inp.get("topic", "")
     languages = inp.get("languages", ["ja", "en", "th"])
     client = _client()
+    if not client:
+        return {"error": "API key not configured"}
     lang_names = {"ja": "日本語", "en": "英語", "th": "タイ語"}
     results = {}
     for lang in languages:
@@ -1037,6 +1043,8 @@ def _h_compliance_check(inp: dict, ctx: dict) -> dict:
     content = inp.get("content", "")
     brand   = inp.get("brand", ctx.get("brand_id", "cashflowsupport"))
     client  = _client()
+    if not client:
+        return {"error": "API key not configured"}
     prompt = f"""以下のコンテンツの金融・法律コンプライアンスチェックをしてください。
 
 ブランド: {brand}
@@ -1124,6 +1132,8 @@ def _h_qualify_lead(inp: dict, ctx: dict) -> dict:
     if not lead:
         return {"ok": False, "error": f"Lead {lead_id} が見つかりません"}
     client = _client()
+    if not client:
+        return {"error": "API key not configured"}
     prompt = f"""リードの資格判定をしてください。
 
 ブランド: {lead.get('brand')}
@@ -1162,6 +1172,8 @@ def _h_generate_proposal(inp: dict, ctx: dict) -> dict:
     if not lead:
         return {"ok": False, "error": f"Lead {lead_id} が見つかりません"}
     client = _client()
+    if not client:
+        return {"error": "API key not configured"}
     brand_ctx = _brand_context(brand)
     prompt = f"""以下のリード向けに提案書ドラフトを作成してください。
 
@@ -1249,6 +1261,8 @@ def _h_generate_report(inp: dict, ctx: dict) -> dict:
     period = inp.get("period", "weekly")
     brands = [brand] if brand else ["dsc-marketing", "upjapan", "cashflowsupport", "bangkok-peach"]
     client = _client()
+    if not client:
+        return {"error": "API key not configured"}
     summaries = []
     for b in brands:
         try:
@@ -1301,6 +1315,8 @@ def _h_seo_research(inp: dict, ctx: dict) -> dict:
     topic   = inp.get("topic", "")
     keyword = inp.get("keyword", "")
     client  = _client()
+    if not client:
+        return {"error": "API key not configured"}
     brand_ctx = _brand_context(brand)
     prompt = f"""{brand_ctx}
 
@@ -1609,6 +1625,14 @@ def run(task_id: str) -> dict:
     output_text = ""
 
     client = _client()
+    if not client:
+        orchestrator.fail_task(task_id, run_id, "ANTHROPIC_API_KEY 未設定")
+        return {
+            "task_id": task_id,
+            "run_id":  run_id,
+            "status":  "failed",
+            "error":   "API key not configured",
+        }
     max_iterations = 10
 
     try:

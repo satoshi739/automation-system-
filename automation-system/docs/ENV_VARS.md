@@ -1,134 +1,148 @@
-# 環境変数
+# 環境変数一覧
 
-## 設定方法
+`.env` ファイルに設定する全変数の用途・必須/任意をブランド別に整理。
 
-`.env` ファイル（`automation-system/` 直下）または Railway / Heroku の環境変数で設定。
+---
 
-```bash
-cp automation-system/.env.example automation-system/.env
-# 各値を編集
-```
+## 共通・システム
 
-## 必須変数
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `ANTHROPIC_API_KEY` | **必須** | Claude AI エージェント全般。未設定でエージェント機能が無効化される |
+| `DRY_RUN` | 任意 | `true` にすると実際の投稿・送信をスキップ（テスト用） |
+| `FLASK_SECRET_KEY` | **必須** | Dashboard セッション署名 |
+| `FLASK_DEBUG` | 任意 | `true` でデバッグモード（本番では設定しない） |
+| `DASHBOARD_PASSWORD` | **必須** | Dashboard ログインパスワード |
+| `MOCK_MODE` | 任意 | `true` でダッシュボードをモックデータで表示（開発用） |
 
-| 変数名 | 説明 | 例 |
-|--------|------|-----|
-| `ANTHROPIC_API_KEY` | Claude API キー。未設定時は AI 機能が無効化される | `sk-ant-...` |
-| `DASHBOARD_PASSWORD` | ダッシュボードのログインパスワード。**未設定時は認証スキップ** | `your-strong-password` |
+---
 
-## オプション変数
+## LINE（メインBot / DSC Marketing）
 
-### Flask / サーバー
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `LINE_CHANNEL_ACCESS_TOKEN` | **必須** | server.py の Webhook・自動返信 |
+| `LINE_CHANNEL_SECRET` | **必須** | Webhook 署名検証 |
+| `OWNER_LINE_USER_ID` | **必須** | 朝サマリーの送信先（オーナー本人の LINE User ID） |
+| `LINE_CHANNEL_ACCESS_TOKEN_CSF` | 任意 | CashflowSupport Bot（コード未接続、将来用） |
+| `LINE_CHANNEL_SECRET_CSF` | 任意 | 同上 |
+| `LINE_CHANNEL_ACCESS_TOKEN_BANGKOK` | 任意 | 旧キー（`BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN` が正、削除推奨） |
+| `LINE_CHANNEL_SECRET_BANGKOK` | 任意 | 同上 |
 
-| 変数名 | デフォルト | 説明 |
-|--------|-----------|------|
-| `FLASK_SECRET_KEY` | ランダム生成 | セッション暗号化キー。**本番では必ず設定** |
-| `PORT` | `8080` | サーバーポート |
-| `FLASK_DEBUG` | `false` | デバッグモード（`true` で有効化） |
+---
 
-### LINE Bot
+## メール送信
 
-| 変数名 | 説明 |
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `FROM_EMAIL` | **必須** | 送信元 Gmail アドレス |
+| `FROM_EMAIL_PASSWORD` | **必須** | Gmail アプリパスワード（2段階認証設定後に発行） |
+| `NOTIFY_EMAIL` | 任意 | 通知受け取り先メールアドレス |
+| `SMTP_HOST` | **必須** | SMTP サーバー（通常 `smtp.gmail.com`） |
+| `SMTP_PORT` | **必須** | SMTP ポート（通常 `587`） |
+
+---
+
+## Google
+
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `GOOGLE_DRIVE_FOLDER_ID` | **必須** | 素材の同期元 Google Drive フォルダ ID |
+
+---
+
+## ブランド別 SNS トークン
+
+### upjapan
+
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `UPJAPAN_META_ACCESS_TOKEN` | **必須** | Instagram/Facebook 投稿 |
+| `UPJAPAN_INSTAGRAM_ACCOUNT_ID` | **必須** | Instagram Business アカウント ID |
+| `UPJAPAN_FB_PAGE_ID` | **必須** | Facebook ページ ID |
+| `UPJAPAN_FB_PAGE_TOKEN` | **必須** | Facebook ページトークン |
+| `UPJAPAN_TWITTER_API_KEY` | 任意 | Twitter/X 投稿 |
+| `UPJAPAN_TWITTER_API_SECRET` | 任意 | 同上 |
+| `UPJAPAN_TWITTER_ACCESS_TOKEN` | 任意 | 同上 |
+| `UPJAPAN_TWITTER_ACCESS_SECRET` | 任意 | 同上 |
+| `UPJAPAN_THREADS_USER_ID` | 任意 | Threads 投稿 |
+| `UPJAPAN_WP_URL` | 任意 | WordPress サイト URL |
+| `UPJAPAN_WP_USER` | 任意 | WordPress ユーザー名 |
+| `UPJAPAN_WP_APP_PASSWORD` | 任意 | WordPress アプリパスワード |
+| `UPJAPAN_GA4_PROPERTY_ID` | 任意 | Google Analytics 4 プロパティ ID |
+| `UPJAPAN_GSC_SITE_URL` | 任意 | Google Search Console サイト URL |
+
+### dsc-marketing
+
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `DSC_MARKETING_META_ACCESS_TOKEN` | **必須** | Instagram/Facebook 投稿 |
+| `DSC_MARKETING_INSTAGRAM_ACCOUNT_ID` | **必須** | Instagram Business アカウント ID |
+| `DSC_MARKETING_FB_PAGE_ID` | **必須** | Facebook ページ ID |
+| `DSC_MARKETING_FB_PAGE_TOKEN` | **必須** | Facebook ページトークン |
+| `DSC_MARKETING_TIKTOK_ACCESS_TOKEN` | 任意 | TikTok 投稿 |
+| `DSC_MARKETING_TWITTER_API_KEY` | 任意 | Twitter/X 投稿 |
+| `DSC_MARKETING_TWITTER_API_SECRET` | 任意 | 同上 |
+| `DSC_MARKETING_TWITTER_ACCESS_TOKEN` | 任意 | 同上 |
+| `DSC_MARKETING_TWITTER_ACCESS_SECRET` | 任意 | 同上 |
+| `DSC_MARKETING_THREADS_USER_ID` | 任意 | Threads 投稿 |
+| `DSC_MARKETING_WP_URL` | 任意 | WordPress サイト URL |
+| `DSC_MARKETING_WP_USER` | 任意 | WordPress ユーザー名 |
+| `DSC_MARKETING_WP_APP_PASSWORD` | 任意 | WordPress アプリパスワード |
+| `DSC_MARKETING_YOUTUBE_CHANNEL_ID` | 任意 | YouTube チャンネル ID |
+| `DSC_MARKETING_GA4_PROPERTY_ID` | 任意 | Google Analytics 4 プロパティ ID |
+| `DSC_MARKETING_GSC_SITE_URL` | 任意 | Google Search Console サイト URL |
+
+### cashflowsupport
+
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `CASHFLOWSUPPORT_META_ACCESS_TOKEN` | **必須** | Instagram/Facebook 投稿 |
+| `CASHFLOWSUPPORT_INSTAGRAM_ACCOUNT_ID` | **必須** | Instagram Business アカウント ID |
+| `CASHFLOWSUPPORT_WP_URL` | 任意 | WordPress サイト URL |
+| `CASHFLOWSUPPORT_WP_USER` | 任意 | WordPress ユーザー名 |
+| `CASHFLOWSUPPORT_WP_APP_PASSWORD` | 任意 | WordPress アプリパスワード |
+| `CASHFLOWSUPPORT_GA4_PROPERTY_ID` | 任意 | Google Analytics 4 プロパティ ID |
+| `CASHFLOWSUPPORT_GSC_SITE_URL` | 任意 | Google Search Console サイト URL |
+
+### bangkok-peach
+
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `BANGKOK_PEACH_META_ACCESS_TOKEN` | **必須** | Instagram/Facebook 投稿 |
+| `BANGKOK_PEACH_INSTAGRAM_ACCOUNT_ID` | **必須** | Instagram Business アカウント ID |
+| `BANGKOK_PEACH_FB_PAGE_ID` | **必須** | Facebook ページ ID |
+| `BANGKOK_PEACH_FB_PAGE_TOKEN` | **必須** | Facebook ページトークン |
+| `BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN` | **必須** | BPG LINE Bot（値あり・コード接続済み） |
+| `BANGKOK_PEACH_LINE_CHANNEL_SECRET` | **必須** | BPG LINE Bot 署名検証（値あり） |
+| `BANGKOK_PEACH_TIKTOK_ACCESS_TOKEN` | 任意 | TikTok 投稿 |
+| `BANGKOK_PEACH_TWITTER_API_KEY` | 任意 | Twitter/X 投稿 |
+| `BANGKOK_PEACH_TWITTER_API_SECRET` | 任意 | 同上 |
+| `BANGKOK_PEACH_TWITTER_ACCESS_TOKEN` | 任意 | 同上 |
+| `BANGKOK_PEACH_TWITTER_ACCESS_SECRET` | 任意 | 同上 |
+| `BANGKOK_PEACH_THREADS_USER_ID` | 任意 | Threads 投稿 |
+| `BANGKOK_PEACH_WP_URL` | 任意 | WordPress サイト URL |
+| `BANGKOK_PEACH_WP_USER` | 任意 | WordPress ユーザー名 |
+| `BANGKOK_PEACH_WP_APP_PASSWORD` | 任意 | WordPress アプリパスワード |
+| `BANGKOK_PEACH_GA4_PROPERTY_ID` | 任意 | Google Analytics 4 プロパティ ID |
+| `BANGKOK_PEACH_GSC_SITE_URL` | 任意 | Google Search Console サイト URL |
+
+### satoshi-blog
+
+| 変数名 | 必須 | 用途 |
+|--------|------|------|
+| `SATOSHI_BLOG_WP_URL` | 任意 | WordPress サイト URL |
+| `SATOSHI_BLOG_WP_USER` | 任意 | WordPress ユーザー名 |
+| `SATOSHI_BLOG_WP_APP_PASSWORD` | 任意 | WordPress アプリパスワード |
+| `SATOSHI_BLOG_GA4_PROPERTY_ID` | 任意 | Google Analytics 4 プロパティ ID |
+| `SATOSHI_BLOG_GSC_SITE_URL` | 任意 | Google Search Console サイト URL |
+
+---
+
+## 削除推奨（重複・不要キー）
+
+| 変数名 | 理由 |
 |--------|------|
-| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Messaging API チャンネルアクセストークン |
-| `LINE_CHANNEL_SECRET` | LINE チャンネルシークレット（Webhook 署名検証） |
-
-### Instagram / Meta
-
-| 変数名 | 説明 |
-|--------|------|
-| `META_APP_ID` | Meta アプリ ID |
-| `META_APP_SECRET` | Meta アプリシークレット |
-| `INSTAGRAM_ACCESS_TOKEN` | Instagram Graph API アクセストークン |
-| `INSTAGRAM_BUSINESS_ACCOUNT_ID` | ビジネスアカウント ID |
-
-### Google
-
-| 変数名 | 説明 |
-|--------|------|
-| `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth クライアント ID |
-| `GOOGLE_OAUTH_CLIENT_SECRET` | Google OAuth クライアントシークレット |
-| `GOOGLE_REFRESH_TOKEN` | Google リフレッシュトークン（GBP・Drive 共通） |
-| `GBP_LOCATION_ID` | Google Business Profile のロケーション ID |
-
-### Twitter / X
-
-| 変数名 | 説明 |
-|--------|------|
-| `TWITTER_API_KEY` | Twitter API キー |
-| `TWITTER_API_SECRET` | Twitter API シークレット |
-| `TWITTER_ACCESS_TOKEN` | アクセストークン |
-| `TWITTER_ACCESS_SECRET` | アクセストークンシークレット |
-
-### TikTok
-
-| 変数名 | 説明 |
-|--------|------|
-| `TIKTOK_ACCESS_TOKEN` | TikTok API アクセストークン |
-
-### WordPress
-
-| 変数名 | 説明 |
-|--------|------|
-| `WORDPRESS_URL` | WordPress サイト URL |
-| `WORDPRESS_USERNAME` | 管理者ユーザー名 |
-| `WORDPRESS_APP_PASSWORD` | WordPress アプリケーションパスワード |
-
-### メール
-
-| 変数名 | 説明 |
-|--------|------|
-| `SMTP_HOST` | SMTP サーバーホスト |
-| `SMTP_PORT` | SMTP ポート（通常 587） |
-| `SMTP_USER` | SMTP ユーザー名 |
-| `SMTP_PASS` | SMTP パスワード |
-
-## 環境変数チェック
-
-```python
-# ダッシュボード内での確認
-import os
-print(os.environ.get("ANTHROPIC_API_KEY", "未設定"))
-```
-
-ダッシュボードの `/health` エンドポイントで稼働確認が可能。AI 接続状態は `/api/stats` の `ai_enabled` フィールドで確認できる。
-
-## .env.example テンプレート
-
-```bash
-# ── 必須 ──────────────────────────────
-ANTHROPIC_API_KEY=
-DASHBOARD_PASSWORD=
-
-# ── Flask ──────────────────────────────
-FLASK_SECRET_KEY=
-PORT=8080
-FLASK_DEBUG=false
-
-# ── LINE ──────────────────────────────
-LINE_CHANNEL_ACCESS_TOKEN=
-LINE_CHANNEL_SECRET=
-
-# ── Meta / Instagram ──────────────────
-META_APP_ID=
-META_APP_SECRET=
-INSTAGRAM_ACCESS_TOKEN=
-INSTAGRAM_BUSINESS_ACCOUNT_ID=
-
-# ── Google / GBP ──────────────────────
-GOOGLE_OAUTH_CLIENT_ID=
-GOOGLE_OAUTH_CLIENT_SECRET=
-GOOGLE_REFRESH_TOKEN=
-GBP_LOCATION_ID=
-
-# ── Twitter ───────────────────────────
-TWITTER_API_KEY=
-TWITTER_API_SECRET=
-TWITTER_ACCESS_TOKEN=
-TWITTER_ACCESS_SECRET=
-
-# ── WordPress ─────────────────────────
-WORDPRESS_URL=
-WORDPRESS_USERNAME=
-WORDPRESS_APP_PASSWORD=
-```
+| `OWNER LINE USER` | スペース混入の誤記（`OWNER_LINE_USER_ID` が正） |
+| `LINE_CHANNEL_ACCESS_TOKEN_BANGKOK` | `BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN` と重複 |
+| `LINE_CHANNEL_SECRET_BANGKOK` | `BANGKOK_PEACH_LINE_CHANNEL_SECRET` と重複 |

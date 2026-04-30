@@ -18,10 +18,15 @@ logger = logging.getLogger(__name__)
 class LINEMessenger:
     BASE_URL = "https://api.line.me/v2/bot"
 
-    def __init__(self):
-        self.token = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
-        self.secret = os.environ["LINE_CHANNEL_SECRET"]
+    def __init__(self, token: str = "", secret: str = ""):
+        self.token = token or os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
+        self.secret = secret or os.environ.get("LINE_CHANNEL_SECRET", "")
         self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
+        if not self.token or not self.secret:
+            logger.warning("LINE_CHANNEL_ACCESS_TOKEN または LINE_CHANNEL_SECRET 未設定 — LINE機能を無効化")
+            self.enabled = False
+        else:
+            self.enabled = True
         self._headers = {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json",
@@ -29,6 +34,8 @@ class LINEMessenger:
 
     def verify_signature(self, body: bytes, signature: str) -> bool:
         """Webhookの署名検証（セキュリティ必須）"""
+        if not self.enabled:
+            return False
         digest = hmac.new(
             self.secret.encode("utf-8"), body, hashlib.sha256
         ).digest()
@@ -37,6 +44,9 @@ class LINEMessenger:
 
     def reply(self, reply_token: str, message: str) -> bool:
         """Webhookイベントへの返信"""
+        if not self.enabled:
+            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINE返信をスキップ")
+            return False
         if self.dry_run:
             logger.info(f"[DRY RUN] LINE返信: {message[:40]}...")
             return True
@@ -57,6 +67,9 @@ class LINEMessenger:
 
     def push(self, user_id: str, message: str) -> bool:
         """特定ユーザーへのプッシュメッセージ"""
+        if not self.enabled:
+            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINEプッシュをスキップ")
+            return False
         if self.dry_run:
             logger.info(f"[DRY RUN] LINEプッシュ to {user_id}: {message[:40]}...")
             return True
@@ -78,6 +91,9 @@ class LINEMessenger:
 
     def broadcast(self, message: str) -> bool:
         """全友だちへの一斉配信"""
+        if not self.enabled:
+            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINE一斉配信をスキップ")
+            return False
         if self.dry_run:
             logger.info(f"[DRY RUN] LINE一斉配信: {message[:40]}...")
             return True
@@ -96,6 +112,9 @@ class LINEMessenger:
 
     def broadcast_with_image(self, message: str, image_url: str, preview_url: str = "") -> bool:
         """画像付き一斉配信"""
+        if not self.enabled:
+            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINE画像付き配信をスキップ")
+            return False
         if not preview_url:
             preview_url = image_url
 
@@ -126,6 +145,8 @@ class LINEMessenger:
 
     def get_profile(self, user_id: str) -> dict:
         """ユーザープロフィール取得（名前・アイコン）"""
+        if not self.enabled:
+            return {}
         resp = requests.get(
             f"{self.BASE_URL}/profile/{user_id}",
             headers=self._headers,

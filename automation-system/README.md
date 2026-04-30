@@ -23,7 +23,7 @@
   ├── LINE に問い合わせが来る
   ├── キーワード自動返信
   ├── リード自動起票（sales-system/leads/ に保存）
-  └── 重要な案件 → decision_queue/ + オーナーに通知
+  └── 重要な案件 → decision_queue/ に記録（翌朝のサマリーで通知）
 
 【2時間ごと】followup チェック
   └── リード獲得から24h・72h・168h後に自動フォローアップ
@@ -83,17 +83,13 @@ python morning_operator.py
 #### スケジューラーを常時起動（Mac）
 
 ```bash
-# バックグラウンドで起動
-nohup python scheduler.py &> logs/scheduler.log &
+# launchd で Mac 起動時に自動起動（推奨）
+launchctl load ~/Library/LaunchAgents/jp.upjapan.scheduler.plist
+launchctl load ~/Library/LaunchAgents/jp.upjapan.webhook.plist
+launchctl load ~/Library/LaunchAgents/jp.upjapan.dashboard.plist
 
-# または launchd でMac起動時に自動起動（setup_launchd.sh を実行）
-bash setup_launchd.sh
-```
-
-#### Webhookサーバーを常時起動
-
-```bash
-nohup python server.py &> logs/server.log &
+# 状態確認
+launchctl list | grep jp.upjapan
 ```
 
 ## ナノバナナプロとの連携方法

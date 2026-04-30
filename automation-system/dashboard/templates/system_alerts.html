@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}システムアラート{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <h2 class="mb-4">システムアラート <small class="text-muted fs-6">（alerts.log 直近100件）</small></h2>
+
+  {% if entries %}
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th style="width:180px;">日時</th>
+          <th style="width:140px;">ソース</th>
+          <th>メッセージ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in entries %}
+        <tr class="{{ 'table-danger' if (
+            'ERROR' in e.message or
+            'FAIL' in e.message or 'fail' in e.message or
+            '停止検知' in e.message or
+            '停止中' in e.message or
+            '死亡' in e.message or
+            'dead' in e.message
+        ) else ('table-warning' if (
+            'WARN' in e.message or 'warn' in e.message or
+            '注意' in e.message
+        ) else '') }}">
+          <td class="text-nowrap font-monospace small">{{ e.time }}</td>
+          <td class="small text-secondary">{{ e.source }}</td>
+          <td class="small">{{ e.message }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-success">
+    アラートログが空です（または alerts.log が見つかりません）。
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
