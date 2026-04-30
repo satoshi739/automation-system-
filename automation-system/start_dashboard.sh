@@ -8,8 +8,8 @@ mkdir -p logs
 # scheduler をバックグラウンドで起動（クラッシュ時は自動再起動）
 (
   while true; do
-    python3 scheduler.py >> logs/scheduler.log 2>&1
-    echo "$(date '+%Y-%m-%d %H:%M:%S') scheduler 停止 → 10秒後に再起動" >> logs/scheduler.log
+    python3 scheduler.py 2>&1 | tee -a logs/scheduler.log
+    echo "$(date '+%Y-%m-%d %H:%M:%S') scheduler 停止 → 10秒後に再起動"
     sleep 10
   done
 ) &
