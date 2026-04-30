@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <div class="page-title">🎬 リール作成</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> リール作成</div>
     <div class="page-sub">AIがスライド台本・ナレーション・ハッシュタグを自動生成</div>
   </div>
 </div>
@@ -14,7 +14,7 @@
   <!-- ── LEFT: 入力フォーム ── -->
   <div>
     <div class="card" style="margin-bottom:16px;">
-      <div class="card-title" style="margin-bottom:18px;">🎯 リール設定</div>
+      <div class="card-title" style="margin-bottom:18px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> リール設定</div>
 
       <!-- ブランド -->
       <div class="form-group">
@@ -42,7 +42,7 @@
           {% for s in ['教育系','体験談','比較','リスト系','問題解決'] %}
           <label class="style-opt {{ 'selected' if loop.first else '' }}" data-val="{{ s }}">
             <input type="radio" name="style" value="{{ s }}" {{ 'checked' if loop.first else '' }} style="display:none">
-            <span class="style-icon">{{ {'教育系':'📚','体験談':'💬','比較':'⚖️','リスト系':'📋','問題解決':'🔧'}[s] }}</span>
+            <span class="style-icon">{{ {'教育系':'<span style="display:inline-flex;align-items:center;"><i data-lucide="book-open"></i></span>','体験談':'<span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span>','比較':'<span style="display:inline-flex;align-items:center;"><i data-lucide="scale"></i></span>️','リスト系':'<span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span>','問題解決':'<span style="display:inline-flex;align-items:center;"><i data-lucide="wrench"></i></span>'}[s] }}</span>
             <span>{{ s }}</span>
           </label>
           {% endfor %}
@@ -64,19 +64,19 @@
 
       <button class="btn btn-accent" id="gen-btn" style="width:100%;" onclick="generate()"
               {% if not ai %}disabled title="ANTHROPIC_API_KEY未設定"{% endif %}>
-        ✦ AIで台本を生成
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIで台本を生成
       </button>
 
       {% if not ai %}
       <div class="alert alert-warn" style="margin-top:12px;font-size:12px;">
-        ⚠️ ANTHROPIC_API_KEY が未設定です
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> ANTHROPIC_API_KEY が未設定です
       </div>
       {% endif %}
     </div>
 
     <!-- 保存済みリール -->
     <div class="card">
-      <div class="card-title" style="margin-bottom:14px;">📋 最近の下書き</div>
+      <div class="card-title" style="margin-bottom:14px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span> 最近の下書き</div>
       <div id="saved-list" style="font-size:12px;color:var(--muted);">
         キューに保存したリールがここに表示されます
       </div>
@@ -95,7 +95,7 @@
 
     <!-- 空状態 -->
     <div id="empty-state" class="card" style="text-align:center;padding:60px 20px;">
-      <div style="font-size:48px;margin-bottom:16px;">🎬</div>
+      <div style="font-size:48px;margin-bottom:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span></div>
       <div style="color:var(--muted2);font-size:14px;margin-bottom:8px;">台本がここに表示されます</div>
       <div style="color:var(--muted);font-size:12px;">トピックを入力してAI生成ボタンを押してください</div>
     </div>
@@ -122,14 +122,14 @@
 
         <!-- スライドプレビュー -->
         <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">📱 スライド構成</div>
+          <div class="card-title" style="margin-bottom:14px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> スライド構成</div>
           <div id="slides-container"></div>
         </div>
 
         <!-- ナレーション & 詳細 -->
         <div>
           <div class="card" style="margin-bottom:12px;">
-            <div class="card-title" style="margin-bottom:10px;">🎙 ナレーション</div>
+            <div class="card-title" style="margin-bottom:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="mic"></i></span> ナレーション</div>
             <div id="res-narration" style="font-size:12px;color:var(--muted2);line-height:1.75;background:var(--s2);border-radius:8px;padding:12px;"></div>
           </div>
           <div class="card" style="margin-bottom:12px;">
@@ -145,7 +145,7 @@
             </div>
           </div>
           <div class="card">
-            <div class="card-title" style="margin-bottom:8px;">📝 キャプション</div>
+            <div class="card-title" style="margin-bottom:8px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> キャプション</div>
             <div id="res-caption" style="font-size:12px;color:var(--muted2);line-height:1.7;white-space:pre-wrap;"></div>
             <div id="res-hashtags" style="font-size:11px;color:var(--accent2);margin-top:8px;line-height:1.8;"></div>
           </div>
@@ -290,7 +290,7 @@ function generate() {
 function renderResult(d, topic) {
   document.getElementById('result').style.display = '';
   document.getElementById('res-title').textContent = d.title || '';
-  document.getElementById('res-hook').textContent  = d.hook ? '🎯 フック: ' + d.hook : '';
+  document.getElementById('res-hook').textContent  = d.hook ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> フック: ' + d.hook : '';
   document.getElementById('res-cta').textContent   = d.cta  || '';
   document.getElementById('res-narration').textContent = d.narration || '';
   document.getElementById('res-bgm').textContent   = d.bgm_mood || '—';
@@ -327,7 +327,7 @@ function saveToQueue() {
   .then(r => r.json())
   .then(data => {
     if (data.ok) {
-      Toastify({text:'✅ キューに保存しました', style:{background:'var(--green)'}}).showToast();
+      Toastify({text:' キューに保存しました', style:{background:'var(--green)'}}).showToast();
     } else {
       Toastify({text: data.error || 'エラー', style:{background:'var(--red)'}}).showToast();
     }

@@ -86,7 +86,7 @@
 
 {% if not ai %}
 <div class="alert alert-warn">
-  ⚠️ ANTHROPIC_API_KEY が未設定です。AIカレンダー生成を使用するには
+  <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> ANTHROPIC_API_KEY が未設定です。AIカレンダー生成を使用するには
   <a href="/settings">設定ページ</a> からAPIキーを設定してください。
 </div>
 {% endif %}
@@ -109,13 +109,13 @@
             id="gen-btn-{{ bid }}"
             {% if not ai %}disabled title="ANTHROPIC_API_KEY未設定"{% endif %}
             onclick="generateCalendar('{{ bid }}')">
-      ✦ 新しいカレンダーをAIで生成
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> 新しいカレンダーをAIで生成
     </button>
     {% if cal %}
     <button class="btn" id="sched-btn-{{ bid }}"
             onclick="scheduleWeek('{{ bid }}')"
             style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);color:var(--accent2);font-weight:600;">
-      📅 全部キューに予約
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> 全部キューに予約
     </button>
     <span class="badge badge-ok">最新: {{ cal.get('week_start', '不明') }}</span>
     <div id="sched-result-{{ bid }}" style="display:none;font-size:12px;color:var(--green2);font-weight:600;"></div>
@@ -179,7 +179,7 @@
   <!-- カレンダーなし -->
   <div class="card">
     <div class="no-calendar-msg">
-      <div class="icon">🗓</div>
+      <div class="icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span></div>
       <div style="font-weight:600;margin-bottom:6px;">週次カレンダーがありません</div>
       <div>「AIで生成」ボタンをクリックして最初のカレンダーを作成してください。</div>
     </div>
@@ -230,7 +230,7 @@ async function generateCalendar(bid) {
     });
     const d = await res.json();
     if (d.ok) {
-      toast('✅ 週次カレンダーを生成しました。ページを更新します…', 'ok');
+      toast(' 週次カレンダーを生成しました。ページを更新します…', 'ok');
       const resultBox = document.getElementById(`result-${bid}`);
       const resultJson = document.getElementById(`result-json-${bid}`);
       resultBox.style.display = 'block';
@@ -299,9 +299,9 @@ async function scheduleWeek(bid) {
     });
     const d = await res.json();
     if (d.ok) {
-      resultEl.textContent = `✅ ${d.scheduled}件をキューに予約しました`;
+      resultEl.textContent = ` ${d.scheduled}件をキューに予約しました`;
       resultEl.style.display = 'block';
-      toast(`📅 ${d.scheduled}件を予約キューに追加しました！`, 'ok');
+      toast(`<span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> ${d.scheduled}件を予約キューに追加しました！`, 'ok');
     } else {
       toast(`エラー: ${d.error}`, 'err');
     }

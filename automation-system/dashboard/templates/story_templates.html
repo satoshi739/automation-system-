@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <div class="page-title">⚙️ ストーリーテンプレート</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> ストーリーテンプレート</div>
     <div class="page-sub">曜日・ブランド別の自動ストーリー配信ルールを管理する</div>
   </div>
   <div class="header-actions">
@@ -27,7 +27,7 @@
 
 {% if not templates %}
 <div class="card" style="text-align:center;padding:60px 20px;">
-  <div style="font-size:60px;margin-bottom:16px;opacity:.4;">📋</div>
+  <div style="font-size:60px;margin-bottom:16px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span></div>
   <div style="font-size:16px;font-weight:600;margin-bottom:8px;">テンプレートがありません</div>
   <div style="color:var(--muted2);font-size:13px;margin-bottom:20px;">ブランド・曜日ごとのストーリー配信ルールを設定します</div>
   <a href="/story-autopilot/templates/new" class="btn btn-accent">最初のテンプレートを作成</a>
@@ -66,10 +66,10 @@
         ▶ {{ mode_label }}
       </span>
       <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--muted2);">
-        🕐 {{ t.run_time }}
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="clock"></i></span> {{ t.run_time }}
       </span>
       <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--s3);border:1px solid var(--border);color:var(--muted2);">
-        📦 {{ t.asset_source }}
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="package"></i></span> {{ t.asset_source }}
       </span>
     </div>
 
@@ -85,7 +85,7 @@
 
     {% if t.topic_prompt %}
     <div style="font-size:11px;color:var(--muted);background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:12px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
-      💬 {{ t.topic_prompt }}
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> {{ t.topic_prompt }}
     </div>
     {% endif %}
 
@@ -107,7 +107,7 @@
 
 <script>
 function generateFromTemplate(tmplId) {
-  Toastify({text:'⏳ 候補を生成中...', duration:3000}).showToast();
+  Toastify({text:'<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 候補を生成中...', duration:3000}).showToast();
   fetch('/api/story-autopilot/generate', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -116,7 +116,7 @@ function generateFromTemplate(tmplId) {
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
-      Toastify({text:`✅ 候補を生成しました (run#${d.run_id}) ステータス:${d.status}`, duration:3000, style:{background:'var(--green)'}}).showToast();
+      Toastify({text:` 候補を生成しました (run#${d.run_id}) ステータス:${d.status}`, duration:3000, style:{background:'var(--green)'}}).showToast();
       setTimeout(()=>{ window.location.href = '/story-autopilot/candidates'; }, 1500);
     } else {
       Toastify({text: d.error || '生成エラー', style:{background:'var(--red)'}}).showToast();

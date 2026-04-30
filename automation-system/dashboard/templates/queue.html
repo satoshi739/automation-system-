@@ -51,7 +51,7 @@
         <div style="display:flex;align-items:center;gap:8px;margin-top:5px;">
           {% if item.scheduled_at %}
           <span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--accent2);background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:6px;padding:2px 7px;">
-            📅 {{ item.scheduled_at }}
+            <span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> {{ item.scheduled_at }}
           </span>
           {% else %}
           <span style="font-size:10px;color:var(--muted);">自動投稿</span>
@@ -61,7 +61,7 @@
         <!-- ホバー時のアクション -->
         <div class="item-actions" style="position:absolute;top:10px;right:12px;opacity:0;transition:opacity .15s;display:flex;gap:6px;">
           <form method="POST" action="/queue/delete/{{ bid }}/{{ platform }}/{{ item._file }}" style="margin:0;">
-            <button class="btn btn-danger btn-sm" style="padding:3px 8px;font-size:11px;" onclick="return confirm('削除しますか？')">✕</button>
+            <button class="btn btn-danger btn-sm" style="padding:3px 8px;font-size:11px;" onclick="return confirm('削除しますか？')"></button>
           </form>
         </div>
       </div>
@@ -87,12 +87,12 @@
   <div style="width:72px;height:72px;border-radius:20px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:20px;">▤</div>
   <div style="font-size:18px;font-weight:700;margin-bottom:8px;">キューは空です</div>
   <div style="font-size:13px;color:var(--muted);margin-bottom:24px;max-width:320px;line-height:1.7;">
-    ブランドページの「✦ 一括生成」ボタンでAIが全プラットフォーム分を自動作成します
+    ブランドページの「<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> 一括生成」ボタンでAIが全プラットフォーム分を自動作成します
   </div>
   <div style="display:flex;gap:12px;">
     <a href="/queue/add" class="btn btn-primary">+ 手動で追加</a>
     {% for bid in nav_brands.keys() %}{% if loop.first %}
-    <a href="/brands/{{ bid }}" class="btn btn-purple">✦ AI一括生成</a>
+    <a href="/brands/{{ bid }}" class="btn btn-purple"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AI一括生成</a>
     {% endif %}{% endfor %}
   </div>
 </div>

@@ -4,13 +4,13 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">📍 MEO Control Tower</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span> MEO Control Tower</div>
     <div class="page-sub">Google Business Profile 一元管理 — 拠点スコア・レビュー・写真アラート</div>
   </div>
   <div class="header-actions">
     <span class="live-dot" id="sync-status">同期済み</span>
-    <button class="btn btn-primary btn-sm" onclick="syncAll()">🔄 今すぐ同期</button>
-    <a href="/reviews" class="btn btn-ghost btn-sm">💬 Review Center</a>
+    <button class="btn btn-primary btn-sm" onclick="syncAll()"><span style="display:inline-flex;align-items:center;"><i data-lucide="refresh-cw"></i></span> 今すぐ同期</button>
+    <a href="/reviews" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> Review Center</a>
   </div>
 </div>
 
@@ -51,7 +51,7 @@
 <!-- ── Alert Banner ── -->
 {% if stats.unanswered > 0 or stats.photo_alerts > 0 %}
 <div class="alert alert-warn" style="margin-bottom:18px;">
-  <span>⚠️</span>
+  <span><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span></span>
   <div>
     {% if stats.unanswered > 0 %}未返信レビューが <strong>{{ stats.unanswered }}件</strong> あります。{% endif %}
     {% if stats.photo_alerts > 0 %}写真が不足している拠点が <strong>{{ stats.photo_alerts }}件</strong> あります。{% endif %}
@@ -98,13 +98,13 @@
       <span class="badge badge-lost">未返信 {{ p.unanswered_reviews }}件</span>
       {% endif %}
       {% if p.photo_alert %}
-      <span class="badge badge-warn">📷 写真不足</span>
+      <span class="badge badge-warn"><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> 写真不足</span>
       {% endif %}
       {% if p.insights %}
       <span class="badge badge-ok">◉ インサイトあり</span>
       {% endif %}
       {% if p.unanswered_reviews == 0 and not p.photo_alert %}
-      <span class="badge badge-ok">✓ 問題なし</span>
+      <span class="badge badge-ok"> 問題なし</span>
       {% endif %}
     </div>
 
@@ -129,7 +129,7 @@
     <div style="display:flex;gap:7px;">
       <a href="/meo/{{ p.id }}" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;">詳細</a>
       {% if p.unanswered_reviews > 0 %}
-      <a href="/reviews?tab=unanswered&profile_id={{ p.id }}" class="btn btn-danger btn-sm">💬 返信 ({{ p.unanswered_reviews }})</a>
+      <a href="/reviews?tab=unanswered&profile_id={{ p.id }}" class="btn btn-danger btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 返信 ({{ p.unanswered_reviews }})</a>
       {% endif %}
     </div>
   </div>
@@ -158,7 +158,7 @@ async function syncAll() {
   } catch(e) {
     toast('通信エラー', 'err');
   } finally {
-    btn.textContent = '🔄 今すぐ同期';
+    btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="refresh-cw"></i></span> 今すぐ同期';
     btn.disabled = false;
   }
 }

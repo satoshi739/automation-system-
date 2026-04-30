@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <div class="page-title">📸 ストーリー作成</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> ストーリー作成</div>
     <div class="page-sub">AIが3フレーム構成のInstagramストーリーを自動生成</div>
   </div>
 </div>
@@ -13,7 +13,7 @@
 
   <!-- ── LEFT: 入力フォーム ── -->
   <div class="card">
-    <div class="card-title" style="margin-bottom:18px;">⚙️ ストーリー設定</div>
+    <div class="card-title" style="margin-bottom:18px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> ストーリー設定</div>
 
     <!-- ブランド -->
     <div class="form-group">
@@ -39,11 +39,11 @@
       <label class="form-label">タイプ</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         {% set types = [
-          ('promotion', '📣', 'プロモーション'),
-          ('info',      '💡', '情報・豆知識'),
-          ('poll',      '🗳️', 'アンケート'),
-          ('event',     '🎉', 'イベント'),
-          ('behind',    '🎥', '舞台裏'),
+          ('promotion', '<span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span>', 'プロモーション'),
+          ('info',      '<span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span>', '情報・豆知識'),
+          ('poll',      '<span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard"></i></span>️', 'アンケート'),
+          ('event',     '<span style="display:inline-flex;align-items:center;"><i data-lucide="party-popper"></i></span>', 'イベント'),
+          ('behind',    '<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>', '舞台裏'),
         ] %}
         {% for val, icon, label in types %}
         <label class="type-opt {{ 'selected' if val=='promotion' else '' }}" data-val="{{ val }}">
@@ -58,12 +58,12 @@
     <button class="btn btn-accent" id="gen-btn" style="width:100%;margin-top:4px;"
             onclick="generate()"
             {% if not ai %}disabled title="ANTHROPIC_API_KEY未設定"{% endif %}>
-      ✦ AIで生成
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIで生成
     </button>
 
     {% if not ai %}
     <div class="alert alert-warn" style="margin-top:12px;font-size:12px;">
-      ⚠️ ANTHROPIC_API_KEY が未設定です
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> ANTHROPIC_API_KEY が未設定です
     </div>
     {% endif %}
 
@@ -83,7 +83,7 @@
   <div>
     <!-- 空状態 -->
     <div id="empty-state" style="text-align:center;padding:80px 20px;">
-      <div style="font-size:64px;margin-bottom:16px;opacity:.4;">📱</div>
+      <div style="font-size:64px;margin-bottom:16px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span></div>
       <div style="color:var(--muted2);font-size:14px;">ストーリーがここにプレビューされます</div>
     </div>
 
@@ -274,7 +274,7 @@ function renderResult(d) {
       <div class="story-frame-no">
         ${frames.map((_, j) => `<div class="story-dot${j===i?' active':''}" style="width:${j===i?'24px':'8px'}"></div>`).join('')}
       </div>
-      <div class="story-emoji">${f.emoji || '✨'}</div>
+      <div class="story-emoji">${f.emoji || ''}</div>
       <div class="story-headline">${f.headline || ''}</div>
       <div class="story-subtext">${f.subtext || ''}</div>
       ${isCta && f.button ? `<div class="story-btn">${f.button}</div>` : ''}
@@ -286,7 +286,7 @@ function renderResult(d) {
   document.getElementById('res-caption').textContent  = d.caption  || '';
   document.getElementById('res-hashtags').textContent = d.hashtags || '';
   document.getElementById('res-sticker').textContent  = d.sticker_suggestion
-    ? '💬 スタンプ案: ' + d.sticker_suggestion : '';
+    ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> スタンプ案: ' + d.sticker_suggestion : '';
   document.getElementById('caption-section').style.display = '';
 }
 
@@ -301,7 +301,7 @@ function saveToQueue() {
   .then(r => r.json())
   .then(data => {
     if (data.ok) {
-      Toastify({text:'✅ キューに保存しました', style:{background:'var(--green)'}}).showToast();
+      Toastify({text:' キューに保存しました', style:{background:'var(--green)'}}).showToast();
     } else {
       Toastify({text: data.error || 'エラー', style:{background:'var(--red)'}}).showToast();
     }

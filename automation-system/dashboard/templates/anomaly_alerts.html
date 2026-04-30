@@ -48,12 +48,12 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">⚡ 異常検知</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> 異常検知</div>
     <div class="page-sub">AIが検知した KPI の異常・急変動・アラート</div>
   </div>
   <div class="header-actions">
-    <a href="/chief-of-staff" class="btn btn-purple btn-sm">🧠 Chief of Staff</a>
-    <a href="/performance-snapshot" class="btn btn-ghost btn-sm">◈ 全体スナップショット</a>
+    <a href="/chief-of-staff" class="btn btn-purple btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> Chief of Staff</a>
+    <a href="/performance-snapshot" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span> 全体スナップショット</a>
   </div>
 </div>
 
@@ -89,7 +89,7 @@
   <div class="alert-card sev-{{ alert.severity }}">
     <div class="alert-header">
       <span class="alert-severity sev-{{ alert.severity }}-chip">
-        {% if alert.severity == 'alert' %}🔴 緊急{% elif alert.severity == 'warn' %}🟡 警告{% else %}🔵 情報{% endif %}
+        {% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span> 緊急{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span> 警告{% else %}<span style="color:#6366f1;">●</span> 情報{% endif %}
       </span>
       {% if alert.brand %}
       <span style="width:7px;height:7px;border-radius:50%;background:{{ alert.brand_color }};box-shadow:0 0 5px {{ alert.brand_color }};flex-shrink:0;"></span>
@@ -124,13 +124,13 @@
     {% endif %}
 
     <div style="display:flex; gap:8px; margin-top:12px;">
-      <button class="btn btn-ghost btn-sm" onclick="toast('解決済みにしました', 'ok')">✓ 解決済み</button>
-      <button class="btn btn-ghost btn-sm" onclick="toast('スヌーズしました', 'info')">⏱ スヌーズ</button>
+      <button class="btn btn-ghost btn-sm" onclick="toast('解決済みにしました', 'ok')"> 解決済み</button>
+      <button class="btn btn-ghost btn-sm" onclick="toast('スヌーズしました', 'info')"><span style="display:inline-flex;align-items:center;"><i data-lucide="timer"></i></span> スヌーズ</button>
     </div>
   </div>
   {% else %}
   <div style="text-align:center; padding:32px; color:var(--muted); font-size:13px;">
-    未解決のアラートはありません ✓
+    未解決のアラートはありません 
   </div>
   {% endfor %}
 </div>
@@ -144,7 +144,7 @@
   {% for alert in resolved_alerts %}
   <div class="alert-card sev-{{ alert.severity }} resolved">
     <div class="alert-header">
-      <span class="resolved-chip">✓ 解決済み</span>
+      <span class="resolved-chip"> 解決済み</span>
       {% if alert.brand %}
       <span style="font-size:12px; font-weight:700; color:{{ alert.brand_color }}">{{ alert.brand }}</span>
       {% endif %}

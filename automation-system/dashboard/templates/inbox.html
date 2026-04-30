@@ -51,14 +51,14 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">📥 写真インボックス</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="download"></i></span> 写真インボックス</div>
     <div class="page-sub">ブランドごとのメディアファイルを確認・処理します</div>
   </div>
 </div>
 
 {% if not ai %}
 <div class="alert alert-warn">
-  ⚠️ ANTHROPIC_API_KEY が未設定です。インボックス処理は可能ですが、キャプションの自動生成はできません。
+  <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> ANTHROPIC_API_KEY が未設定です。インボックス処理は可能ですが、キャプションの自動生成はできません。
   <a href="/settings">設定ページ</a> からAPIキーを設定してください。
 </div>
 {% endif %}
@@ -66,7 +66,7 @@
 {% if not inbox_data %}
 <div class="card">
   <div class="drop-zone" style="border:none;">
-    <div class="drop-icon">📭</div>
+    <div class="drop-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="mail-open"></i></span></div>
     ブランド設定がありません。<code>config/brands.yaml</code> を確認してください。
   </div>
 </div>
@@ -93,7 +93,7 @@
     <div id="filelist-{{ bid }}" class="file-list">
       {% for f in data.files %}
       <div class="file-row">
-        <span style="font-size:15px;">{{ '🎬' if f.is_video else '🖼' }}</span>
+        <span style="font-size:15px;">{{ '<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>' if f.is_video else '<span style="display:inline-flex;align-items:center;"><i data-lucide="image"></i></span>' }}</span>
         <span class="file-name" title="{{ f.name }}">{{ f.name }}</span>
         <span class="file-size">{{ f.size }} KB</span>
         <span class="badge {% if f.is_video %}badge-purple{% else %}badge-l2{% endif %}">
@@ -111,7 +111,7 @@
       <input type="file" id="file-input-{{ bid }}" multiple
              accept=".jpg,.jpeg,.png,.webp,.heic,.mp4,.mov,.m4v"
              onchange="uploadFiles('{{ bid }}', this.files)">
-      <div class="drop-icon">📂</div>
+      <div class="drop-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="folder-open"></i></span></div>
       <div>ここにファイルをドロップ</div>
       <div style="font-size:11px;margin-top:4px;opacity:.6;">または クリックして選択</div>
     </div>
@@ -160,7 +160,7 @@ async function uploadFiles(bid, files) {
     if (d.ok) {
       barEl.style.width = '100%';
       const names = d.saved.join(', ');
-      toast(`✅ ${d.count}件 保存 → AI処理中…`, 'ok');
+      toast(` ${d.count}件 保存 → AI処理中…`, 'ok');
       d.saved.forEach(name => addFileRow(bid, name));
       updateBadge(bid);
       // 保存完了後に自動でAI処理を実行
@@ -188,7 +188,7 @@ function addFileRow(bid, name) {
   const row = document.createElement('div');
   row.className = 'file-row';
   row.innerHTML = `
-    <span style="font-size:15px;">${isVideo ? '🎬' : '🖼'}</span>
+    <span style="font-size:15px;">${isVideo ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>' : '<span style="display:inline-flex;align-items:center;"><i data-lucide="image"></i></span>'}</span>
     <span class="file-name" title="${name}">${name}</span>
     <span class="badge ${isVideo ? 'badge-purple' : 'badge-l2'}">${isVideo ? 'VIDEO' : 'IMAGE'}</span>
   `;
@@ -215,7 +215,7 @@ async function processInbox(brand, btn) {
     });
     const d = await res.json();
     if (d.ok) {
-      toast(`✅ ${brand}: ${d.processed} 件処理しました`, 'ok');
+      toast(` ${brand}: ${d.processed} 件処理しました`, 'ok');
       setTimeout(() => location.reload(), 1200);
     } else {
       toast(`エラー: ${d.error}`, 'err');

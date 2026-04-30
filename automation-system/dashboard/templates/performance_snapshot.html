@@ -50,12 +50,12 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">◈ Performance Snapshot</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span> Performance Snapshot</div>
     <div class="page-sub">{{ snap.period }} / {{ snap.generated_at }} 生成</div>
   </div>
   <div class="header-actions">
-    <a href="/anomaly-alerts" class="btn btn-ghost btn-sm">⚡ 異常検知</a>
-    <a href="/chief-of-staff" class="btn btn-purple btn-sm">🧠 Chief of Staff</a>
+    <a href="/anomaly-alerts" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> 異常検知</a>
+    <a href="/chief-of-staff" class="btn btn-purple btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> Chief of Staff</a>
   </div>
 </div>
 
@@ -94,10 +94,10 @@
           <div class="metric-bar-fill" style="width:{{ [bm.posts, 52] | min / 52 * 100 | int }}%; background:{{ bm.color }};"></div>
         </div>
         <div class="metric-nums">
-          <span>📤 <strong>{{ bm.posts }}</strong>件</span>
-          <span>📊 <strong>{{ bm.engagement }}%</strong></span>
-          <span>👤 <strong>{{ bm.leads }}</strong></span>
-          {% if bm.meo_score > 0 %}<span>📍 <strong>{{ bm.meo_score }}</strong></span>{% endif %}
+          <span><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> <strong>{{ bm.posts }}</strong>件</span>
+          <span><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> <strong>{{ bm.engagement }}%</strong></span>
+          <span><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span> <strong>{{ bm.leads }}</strong></span>
+          {% if bm.meo_score > 0 %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span> <strong>{{ bm.meo_score }}</strong></span>{% endif %}
         </div>
       </div>
       <div class="trend-{{ bm.trend }}" style="font-size:14px;">
@@ -129,7 +129,7 @@
     <span style="font-size:11px;color:{{ post.brand_color }};font-weight:700;width:40px;flex-shrink:0;">{{ post.brand }}</span>
     <span style="font-size:10.5px;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted2);flex-shrink:0;">{{ post.platform }}</span>
     <span style="flex:1;color:var(--text);">{{ post.caption }}</span>
-    <span style="color:var(--red);font-size:12px;">♥ {{ post.likes }}</span>
+    <span style="color:var(--red);font-size:12px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> {{ post.likes }}</span>
     <span style="color:var(--muted2);font-size:12px;">reach {{ post.reach | int }}</span>
     <span style="color:var(--green2);font-size:12px;font-weight:700;">{{ post.eng_rate }}%</span>
   </div>

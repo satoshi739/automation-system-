@@ -238,11 +238,11 @@
 <div class="page-header">
   <div>
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">AI ORGANIZATION</div>
-    <div class="page-title">🤖 AI組織</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> AI組織</div>
     <div class="page-sub">人間 → AI CEO → AI Agents の3層構造で全ブランドを自律運営します</div>
   </div>
   <div class="header-actions">
-    <a href="/agent-workspace" class="btn btn-ghost btn-sm">⚙ Agent Workspace</a>
+    <a href="/agent-workspace" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> Agent Workspace</a>
     <a href="/president" class="btn btn-ghost btn-sm">社長ビュー →</a>
   </div>
 </div>
@@ -285,7 +285,7 @@
 <!-- Tier 1: President -->
 <div class="tier-label">Human Layer — President</div>
 <div class="president-card">
-  <div class="president-avatar">👤</div>
+  <div class="president-avatar"><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span></div>
   <div style="flex:1;min-width:0;">
     <div class="president-role">President / Founder / Owner</div>
     <div class="president-name">{{ president.name or 'Satoshi' }}</div>
@@ -299,7 +299,7 @@
 <!-- Tier 2: AI CEO -->
 <div class="tier-label">AI Layer — CEO</div>
 <div class="ceo-card">
-  <div class="ceo-avatar">🤖</div>
+  <div class="ceo-avatar"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
   <div style="flex:1;min-width:0;">
     <div class="ceo-role">{{ ai_ceo.role or 'AI CEO' }}</div>
     <div class="ceo-name">{{ ai_ceo.name or 'CEO Agent' }}</div>
@@ -322,7 +322,7 @@
 <div class="tier-label">AI Agents Layer</div>
 {% if not agents %}
 <div style="text-align:center;padding:48px 20px;background:var(--s1);border:1px dashed var(--border);border-radius:16px;margin-bottom:24px;">
-  <div style="font-size:48px;margin-bottom:14px;opacity:.4;">🤖</div>
+  <div style="font-size:48px;margin-bottom:14px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
   <div style="font-size:16px;font-weight:700;margin-bottom:6px;">AIエージェントが未設定です</div>
   <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6;">
     <code>config/os_config.yaml</code> にエージェント設定を追加してください。
@@ -336,13 +336,13 @@
 <div class="agents-grid">
   {% for ag in agents %}
   {% set icon_map = {
-    'コンテンツ生成': '✦',
+    'コンテンツ生成': '<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span>',
     '営業': '◎',
-    '分析': '◈',
-    '運用': '⚙',
-    '記事生成': '✍',
+    '分析': '<span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span>',
+    '運用': '<span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span>',
+    '記事生成': '<span style="display:inline-flex;align-items:center;"><i data-lucide="pen-line"></i></span>',
   } %}
-  {% set icon = '🤖' %}
+  {% set icon = '<span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span>' %}
   {% for k, v in icon_map.items() %}{% if k in ag.role %}{% set icon = v %}{% endif %}{% endfor %}
 
   <div class="agent-card" style="--ac:{{ ag.brand_color }};--ac-bg:{{ ag.brand_color }}18;--ac-border:{{ ag.brand_color }}35;">

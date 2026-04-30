@@ -16,8 +16,8 @@
     </div>
   </div>
   <div class="header-actions">
-    <button onclick="openBulkModal()" class="btn btn-purple">✨ 一括生成</button>
-    <a href="/settings/{{ brand_id }}" class="btn btn-ghost">⚙ 設定</a>
+    <button onclick="openBulkModal()" class="btn btn-purple"> 一括生成</button>
+    <a href="/settings/{{ brand_id }}" class="btn btn-ghost"><span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> 設定</a>
     <a href="/queue/add?brand={{ brand_id }}" class="btn btn-primary">＋ 投稿追加</a>
     <a href="/brands" class="btn btn-ghost">← 一覧</a>
   </div>
@@ -107,7 +107,7 @@
 
   <!-- AI提案バナー -->
   <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-    <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(99,102,241,.2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">✦</div>
+    <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(99,102,241,.2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
     <div style="flex:1;">
       <div style="font-size:13px;font-weight:700;color:var(--purple2);margin-bottom:3px;">AI提案 — {{ brand.name_short }}</div>
       <div style="font-size:12px;color:var(--muted2);line-height:1.5;">
@@ -124,7 +124,7 @@
       {% if cockpit.publishing_pending > 0 %}
       <a href="/publishing?status=pending_approval" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(139,92,246,.3);">コンテンツ承認</a>
       {% endif %}
-      <button onclick="openBulkModal()" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(139,92,246,.3);">✨ AI生成</button>
+      <button onclick="openBulkModal()" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(139,92,246,.3);"> AI生成</button>
     </div>
   </div>
 
@@ -138,13 +138,13 @@
     <!-- ── ヘッダー ── -->
     <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(139,92,246,.04));">
       <div style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 14px rgba(99,102,241,.4);">✦</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 14px rgba(99,102,241,.4);"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
         <div>
           <div style="font-size:16px;font-weight:700;letter-spacing:-.3px;">AI コンテンツスタジオ</div>
           <div style="font-size:11px;color:var(--muted);margin-top:1px;">Claude が全プラットフォームのコンテンツを同時生成します</div>
         </div>
       </div>
-      <button onclick="closeBulkModal()" style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--muted2);cursor:pointer;font-size:13px;transition:all .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted2)'">✕ 閉じる</button>
+      <button onclick="closeBulkModal()" style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:var(--muted2);cursor:pointer;font-size:13px;transition:all .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted2)'"> 閉じる</button>
     </div>
 
     <!-- ── STEP 1: 入力 ── -->
@@ -174,11 +174,11 @@
           <button id="btn-ai-suggest" onclick="aiSuggestTopics()"
             style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:5px 13px;font-size:11.5px;color:var(--purple2);cursor:pointer;transition:all .18s;white-space:nowrap;font-weight:500;"
             onmouseover="this.style.background='rgba(139,92,246,.2)'" onmouseout="this.style.background='rgba(139,92,246,.1)'">
-            ✦ AIが今日の提案
+            <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIが今日の提案
           </button>
         </div>
         <div id="ai-topic-suggestions" style="display:none;margin-top:10px;padding:12px;background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.2);border-radius:10px;">
-          <div style="font-size:10px;color:var(--purple2);font-weight:700;margin-bottom:8px;letter-spacing:.5px;">✦ AIの今日の提案</div>
+          <div style="font-size:10px;color:var(--purple2);font-weight:700;margin-bottom:8px;letter-spacing:.5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIの今日の提案</div>
           <div id="ai-topics-list" style="display:flex;flex-wrap:wrap;gap:7px;"></div>
         </div>
       </div>
@@ -187,7 +187,7 @@
       <div style="margin-bottom:22px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">02 — トーン・スタイル</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="tone-grid">
-          {% for tone, icon, desc in [('実務的・わかりやすい','◎','シンプルで要点重視'),('フレンドリー・親しみやすい','☺','温かく身近な語り口'),('教育系・深堀り','◈','知識・事例を詳しく'),('インパクト重視','⚡','強いCTA・行動促進')] %}
+          {% for tone, icon, desc in [('実務的・わかりやすい','◎','シンプルで要点重視'),('フレンドリー・親しみやすい','','温かく身近な語り口'),('教育系・深堀り','<span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span>','知識・事例を詳しく'),('インパクト重視','<span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span>','強いCTA・行動促進')] %}
           <button type="button" onclick="selectTone(this,'{{ tone }}')" data-tone="{{ tone }}"
             class="tone-btn {% if loop.first %}tone-active{% endif %}"
             style="background:var(--s2);border:1px solid {{ 'rgba(99,102,241,.5)' if loop.first else 'var(--border)' }};border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .18s;">
@@ -219,7 +219,7 @@
           <label style="display:flex;align-items:center;gap:7px;cursor:pointer;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:500;transition:all .15s;user-select:none;"
                  onmouseover="this.style.borderColor='var(--purple2)'" onmouseout="this.style.borderColor='rgba(139,92,246,.3)'">
             <input type="checkbox" name="gen-platform" value="reel" checked style="accent-color:var(--purple);width:13px;height:13px;">
-            <span>🎬</span> リール画像
+            <span><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span></span> リール画像
           </label>
         </div>
       </div>
@@ -228,7 +228,7 @@
         style="width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:-.2px;box-shadow:0 8px 24px rgba(139,92,246,.4);transition:all .2s;font-family:inherit;"
         onmouseover="this.style.boxShadow='0 12px 32px rgba(139,92,246,.6)';this.style.transform='translateY(-1px)'"
         onmouseout="this.style.boxShadow='0 8px 24px rgba(139,92,246,.4)';this.style.transform=''">
-        ✦ &nbsp;すべて一括生成する
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> &nbsp;すべて一括生成する
       </button>
     </div>
 
@@ -241,7 +241,7 @@
       <div style="display:flex;gap:20px;align-items:flex-start;">
         <!-- 左: アニメーション -->
         <div style="flex-shrink:0;width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;">
-          <div id="loading-spinner" style="font-size:36px;animation:spin 3s linear infinite;">✦</div>
+          <div id="loading-spinner" style="font-size:36px;animation:spin 3s linear infinite;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
         </div>
         <!-- 右: テキスト + ステップ -->
         <div style="flex:1;">
@@ -259,7 +259,7 @@
       <div style="display:flex;border-bottom:1px solid var(--border);padding:0 8px;overflow-x:auto;">
         <div id="preview-tabs" style="display:flex;gap:2px;"></div>
         <div style="margin-left:auto;padding:8px 16px;display:flex;gap:8px;align-items:center;">
-          <span style="font-size:11px;color:var(--green2);font-weight:600;">✓ 生成完了</span>
+          <span style="font-size:11px;color:var(--green2);font-weight:600;"> 生成完了</span>
         </div>
       </div>
 
@@ -280,14 +280,14 @@
             oninput="syncEditArea()"></div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
             <span id="char-counter" style="font-size:11px;color:var(--muted);"></span>
-            <button onclick="copyCurrentPlatform()" style="font-size:11px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:4px 12px;color:var(--muted2);cursor:pointer;transition:all .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted2)'">📋 コピー</button>
+            <button onclick="copyCurrentPlatform()" style="font-size:11px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:4px 12px;color:var(--muted2);cursor:pointer;transition:all .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted2)'"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span> コピー</button>
           </div>
         </div>
       </div>
 
       <!-- リール -->
       <div id="reel-preview" style="display:none;padding:16px 24px;border-top:1px solid var(--border);">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🎬 リールスライド</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> リールスライド</div>
         <div id="reel-slides-container" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;"></div>
       </div>
 
@@ -296,7 +296,7 @@
         <button onclick="saveAllToQueue()" id="btn-save"
           style="flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(16,185,129,.3);transition:all .2s;"
           onmouseover="this.style.boxShadow='0 6px 20px rgba(16,185,129,.5)'" onmouseout="this.style.boxShadow='0 4px 14px rgba(16,185,129,.3)'">
-          ✓ &nbsp;全プラットフォームをキューに追加
+           &nbsp;全プラットフォームをキューに追加
         </button>
         <button onclick="resetBulkModal()" class="btn btn-ghost" style="padding:13px 20px;">↩ やり直す</button>
       </div>
@@ -304,7 +304,7 @@
 
     <!-- ── STEP 4: 完了 ── -->
     <div id="bulk-step-done" style="display:none;padding:64px 28px;text-align:center;">
-      <div style="width:72px;height:72px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;">✓</div>
+      <div style="width:72px;height:72px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;"></div>
       <div style="font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.4px;">キューに追加完了</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:28px;" id="saved-summary">明朝の自動投稿で一斉配信されます</div>
       <div style="display:flex;gap:10px;justify-content:center;">
@@ -357,7 +357,7 @@ function selectTone(el, tone) {
 /* ── AI トピック提案 ── */
 async function aiSuggestTopics() {
   const btn = document.getElementById('btn-ai-suggest');
-  btn.textContent = '⏳ 提案中...'; btn.disabled = true;
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 提案中...'; btn.disabled = true;
   try {
     const r = await fetch(`/api/ai/suggest_topics/${BRAND_ID_CURRENT}`, {method:'POST'});
     const d = await r.json();
@@ -374,7 +374,7 @@ async function aiSuggestTopics() {
       box.style.display = '';
     }
   } catch(e) {}
-  btn.textContent = '✦ AIが今日の提案'; btn.disabled = false;
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIが今日の提案'; btn.disabled = false;
 }
 
 /* ── 一括生成 ── */
@@ -386,12 +386,12 @@ async function startBulkGenerate() {
 
   showStep('loading');
   const platforms_gen = [
-    {key:'instagram', label:'📷 Instagram'},
-    {key:'threads',   label:'🧵 Threads'},
-    {key:'facebook',  label:'📘 Facebook'},
+    {key:'instagram', label:'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> Instagram'},
+    {key:'threads',   label:'<span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span> Threads'},
+    {key:'facebook',  label:'<span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span> Facebook'},
     {key:'twitter',   label:'𝕏 Twitter/X'},
-    {key:'line',      label:'📱 LINE'},
-    {key:'wordpress', label:'🌐 WordPress'},
+    {key:'line',      label:'<span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> LINE'},
+    {key:'wordpress', label:'<span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span> WordPress'},
   ];
   const stepsEl = document.getElementById('loading-steps');
   stepsEl.innerHTML = platforms_gen.map(p =>
@@ -423,7 +423,7 @@ async function startBulkGenerate() {
     clearInterval(tick); progBar.style.width = '90%';
 
     if (genReel && generatedContent.reel) {
-      document.getElementById('loading-msg').textContent = '🎬 リールスライドを生成中...';
+      document.getElementById('loading-msg').textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> リールスライドを生成中...';
       const rr = await fetch(`/api/ai/generate_reel/${BRAND_ID_CURRENT}`, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({topic, reel: generatedContent.reel})
@@ -447,12 +447,12 @@ async function startBulkGenerate() {
 
 /* ── プレビュー構築 ── */
 const PLATFORM_META = {
-  instagram: { label:'Instagram', icon:'📷', color:'#e1306c', limit:2200 },
-  threads:   { label:'Threads',   icon:'🧵', color:'#000',   limit:500  },
-  facebook:  { label:'Facebook',  icon:'📘', color:'#1877f2', limit:63206},
+  instagram: { label:'Instagram', icon:'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>', color:'#e1306c', limit:2200 },
+  threads:   { label:'Threads',   icon:'<span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span>', color:'#000',   limit:500  },
+  facebook:  { label:'Facebook',  icon:'<span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span>', color:'#1877f2', limit:63206},
   twitter:   { label:'Twitter/X', icon:'𝕏',  color:'#1da1f2', limit:280  },
-  line:      { label:'LINE',      icon:'📱', color:'#06c755', limit:500  },
-  wordpress: { label:'WordPress', icon:'🌐', color:'#21759b', limit:null  },
+  line:      { label:'LINE',      icon:'<span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span>', color:'#06c755', limit:500  },
+  wordpress: { label:'WordPress', icon:'<span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span>', color:'#21759b', limit:null  },
 };
 
 function getContent(platform, d) {
@@ -566,11 +566,11 @@ function renderMockup(platform, content, meta) {
         <div style="margin-left:auto;font-size:18px;color:#fff;">···</div>
       </div>
       <div style="aspect-ratio:1;background:linear-gradient(135deg,${BRAND_COLOR}22,${BRAND_COLOR}44);display:flex;align-items:center;justify-content:center;">
-        <div style="font-size:36px;opacity:.4;">📷</div>
+        <div style="font-size:36px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span></div>
       </div>
       <div style="padding:10px 12px;">
         <div style="display:flex;gap:12px;margin-bottom:8px;font-size:20px;">
-          <span>♡</span><span>💬</span><span>↗</span><span style="margin-left:auto;">⊓</span>
+          <span><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span></span><span><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span></span><span>↗</span><span style="margin-left:auto;">⊓</span>
         </div>
         <div style="font-size:11.5px;color:#fff;line-height:1.5;max-height:80px;overflow:hidden;">${escHtml(tx.slice(0,140))}${tx.length>140?'…':''}</div>
       </div>
@@ -586,21 +586,21 @@ function renderMockup(platform, content, meta) {
       </div>
       <div style="font-size:13px;color:#fff;line-height:1.7;margin-bottom:12px;">${escHtml(tx.slice(0,280))}${tx.length>280?'…':''}</div>
       <div style="display:flex;justify-content:space-between;color:#71767b;font-size:12px;">
-        <span>💬 0</span><span>↺ 0</span><span>♡ 0</span><span>↗</span>
+        <span><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 0</span><span>↺ 0</span><span><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> 0</span><span>↗</span>
       </div>
     </div>`;
 
   } else if (platform === 'line') {
     c.innerHTML = `
     <div style="background:#1a1a2e;border-radius:16px;border:1px solid #2a2a4a;padding:16px;max-width:300px;margin:0 auto;font-family:-apple-system,sans-serif;">
-      <div style="font-size:10px;color:#888;text-align:center;margin-bottom:12px;">📱 LINE 配信プレビュー</div>
+      <div style="font-size:10px;color:#888;text-align:center;margin-bottom:12px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> LINE 配信プレビュー</div>
       <div style="display:flex;gap:8px;align-items:flex-end;">
         <div style="width:36px;height:36px;border-radius:50%;background:#06c755;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;">${BRAND_SHORT[0]}</div>
         <div style="background:#fff;border-radius:12px 12px 12px 0;padding:12px 14px;max-width:220px;">
           <div style="font-size:12px;line-height:1.7;color:#333;white-space:pre-wrap;">${escHtml(tx.slice(0,200))}${tx.length>200?'…':''}</div>
         </div>
       </div>
-      <div style="font-size:10px;color:#666;text-align:right;margin-top:5px;">14:30 ✓✓</div>
+      <div style="font-size:10px;color:#666;text-align:right;margin-top:5px;">14:30 </div>
     </div>`;
 
   } else if (platform === 'wordpress') {
@@ -619,7 +619,7 @@ function renderMockup(platform, content, meta) {
   } else {
     c.innerHTML = `
     <div style="background:var(--s2);border-radius:16px;border:1px solid var(--border);padding:20px;max-width:300px;margin:0 auto;text-align:center;">
-      <div style="font-size:32px;margin-bottom:12px;">${meta?.icon||'📝'}</div>
+      <div style="font-size:32px;margin-bottom:12px;">${meta?.icon||'<span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span>'}</div>
       <div style="font-size:13px;color:var(--muted2);line-height:1.7;">${escHtml(tx.slice(0,150))}${tx.length>150?'…':''}</div>
     </div>`;
   }
@@ -636,7 +636,7 @@ function copyCurrentPlatform() {
 /* ── 全プラットフォーム保存 ── */
 async function saveAllToQueue() {
   const btn = document.getElementById('btn-save');
-  btn.textContent = '⏳ 保存中...'; btn.disabled = true;
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 保存中...'; btn.disabled = true;
 
   // 編集中の内容をgeneratedContentに反映
   if (currentPlatform && generatedContent[currentPlatform]) {
@@ -655,14 +655,14 @@ async function saveAllToQueue() {
 
   if (result.ok) {
     const saved = result.saved || [];
-    const icons = {'instagram':'📷','threads':'🧵','facebook':'📘','twitter':'𝕏','line':'📱','wordpress':'🌐'};
+    const icons = {'instagram':'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>','threads':'<span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span>','facebook':'<span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span>','twitter':'𝕏','line':'<span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span>','wordpress':'<span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span>'};
     document.getElementById('saved-summary').textContent =
       saved.map(p => (icons[p]||'') + ' ' + (PLATFORM_META[p]?.label||p)).join('  ·  ') + ' をキューに追加しました';
     showStep('done');
-    if (typeof toast !== 'undefined') toast(`✓ ${saved.length}プラットフォームに追加完了`, 'ok');
+    if (typeof toast !== 'undefined') toast(` ${saved.length}プラットフォームに追加完了`, 'ok');
   } else {
     if (typeof toast !== 'undefined') toast('保存失敗: ' + (result.error||''), 'err');
-    btn.textContent = '✓ 全プラットフォームをキューに追加'; btn.disabled = false;
+    btn.textContent = ' 全プラットフォームをキューに追加'; btn.disabled = false;
   }
 }
 
@@ -680,7 +680,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
   <a href="/brands/{{ brand_id }}"
      class="platform-pill {{ 'active' if not active_platform else '' }}">
-    🏠 概要
+    <span style="display:inline-flex;align-items:center;"><i data-lucide="home"></i></span> 概要
   </a>
   {% for p, info in platforms.items() %}
   <a href="/brands/{{ brand_id }}?platform={{ p }}"
@@ -696,16 +696,16 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
   {% endfor %}
   <a href="/brands/{{ brand_id }}?platform=analytics"
      class="platform-pill {{ 'active' if active_platform=='analytics' else '' }}">
-    📊 Analytics
+    <span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> Analytics
   </a>
   <a href="/brands/{{ brand_id }}?platform=search"
      class="platform-pill {{ 'active' if active_platform=='search' else '' }}">
-    🔍 Search Console
+    <span style="display:inline-flex;align-items:center;"><i data-lucide="search"></i></span> Search Console
   </a>
   {% if wp_drafts is defined and wp_drafts %}
   <a href="/brands/{{ brand_id }}?platform=wordpress"
      class="platform-pill {{ 'active' if active_platform=='wordpress' else '' }}">
-    🌐 WordPress
+    <span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span> WordPress
     <span style="background:var(--accent);color:#fff;border-radius:10px;padding:0 5px;font-size:10px;">
       {{ wp_drafts|length }}件
     </span>
@@ -719,23 +719,23 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
   {% set total_pending = namespace(n=0) %}
   {% for p, info in platforms.items() %}{% set total_pending.n = total_pending.n + info.pending_count %}{% endfor %}
   <div class="stat-card">
-    <div class="stat-label">📅 投稿待ち合計</div>
+    <div class="stat-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> 投稿待ち合計</div>
     <div class="stat-value {% if total_pending.n > 0 %}yellow{% else %}green{% endif %}">{{ total_pending.n }}</div>
     <div class="stat-meta">全プラットフォーム</div>
   </div>
   {% if ga_data and not ga_data.get('error') %}
   <div class="stat-card green-top">
-    <div class="stat-label">📊 セッション（28日）</div>
+    <div class="stat-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> セッション（28日）</div>
     <div class="stat-value green">{{ "{:,}".format(ga_data.overview.sessions|default(0)) }}</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">👥 ユーザー（28日）</div>
+    <div class="stat-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="users"></i></span> ユーザー（28日）</div>
     <div class="stat-value blue">{{ "{:,}".format(ga_data.overview.users|default(0)) }}</div>
   </div>
   {% endif %}
   {% if gsc_data and not gsc_data.get('error') %}
   <div class="stat-card">
-    <div class="stat-label">🔍 クリック（28日）</div>
+    <div class="stat-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="search"></i></span> クリック（28日）</div>
     <div class="stat-value blue">{{ "{:,}".format(gsc_data.overview.clicks|default(0)) }}</div>
   </div>
   {% endif %}
@@ -898,7 +898,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
         {% if info.pending_count > 0 %}
         <span class="badge badge-warn">{{ info.pending_count }}件待機</span>
         {% else %}
-        <span class="badge badge-ok">✅ 空</span>
+        <span class="badge badge-ok"> 空</span>
         {% endif %}
       </div>
       {% if info.posts %}
@@ -942,12 +942,12 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
         </div>
         {% if item.image_url or item.video_url %}
         <div style="font-size:11px;color:var(--muted);margin-top:4px;">
-          🔗 {{ (item.image_url or item.video_url or '')[:60] }}
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span> {{ (item.image_url or item.video_url or '')[:60] }}
         </div>
         {% endif %}
       </td>
       <td>
-        {% if item.posted %}<span class="badge badge-ok">✅ 投稿済</span>
+        {% if item.posted %}<span class="badge badge-ok"> 投稿済</span>
         {% else %}<span class="badge badge-warn">待機中</span>{% endif %}
       </td>
       <td style="font-size:11px;color:var(--muted);">{{ item._file }}</td>
@@ -1010,7 +1010,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
 {% endif %}
 {% else %}
 <div class="alert alert-info">
-  <span>📊</span>
+  <span><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span></span>
   <div>
     <strong>Google Analytics の設定方法</strong><br>
     1. <code>.env</code> に <code>{{ brand_id.upper().replace('-','_') }}_GA4_PROPERTY_ID=プロパティID</code> を追加<br>
@@ -1020,7 +1020,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
   </div>
 </div>
 {% if ga_data.get('error') %}
-<div class="alert alert-warn"><span>⚠️</span><div>{{ ga_data.error }}</div></div>
+<div class="alert alert-warn"><span><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span></span><div>{{ ga_data.error }}</div></div>
 {% endif %}
 {% endif %}
 
@@ -1063,7 +1063,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
 {% endif %}
 {% else %}
 <div class="alert alert-info">
-  <span>🔍</span>
+  <span><span style="display:inline-flex;align-items:center;"><i data-lucide="search"></i></span></span>
   <div>
     <strong>Search Console の設定方法</strong><br>
     1. <code>.env</code> に <code>{{ brand_id.upper().replace('-','_') }}_GSC_SITE_URL={{ brand.url }}</code> を追加<br>
@@ -1078,7 +1078,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
 {% if wp_drafts %}
 <div class="card">
   <div class="card-header">
-    <span class="card-title">📝 WordPress 下書き（{{ wp_drafts|length }}件）</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> WordPress 下書き（{{ wp_drafts|length }}件）</span>
     <a href="{{ brand.url }}/wp-admin/post-new.php" target="_blank" class="btn btn-ghost btn-sm">
       ＋ 新規作成
     </a>
@@ -1092,9 +1092,9 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
       <td style="font-size:12px;color:var(--muted);">{{ (post.date or '')[:10] }}</td>
       <td style="display:flex;gap:8px;">
         <form method="POST" action="/brands/{{ brand_id }}/publish_draft/{{ post.id }}">
-          <button class="btn btn-green btn-sm">📢 公開</button>
+          <button class="btn btn-green btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> 公開</button>
         </form>
-        <a href="{{ post.link }}" target="_blank" class="btn btn-ghost btn-sm">👁 プレビュー</a>
+        <a href="{{ post.link }}" target="_blank" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="eye"></i></span> プレビュー</a>
       </td>
     </tr>
     {% endfor %}
@@ -1103,7 +1103,7 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
 </div>
 {% else %}
 <div class="alert alert-info">
-  <span>🌐</span>
+  <span><span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span></span>
   <div>
     <strong>WordPress の設定方法</strong><br>
     1. WordPress管理画面 → ユーザー → プロフィール → アプリケーションパスワードを生成<br>

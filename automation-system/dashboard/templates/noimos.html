@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🧠 NoiMos AI <span style="font-size:13px;font-weight:400;color:var(--muted2);margin-left:8px;">元ネタアーカイブ</span></div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> NoiMos AI <span style="font-size:13px;font-weight:400;color:var(--muted2);margin-left:8px;">元ネタアーカイブ</span></div>
     <div class="page-sub">バズった投稿の構造を抽出し、自社ブランドへ移植する</div>
   </div>
   <div class="header-actions">
@@ -48,9 +48,9 @@
   <a href="/noimos?status={{ s }}" class="platform-pill {{ 'active' if status_filter == s else '' }}">{{ label }}</a>
   {% endfor %}
   <div style="margin-left:auto;">
-    <a href="/campaigns" class="btn btn-ghost btn-sm">🎯 キャンペーン</a>
-    <a href="/ideas" class="btn btn-ghost btn-sm">💡 アイデア一覧</a>
-    <a href="/publishing" class="btn btn-ghost btn-sm">📤 承認キュー</a>
+    <a href="/campaigns" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> キャンペーン</a>
+    <a href="/ideas" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> アイデア一覧</a>
+    <a href="/publishing" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> 承認キュー</a>
   </div>
 </div>
 
@@ -100,16 +100,16 @@
           {% endfor %}
           {% for flag in p.risk_flags %}
           <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:var(--red);">
-            ⚠ {{ flag }}
+            <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> {{ flag }}
           </span>
           {% endfor %}
         </div>
 
         <!-- Metrics -->
         <div style="display:flex;gap:16px;font-size:11px;color:var(--muted);">
-          {% if p.metrics_likes %}<span>❤ {{ '{:,}'.format(p.metrics_likes) }}</span>{% endif %}
-          {% if p.metrics_saves %}<span>🔖 {{ '{:,}'.format(p.metrics_saves) }}</span>{% endif %}
-          {% if p.metrics_comments %}<span>💬 {{ '{:,}'.format(p.metrics_comments) }}</span>{% endif %}
+          {% if p.metrics_likes %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> {{ '{:,}'.format(p.metrics_likes) }}</span>{% endif %}
+          {% if p.metrics_saves %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="bookmark"></i></span> {{ '{:,}'.format(p.metrics_saves) }}</span>{% endif %}
+          {% if p.metrics_comments %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> {{ '{:,}'.format(p.metrics_comments) }}</span>{% endif %}
           {% if p.metrics_views %}<span>▶ {{ '{:,}'.format(p.metrics_views) }}</span>{% endif %}
           <span style="margin-left:auto;">{{ p.created_at[:10] }}</span>
         </div>
@@ -128,7 +128,7 @@
 </div>
 {% else %}
 <div class="card" style="text-align:center;padding:60px 24px;">
-  <div style="font-size:40px;margin-bottom:16px;">🧠</div>
+  <div style="font-size:40px;margin-bottom:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span></div>
   <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;">元ネタがまだありません</div>
   <div style="font-size:13px;color:var(--muted2);margin-bottom:24px;">バズった投稿を登録して、構造を抽出しましょう</div>
   <a href="/noimos/new" class="btn btn-primary">＋ 元ネタを登録する</a>

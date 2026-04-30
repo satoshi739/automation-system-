@@ -42,8 +42,8 @@
     <div class="page-sub">スケジューラー・朝のオペレーター・Webhookサーバーの動作記録</div>
   </div>
   <div class="header-actions">
-    <a href="/audit-logs" class="btn btn-ghost btn-sm">🗂 監査ログ</a>
-    <button onclick="location.reload()" class="btn btn-ghost btn-sm">🔄 更新</button>
+    <a href="/audit-logs" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span> 監査ログ</a>
+    <button onclick="location.reload()" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="refresh-cw"></i></span> 更新</button>
   </div>
 </div>
 
@@ -54,7 +54,7 @@
     <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err
       {%- elif 'WARNING' in line or 'WARNING' in line %}log-warn
       {%- elif 'INFO' in line %}log-info
-      {%- elif 'OK' in line or 'ok' in line or '✅' in line or '完了' in line %}log-ok
+      {%- elif 'OK' in line or 'ok' in line or '' in line or '完了' in line %}log-ok
       {%- endif %}">{{ line }}</div>
     {% endfor %}
   {% else %}
@@ -65,13 +65,13 @@
 
 <div class="log-section">
   <div class="log-section-hd">
-    <div class="log-section-title">⏰ スケジューラー</div>
+    <div class="log-section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="clock"></i></span> スケジューラー</div>
     <span class="log-count">直近 {{ scheduler_log|length }} 行</span>
   </div>
   <div class="log-box" id="logScheduler">
     {% if scheduler_log %}
       {% for line in scheduler_log %}
-      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '✅' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
+      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
       {% endfor %}
     {% else %}
     <div class="log-empty">ログがまだありません — スケジューラーが起動すると記録されます</div>
@@ -81,13 +81,13 @@
 
 <div class="log-section">
   <div class="log-section-hd">
-    <div class="log-section-title">☀️ 朝のオペレーター</div>
+    <div class="log-section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span> 朝のオペレーター</div>
     <span class="log-count">直近 {{ morning_log|length }} 行</span>
   </div>
   <div class="log-box" id="logMorning">
     {% if morning_log %}
       {% for line in morning_log %}
-      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '✅' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
+      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
       {% endfor %}
     {% else %}
     <div class="log-empty">ログがまだありません — 毎朝 9:00 に実行されます</div>
@@ -97,13 +97,13 @@
 
 <div class="log-section">
   <div class="log-section-hd">
-    <div class="log-section-title">📡 LINE Webhook サーバー</div>
+    <div class="log-section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="wifi"></i></span> LINE Webhook サーバー</div>
     <span class="log-count">直近 {{ server_log|length }} 行</span>
   </div>
   <div class="log-box" id="logServer">
     {% if server_log %}
       {% for line in server_log %}
-      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '✅' in line or '200' in line %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
+      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '200' in line %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
       {% endfor %}
     {% else %}
     <div class="log-empty">ログがまだありません — LINE メッセージを受信すると記録されます</div>
@@ -114,7 +114,7 @@
 <!-- ログローテーション履歴 -->
 <div class="log-section" style="margin-top:32px;">
   <div class="log-section-hd">
-    <div class="log-section-title">🔄 ログローテーション履歴</div>
+    <div class="log-section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="refresh-cw"></i></span> ログローテーション履歴</div>
     <span class="log-count">archive: {{ archive_snap.dirs }} dirs / {{ "%.1f"|format(archive_snap.total_mb) }} MB</span>
   </div>
 
@@ -168,7 +168,7 @@
   <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
     <div>
       <div style="font-size:13.5px;font-weight:600;color:var(--accent2);margin-bottom:4px;">
-        🗂 操作の監査ログを確認しますか？
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span> 操作の監査ログを確認しますか？
       </div>
       <div style="font-size:12px;color:var(--muted2);">
         誰が・何を・いつ操作したかの詳細な記録は「監査ログ」で確認できます。

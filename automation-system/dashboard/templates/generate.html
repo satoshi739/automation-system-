@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">✨ AI コンテンツ生成</div>
+    <div class="page-title"> AI コンテンツ生成</div>
     <div class="page-sub">Claude AIがInstagram投稿文・LINE配信文を自動生成します</div>
   </div>
 </div>
@@ -13,7 +13,7 @@
 
   <!-- Instagram 生成 -->
   <div class="card">
-    <div class="card-header"><span class="card-title">📱 Instagram 投稿文</span></div>
+    <div class="card-header"><span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> Instagram 投稿文</span></div>
 
     <div class="form-group">
       <label class="form-label">ブランド</label>
@@ -46,30 +46,30 @@
     </div>
 
     <button onclick="generateIG()" class="btn btn-primary" id="ig-btn" style="width:100%;justify-content:center;">
-      ✨ 生成する
+       生成する
     </button>
 
     <div id="ig-result" style="margin-top:18px;display:none;">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">🪝 フック（冒頭1行）</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="anchor"></i></span> フック（冒頭1行）</div>
       <div id="ig-hook" style="font-size:14px;font-weight:700;color:var(--yellow);padding:8px 0;"></div>
 
-      <div style="font-size:12px;color:var(--muted);margin:12px 0 6px;">📝 キャプション</div>
+      <div style="font-size:12px;color:var(--muted);margin:12px 0 6px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> キャプション</div>
       <div id="ig-caption" class="ai-output"></div>
 
       <div style="font-size:12px;color:var(--muted);margin:12px 0 6px;">#️⃣ ハッシュタグ</div>
       <div id="ig-hashtags" class="ai-output" style="min-height:40px;font-size:13px;color:var(--muted);"></div>
 
       <div class="ai-output-actions">
-        <button onclick="addToQueue('instagram')" class="btn btn-primary btn-sm">📅 キューに追加</button>
-        <button onclick="copyIG()" class="btn btn-ghost btn-sm">📋 コピー</button>
-        <button onclick="document.getElementById('ig-result').style.display='none'" class="btn btn-ghost btn-sm">✕ クリア</button>
+        <button onclick="addToQueue('instagram')" class="btn btn-primary btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> キューに追加</button>
+        <button onclick="copyIG()" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span> コピー</button>
+        <button onclick="document.getElementById('ig-result').style.display='none'" class="btn btn-ghost btn-sm"> クリア</button>
       </div>
     </div>
   </div>
 
   <!-- LINE 生成 -->
   <div class="card">
-    <div class="card-header"><span class="card-title">📣 LINE 配信文</span></div>
+    <div class="card-header"><span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> LINE 配信文</span></div>
 
     <div class="form-group">
       <label class="form-label">ブランド</label>
@@ -95,16 +95,16 @@
     </div>
 
     <button onclick="generateLINE()" class="btn btn-green" id="line-btn" style="width:100%;justify-content:center;margin-top:8px;">
-      ✨ 生成する
+       生成する
     </button>
 
     <div id="line-result" style="margin-top:18px;display:none;">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">📩 メッセージ</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="mail"></i></span> メッセージ</div>
       <div id="line-message" class="ai-output"></div>
       <div class="ai-output-actions">
-        <button onclick="addToQueue('line')" class="btn btn-green btn-sm">📅 キューに追加</button>
-        <button onclick="copyLINE()" class="btn btn-ghost btn-sm">📋 コピー</button>
-        <button onclick="document.getElementById('line-result').style.display='none'" class="btn btn-ghost btn-sm">✕ クリア</button>
+        <button onclick="addToQueue('line')" class="btn btn-green btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> キューに追加</button>
+        <button onclick="copyLINE()" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span> コピー</button>
+        <button onclick="document.getElementById('line-result').style.display='none'" class="btn btn-ghost btn-sm"> クリア</button>
       </div>
     </div>
   </div>
@@ -115,8 +115,8 @@
 <div id="queue-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;">
   <div class="card" style="width:500px;max-width:90vw;margin:0;">
     <div class="card-header">
-      <span class="card-title">📅 投稿キューに追加</span>
-      <button onclick="document.getElementById('queue-modal').style.display='none'" class="btn btn-ghost btn-sm">✕</button>
+      <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> 投稿キューに追加</span>
+      <button onclick="document.getElementById('queue-modal').style.display='none'" class="btn btn-ghost btn-sm"></button>
     </div>
     <form id="queue-form">
       <input type="hidden" id="qf-channel" name="channel">
@@ -139,7 +139,7 @@ async function generateIG() {
   const topic = document.getElementById('ig-topic').value.trim();
   if (!topic) { alert('トピックを入力してください'); return; }
   const btn = document.getElementById('ig-btn');
-  btn.textContent = '⏳ 生成中...'; btn.disabled = true;
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
 
   const resp = await fetch('/api/ai/generate_post', {
     method: 'POST', headers: {'Content-Type':'application/json'},
@@ -150,7 +150,7 @@ async function generateIG() {
       extra:  document.getElementById('ig-extra').value,
     })
   });
-  btn.textContent = '✨ 生成する'; btn.disabled = false;
+  btn.textContent = ' 生成する'; btn.disabled = false;
 
   const d = await resp.json();
   if (d.error) { alert('エラー: ' + d.error); return; }
@@ -165,7 +165,7 @@ async function generateLINE() {
   const topic = document.getElementById('line-topic').value.trim();
   if (!topic) { alert('トピックを入力してください'); return; }
   const btn = document.getElementById('line-btn');
-  btn.textContent = '⏳ 生成中...'; btn.disabled = true;
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
 
   const resp = await fetch('/api/ai/generate_line', {
     method: 'POST', headers: {'Content-Type':'application/json'},
@@ -174,7 +174,7 @@ async function generateLINE() {
       purpose: document.getElementById('line-purpose').value,
     })
   });
-  btn.textContent = '✨ 生成する'; btn.disabled = false;
+  btn.textContent = ' 生成する'; btn.disabled = false;
 
   const d = await resp.json();
   if (d.error) { alert('エラー: ' + d.error); return; }
@@ -201,7 +201,7 @@ document.getElementById('queue-form').addEventListener('submit', async e => {
   const fd = new FormData(e.target);
   await fetch('/queue/add', { method: 'POST', body: fd });
   document.getElementById('queue-modal').style.display = 'none';
-  alert('✅ キューに追加しました');
+  alert(' キューに追加しました');
 });
 
 function copyIG() {

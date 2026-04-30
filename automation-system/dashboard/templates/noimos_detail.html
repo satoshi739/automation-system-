@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🧠 {{ pattern.title }}</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> {{ pattern.title }}</div>
     <div class="page-sub">
       {{ pattern.source_type or '不明' }} &nbsp;·&nbsp; {{ pattern.created_at[:10] }}
       {% if pattern.status == 'extracted' %}<span class="badge badge-ok" style="margin-left:8px;">抽出済み</span>{% endif %}
@@ -42,15 +42,15 @@
       <div style="display:flex;gap:20px;padding:12px;background:var(--s2);border-radius:var(--radius-sm);border:1px solid var(--border);">
         <div style="text-align:center;">
           <div style="font-size:18px;font-weight:800;color:var(--red);">{{ '{:,}'.format(pattern.metrics_likes or 0) }}</div>
-          <div style="font-size:10px;color:var(--muted);">❤ いいね</div>
+          <div style="font-size:10px;color:var(--muted);"><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> いいね</div>
         </div>
         <div style="text-align:center;">
           <div style="font-size:18px;font-weight:800;color:var(--yellow2);">{{ '{:,}'.format(pattern.metrics_saves or 0) }}</div>
-          <div style="font-size:10px;color:var(--muted);">🔖 保存</div>
+          <div style="font-size:10px;color:var(--muted);"><span style="display:inline-flex;align-items:center;"><i data-lucide="bookmark"></i></span> 保存</div>
         </div>
         <div style="text-align:center;">
           <div style="font-size:18px;font-weight:800;color:var(--accent2);">{{ '{:,}'.format(pattern.metrics_comments or 0) }}</div>
-          <div style="font-size:10px;color:var(--muted);">💬 コメント</div>
+          <div style="font-size:10px;color:var(--muted);"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> コメント</div>
         </div>
         <div style="text-align:center;">
           <div style="font-size:18px;font-weight:800;color:var(--green2);">{{ '{:,}'.format(pattern.metrics_views or 0) }}</div>
@@ -82,9 +82,9 @@
           </div>
           <div style="margin-bottom:8px;"><label class="form-label">キャプション抜粋</label><textarea class="form-textarea" name="caption" rows="2"></textarea></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
-            <div><label class="form-label" style="font-size:10px;">❤ いいね</label><input class="form-input" name="likes" type="number" min="0" placeholder="0"></div>
-            <div><label class="form-label" style="font-size:10px;">🔖 保存</label><input class="form-input" name="saves" type="number" min="0" placeholder="0"></div>
-            <div><label class="form-label" style="font-size:10px;">💬 コメント</label><input class="form-input" name="comments" type="number" min="0" placeholder="0"></div>
+            <div><label class="form-label" style="font-size:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> いいね</label><input class="form-input" name="likes" type="number" min="0" placeholder="0"></div>
+            <div><label class="form-label" style="font-size:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bookmark"></i></span> 保存</label><input class="form-input" name="saves" type="number" min="0" placeholder="0"></div>
+            <div><label class="form-label" style="font-size:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> コメント</label><input class="form-input" name="comments" type="number" min="0" placeholder="0"></div>
             <div><label class="form-label" style="font-size:10px;">▶ 再生</label><input class="form-input" name="views" type="number" min="0" placeholder="0"></div>
           </div>
           <button type="submit" class="btn btn-primary btn-sm">追加</button>
@@ -99,8 +99,8 @@
         </div>
         {% if ex.caption %}<div style="font-size:12px;color:var(--muted2);margin-bottom:4px;">{{ ex.caption[:100] }}…</div>{% endif %}
         <div style="display:flex;gap:12px;font-size:11px;color:var(--muted);">
-          {% if ex.likes %}<span>❤ {{ '{:,}'.format(ex.likes) }}</span>{% endif %}
-          {% if ex.saves %}<span>🔖 {{ '{:,}'.format(ex.saves) }}</span>{% endif %}
+          {% if ex.likes %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> {{ '{:,}'.format(ex.likes) }}</span>{% endif %}
+          {% if ex.saves %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="bookmark"></i></span> {{ '{:,}'.format(ex.saves) }}</span>{% endif %}
           {% if ex.views %}<span>▶ {{ '{:,}'.format(ex.views) }}</span>{% endif %}
           {% if ex.source_url %}<a href="{{ ex.source_url }}" target="_blank" style="color:var(--accent2);margin-left:auto;">リンク →</a>{% endif %}
         </div>
@@ -134,22 +134,22 @@
       <form method="POST" action="/noimos/{{ pattern.id }}/extract">
 
         <div class="form-group">
-          <label class="form-label">🎣 Hook（冒頭の引き）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="fish"></i></span> Hook（冒頭の引き）</label>
           <textarea class="form-textarea" name="hook" rows="3" placeholder="最初の1〜3秒 / 冒頭1行で視聴者を引き止めた表現...">{{ pattern.hook or '' }}</textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">⚡ Problem Framing（問題提示）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Problem Framing（問題提示）</label>
           <textarea class="form-textarea" name="problem_framing" rows="3" placeholder="どんな悩み・課題を掘り起こしたか。「〇〇な人いませんか？」系...">{{ pattern.problem_framing or '' }}</textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">🌊 Emotional Arc（感情の流れ）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="waves"></i></span> Emotional Arc（感情の流れ）</label>
           <textarea class="form-textarea" name="emotional_arc" rows="3" placeholder="例: 共感（わかる！）→ 驚き（そうなの？）→ 納得（試してみよう）">{{ pattern.emotional_arc or '' }}</textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">📣 CTA（行動喚起）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> CTA（行動喚起）</label>
           <input class="form-input" name="cta" value="{{ pattern.cta or '' }}" placeholder="保存してね / コメントで教えて / DM送って など">
         </div>
 
@@ -168,7 +168,7 @@
 
         <!-- Risk flags -->
         <div class="form-group">
-          <label class="form-label">⚠ リスクフラグ</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> リスクフラグ</label>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             {% for flag in risk_flag_options %}
             <label class="risk-label" style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;border:1px solid rgba(239,68,68,.2);cursor:pointer;font-size:11.5px;transition:all .15s;{% if flag in pattern.risk_flags %}background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.4);color:var(--red);{% else %}color:var(--muted2);{% endif %}">

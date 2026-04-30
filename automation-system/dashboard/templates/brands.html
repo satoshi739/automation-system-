@@ -5,7 +5,7 @@
 <div class="page-header">
   <div>
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">BRAND OPERATIONS</div>
-    <div class="page-title">🏷 ブランド運営</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="tag"></i></span> ブランド運営</div>
     <div class="page-sub">UPJ グループ 全ブランドの運転席</div>
   </div>
   <div class="header-actions">
@@ -62,7 +62,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;">
       {% if s.meo_score is not none and s.meo_score %}
       <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;">📍</span>
+        <span style="font-size:13px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span></span>
         <div>
           <div style="font-size:13px;font-weight:700;color:{{ 'var(--green2)' if s.meo_score >= 70 else 'var(--yellow2)' if s.meo_score >= 40 else 'var(--red)' }};">{{ s.meo_score }}</div>
           <div style="font-size:9px;color:var(--muted);">MEOスコア</div>
@@ -70,13 +70,13 @@
       </div>
       {% else %}
       <div style="background:var(--s2);border:1px dashed var(--border);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:8px;opacity:.4;">
-        <span style="font-size:13px;">📍</span>
+        <span style="font-size:13px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span></span>
         <div style="font-size:11px;color:var(--muted);">MEO未連携</div>
       </div>
       {% endif %}
 
       <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;">✒</span>
+        <span style="font-size:13px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="pen"></i></span></span>
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--blue);">{{ s.blog_drafts }}</div>
           <div style="font-size:9px;color:var(--muted);">ブログ下書き</div>

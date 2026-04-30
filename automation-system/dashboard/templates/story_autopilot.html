@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <div class="page-title">📱 Story Autopilot</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> Story Autopilot</div>
     <div class="page-sub">Instagramストーリーの自動運用基盤 — テンプレート設定・候補生成・公開管理</div>
   </div>
   <div class="header-actions">
@@ -13,7 +13,7 @@
     {% endif %}
     <a href="/story-autopilot/templates/new" class="btn btn-accent btn-sm">＋ テンプレート追加</a>
     <button class="btn btn-ghost btn-sm" onclick="seedDemo()" title="デモデータを投入">
-      🌱 デモシード
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="sprout"></i></span> デモシード
     </button>
   </div>
 </div>
@@ -65,13 +65,13 @@
   <!-- LEFT: テンプレート一覧 -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div class="card-title">⚙️ テンプレート</div>
+      <div class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> テンプレート</div>
       <a href="/story-autopilot/templates" class="btn btn-ghost btn-sm">全て表示</a>
     </div>
 
     {% if not templates %}
     <div style="text-align:center;padding:40px 20px;color:var(--muted);">
-      <div style="font-size:40px;margin-bottom:12px;opacity:.4;">📋</div>
+      <div style="font-size:40px;margin-bottom:12px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span></div>
       <div>テンプレートがありません</div>
       <a href="/story-autopilot/templates/new" class="btn btn-accent btn-sm" style="margin-top:12px;">最初のテンプレートを作成</a>
     </div>
@@ -109,13 +109,13 @@
   <!-- RIGHT: 最近の実行履歴 -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div class="card-title">🕒 最近の実行</div>
+      <div class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="clock"></i></span> 最近の実行</div>
       <a href="/story-autopilot/candidates" class="btn btn-ghost btn-sm">承認待ちを確認</a>
     </div>
 
     {% if not recent_runs %}
     <div style="text-align:center;padding:40px 20px;color:var(--muted);">
-      <div style="font-size:40px;margin-bottom:12px;opacity:.4;">📭</div>
+      <div style="font-size:40px;margin-bottom:12px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="mail-open"></i></span></div>
       <div>実行履歴がありません</div>
     </div>
     {% else %}
@@ -124,15 +124,15 @@
       <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:10px;">
         <div style="flex-shrink:0;">
           {% if run.status == 'published' %}
-          <span style="font-size:16px;">✅</span>
+          <span style="font-size:16px;"></span>
           {% elif run.status == 'pending_approval' %}
-          <span style="font-size:16px;">⏳</span>
+          <span style="font-size:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span></span>
           {% elif run.status == 'rejected' %}
-          <span style="font-size:16px;">❌</span>
+          <span style="font-size:16px;"></span>
           {% elif run.status == 'failed' %}
-          <span style="font-size:16px;">🔥</span>
+          <span style="font-size:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="flame"></i></span></span>
           {% else %}
-          <span style="font-size:16px;">⏺</span>
+          <span style="font-size:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="circle"></i></span></span>
           {% endif %}
         </div>
         <div style="flex:1;min-width:0;">
@@ -161,7 +161,7 @@
 <!-- ブランド別インサイト -->
 {% if insight_summary %}
 <div class="card" style="margin-top:20px;">
-  <div class="card-title" style="margin-bottom:18px;">📊 ブランド別ストーリーインサイト (28日間)</div>
+  <div class="card-title" style="margin-bottom:18px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> ブランド別ストーリーインサイト (28日間)</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
     {% for bid, b in brands.items() %}
     {% set ins = insight_summary.get(bid, {}) %}
@@ -209,7 +209,7 @@ function approveRun(id) {
   fetch(`/api/story-autopilot/runs/${id}/approve`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})})
     .then(r => r.json())
     .then(d => {
-      if (d.ok) { Toastify({text:'✅ 承認・公開しました', style:{background:'var(--green)'}}).showToast(); setTimeout(()=>location.reload(), 1200); }
+      if (d.ok) { Toastify({text:' 承認・公開しました', style:{background:'var(--green)'}}).showToast(); setTimeout(()=>location.reload(), 1200); }
       else { Toastify({text: d.error || 'エラー', style:{background:'var(--red)'}}).showToast(); }
     });
 }
@@ -234,7 +234,7 @@ function generateFromTemplate(tmplId) {
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
-      Toastify({text:`✅ 候補を生成しました (run#${d.run_id})`, style:{background:'var(--green)'}}).showToast();
+      Toastify({text:` 候補を生成しました (run#${d.run_id})`, style:{background:'var(--green)'}}).showToast();
       setTimeout(()=>location.reload(), 1200);
     } else {
       Toastify({text: d.error || '生成エラー', style:{background:'var(--red)'}}).showToast();
@@ -246,7 +246,7 @@ function seedDemo() {
   fetch('/api/story-autopilot/templates/seed', {method:'POST'})
     .then(r => r.json())
     .then(d => {
-      Toastify({text:'🌱 デモデータをシードしました', style:{background:'var(--green)'}}).showToast();
+      Toastify({text:'<span style="display:inline-flex;align-items:center;"><i data-lucide="sprout"></i></span> デモデータをシードしました', style:{background:'var(--green)'}}).showToast();
       setTimeout(()=>location.reload(), 1200);
     });
 }

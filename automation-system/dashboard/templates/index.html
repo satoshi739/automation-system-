@@ -163,14 +163,14 @@
   <div class="os-agents-wrap">
     <span style="font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;">Agents</span>
     {% set agent_names = [
-      ('✦','UPJ','#5b8af5'),
-      ('✦','DSC','#34d399'),
-      ('✦','CFJ','#fbbf24'),
-      ('✦','BPG','#f472b6'),
+      ('<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span>','UPJ','#5b8af5'),
+      ('<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span>','DSC','#34d399'),
+      ('<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span>','CFJ','#fbbf24'),
+      ('<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span>','BPG','#f472b6'),
       ('/','Blog','#a78bfa'),
       ('◎','Sales','#f59e0b'),
-      ('◈','Analytics','#06b6d4'),
-      ('⚙','Ops','#8b5cf6'),
+      ('<span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span>','Analytics','#06b6d4'),
+      ('<span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span>','Ops','#8b5cf6'),
     ] %}
     {% for icon, name, color in agent_names %}
     <div class="os-agent-dot">
@@ -374,7 +374,7 @@
         {% endif %}
         {% endfor %}
       </div>
-      <div class="bld-gen" style="color:{{ b.color }};">✦ 一括生成する</div>
+      <div class="bld-gen" style="color:{{ b.color }};"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> 一括生成する</div>
     </div>
 
   </a>

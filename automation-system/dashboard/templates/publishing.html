@@ -4,11 +4,11 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">📤 承認キュー</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> 承認キュー</div>
     <div class="page-sub">承認依頼一覧 — 承認すると投稿キューへの送出準備が完了します</div>
   </div>
   <div class="header-actions">
-    <a href="/ideas" class="btn btn-ghost btn-sm">💡 アイデア一覧</a>
+    <a href="/ideas" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> アイデア一覧</a>
   </div>
 </div>
 
@@ -80,7 +80,7 @@
         {% endif %}
 
         <div style="display:flex;gap:14px;font-size:11px;color:var(--muted);">
-          {% if j.scheduled_at %}<span>📅 {{ j.scheduled_at[:16] }}</span>{% endif %}
+          {% if j.scheduled_at %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> {{ j.scheduled_at[:16] }}</span>{% endif %}
           <span>登録: {{ j.created_at[:10] }}</span>
           {% if j.approval_note %}<span>メモ: {{ j.approval_note }}</span>{% endif %}
         </div>
@@ -91,11 +91,11 @@
         {% if j.status == 'pending_approval' %}
         <form method="POST" action="/publishing/{{ j.id }}/approve">
           <input type="hidden" name="note" value="">
-          <button type="submit" class="btn btn-green btn-sm" style="width:100%;">✓ 承認</button>
+          <button type="submit" class="btn btn-green btn-sm" style="width:100%;"> 承認</button>
         </form>
         <form method="POST" action="/publishing/{{ j.id }}/reject">
           <input type="hidden" name="note" value="">
-          <button type="submit" class="btn btn-danger btn-sm" style="width:100%;">✕ 却下</button>
+          <button type="submit" class="btn btn-danger btn-sm" style="width:100%;"> 却下</button>
         </form>
         {% elif j.status == 'approved' %}
         <div style="text-align:center;">
@@ -116,11 +116,11 @@
         <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <form method="POST" action="/publishing/{{ j.id }}/approve">
             <textarea class="form-textarea" name="note" rows="2" placeholder="承認コメント（任意）" style="margin-bottom:6px;"></textarea>
-            <button type="submit" class="btn btn-green btn-sm">✓ コメント付き承認</button>
+            <button type="submit" class="btn btn-green btn-sm"> コメント付き承認</button>
           </form>
           <form method="POST" action="/publishing/{{ j.id }}/reject">
             <textarea class="form-textarea" name="note" rows="2" placeholder="却下理由を入力..." style="margin-bottom:6px;"></textarea>
-            <button type="submit" class="btn btn-danger btn-sm">✕ コメント付き却下</button>
+            <button type="submit" class="btn btn-danger btn-sm"> コメント付き却下</button>
           </form>
         </div>
       </details>
@@ -131,7 +131,7 @@
 </div>
 {% else %}
 <div style="text-align:center;padding:56px 24px;background:var(--s1);border:1px dashed {% if status_filter=='pending_approval' %}rgba(16,185,129,.25){% else %}var(--border){% endif %};border-radius:16px;">
-  <div style="font-size:52px;margin-bottom:14px;">{% if status_filter=='pending_approval' %}✅{% else %}📭{% endif %}</div>
+  <div style="font-size:52px;margin-bottom:14px;">{% if status_filter=='pending_approval' %}{% else %}<span style="display:inline-flex;align-items:center;"><i data-lucide="mail-open"></i></span>{% endif %}</div>
   <div style="font-size:16px;font-weight:700;color:{% if status_filter=='pending_approval' %}var(--green2){% else %}var(--text){% endif %};margin-bottom:8px;">
     {% if status_filter == 'pending_approval' %}承認待ちはありません{% else %}該当するジョブがありません{% endif %}
   </div>
@@ -143,9 +143,9 @@
     {% endif %}
   </div>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-    <a href="/ideas" class="btn btn-accent btn-sm">💡 アイデアを追加</a>
-    <a href="/campaigns" class="btn btn-ghost btn-sm">🎯 Campaign Pipeline</a>
-    <a href="/story-autopilot/candidates" class="btn btn-ghost btn-sm">📱 ストーリー候補</a>
+    <a href="/ideas" class="btn btn-accent btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> アイデアを追加</a>
+    <a href="/campaigns" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> Campaign Pipeline</a>
+    <a href="/story-autopilot/candidates" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> ストーリー候補</a>
   </div>
 </div>
 {% endif %}

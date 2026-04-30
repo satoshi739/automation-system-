@@ -153,13 +153,13 @@
     <div style="font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">
       AI CEO Dashboard &nbsp;·&nbsp; {{ brief.date }}
     </div>
-    <div class="page-title">🏢 AI CEO ダッシュボード</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span> AI CEO ダッシュボード</div>
     <div class="page-sub">全ブランド・全エージェントの統括。社長の指示を受け、各AIエージェントにタスクを割り当てます。</div>
   </div>
   <div class="header-actions">
     <span class="ceo-header-badge">AI運営中</span>
-    <a href="/president" class="btn btn-ghost btn-sm">👑 社長画面</a>
-    <a href="/decisions" class="btn btn-primary btn-sm">⚡ 承認待ち {% if pending_approvals %}<span style="background:rgba(255,255,255,.2);border-radius:20px;padding:0 7px;">{{ pending_approvals|length }}</span>{% endif %}</a>
+    <a href="/president" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span> 社長画面</a>
+    <a href="/decisions" class="btn btn-primary btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> 承認待ち {% if pending_approvals %}<span style="background:rgba(255,255,255,.2);border-radius:20px;padding:0 7px;">{{ pending_approvals|length }}</span>{% endif %}</a>
   </div>
 </div>
 
@@ -169,7 +169,7 @@
   <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:10px;">
     <!-- 社長 -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:90px;">
-      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(245,158,11,.3);">👑</div>
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(245,158,11,.3);"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span></div>
       <div style="font-size:11px;font-weight:700;color:#f59e0b;">社長 (Satoshi)</div>
       <div style="font-size:9.5px;color:var(--muted);">最終意思決定</div>
     </div>
@@ -178,7 +178,7 @@
     </div>
     <!-- AI CEO -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:90px;">
-      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(139,92,246,.3);">🏢</div>
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(139,92,246,.3);"><span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span></div>
       <div style="font-size:11px;font-weight:700;color:#8b5cf6;">AI CEO</div>
       <div style="font-size:9.5px;color:var(--muted);">分析・タスク割り当て</div>
     </div>
@@ -187,7 +187,7 @@
     </div>
     <!-- Agents -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:90px;">
-      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(16,185,129,.3);">🤖</div>
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(16,185,129,.3);"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
       <div style="font-size:11px;font-weight:700;color:#10b981;">AI Agents</div>
       <div style="font-size:9.5px;color:var(--muted);">専門スキル実行</div>
     </div>
@@ -196,7 +196,7 @@
     </div>
     <!-- 完了 -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:70px;">
-      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(99,102,241,.3);">✅</div>
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(99,102,241,.3);"></div>
       <div style="font-size:11px;font-weight:700;color:#6366f1;">完了</div>
       <div style="font-size:9.5px;color:var(--muted);">SNS投稿・リード等</div>
     </div>
@@ -214,7 +214,7 @@
 
 <!-- ══ 社長 → AI CEO 指示ボックス ══ -->
 <div class="card" style="margin-bottom:20px;border-color:rgba(245,158,11,.25);background:linear-gradient(135deg,rgba(245,158,11,.04),rgba(10,16,36,.9));">
-  <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">👑 社長 → AI CEO への指示</div>
+  <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span> 社長 → AI CEO への指示</div>
   <div style="font-size:12.5px;color:var(--muted2);margin-bottom:12px;">
     ここに指示を入力すると、AI CEO が解釈して各エージェントにタスクを割り当てます。
   </div>
@@ -228,7 +228,7 @@
     <button onclick="sendPresidentInstruction()" id="instruct-btn"
       style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:700;font-size:13px;
              padding:9px 20px;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s;">
-      🏢 CEO に指示を送る
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span> CEO に指示を送る
     </button>
     <button onclick="triggerDispatch()" id="dispatch-btn"
       style="background:rgba(139,92,246,.15);color:var(--purple2);font-weight:600;font-size:12px;
@@ -243,7 +243,7 @@
 {% if to_president %}
 <div class="card" style="margin-bottom:20px;border-color:rgba(99,102,241,.3);">
   <div class="section-header">
-    <span class="section-title" style="color:var(--accent2);">👑 社長に上げるべき案件</span>
+    <span class="section-title" style="color:var(--accent2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span> 社長に上げるべき案件</span>
     <a href="/president" class="section-action">社長画面を開く →</a>
   </div>
   {% for item in to_president %}
@@ -261,7 +261,7 @@
 <!-- ══ 今日の戦略優先順位 ══ -->
 <div class="card">
   <div class="section-header">
-    <span class="section-title">🎯 今日の戦略優先順位</span>
+    <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> 今日の戦略優先順位</span>
     <span style="font-size:11px;color:var(--muted);">AI CEOが策定</span>
   </div>
   {% if ceo_priorities %}
@@ -285,7 +285,7 @@
   <!-- 全ブランド状態 -->
   <div class="card" style="margin-bottom:0;">
     <div class="section-header">
-      <span class="section-title">🏢 全ブランドの状態</span>
+      <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span> 全ブランドの状態</span>
       <a href="/brands" class="section-action">詳細</a>
     </div>
     <div class="ceo-brand-table">
@@ -324,7 +324,7 @@
   <!-- エスカレーション -->
   <div class="card" style="margin-bottom:0;">
     <div class="section-header">
-      <span class="section-title">⬆️ エスカレーション</span>
+      <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="arrow-up"></i></span>️ エスカレーション</span>
       <span style="font-size:11px;color:var(--muted);">社長判断が必要な案件</span>
     </div>
     {% if escalations %}
@@ -341,7 +341,7 @@
       </div>
       {% endfor %}
     {% else %}
-      <div class="empty-cta">エスカレーション案件なし ✓<br><a href="/president">社長画面</a></div>
+      <div class="empty-cta">エスカレーション案件なし <br><a href="/president">社長画面</a></div>
     {% endif %}
   </div>
 </div>
@@ -351,7 +351,7 @@
 <!-- ══ タスクキュー ══ -->
 <div class="card">
   <div class="section-header">
-    <span class="section-title">📋 Task Queue</span>
+    <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span> Task Queue</span>
     <div style="display:flex;align-items:center;gap:10px;">
       <span style="font-size:11px;color:var(--muted);">{{ task_queue|length }}件</span>
       <a href="/decisions" class="section-action">承認待ちを処理</a>
@@ -391,7 +391,7 @@
 <!-- ══ ボトルネック ══ -->
 <div class="card">
   <div class="section-header">
-    <span class="section-title">🚧 ボトルネック</span>
+    <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="construction"></i></span> ボトルネック</span>
     <span style="font-size:11px;color:var(--muted);">{{ bottlenecks|length }}件検出</span>
   </div>
   {% if bottlenecks %}
@@ -405,13 +405,13 @@
     </div>
     {% endfor %}
   {% else %}
-    <div class="empty-cta">ボトルネックなし ✓</div>
+    <div class="empty-cta">ボトルネックなし </div>
   {% endif %}
 </div>
 
 <!-- ══ AI Chief of Staff パネル ══ -->
 <div style="margin-bottom:16px; padding:16px 20px; background:linear-gradient(135deg, rgba(99,102,241,.07), rgba(139,92,246,.04)); border:1px solid rgba(99,102,241,.2); border-radius:var(--radius); display:flex; align-items:flex-start; gap:20px;">
-  <div style="font-size:26px; flex-shrink:0;">🧠</div>
+  <div style="font-size:26px; flex-shrink:0;"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span></div>
   <div style="flex:1; min-width:0;">
     <div style="font-size:13px; font-weight:700; margin-bottom:10px;">AI Chief of Staff — ブランド別おすすめアクション</div>
     {% if recommendations %}
@@ -435,13 +435,13 @@
 {% if open_anomalies %}
 <div class="card" style="margin-bottom:16px;">
   <div class="section-header">
-    <span class="section-title">⚡ 異常検知</span>
+    <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> 異常検知</span>
     <a href="/anomaly-alerts" class="section-action">詳細 →</a>
   </div>
   {% for alert in open_anomalies[:4] %}
   <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 14px; border-radius:var(--radius-sm); margin-bottom:8px;
     {% if alert.severity == 'alert' %}background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);{% elif alert.severity == 'warn' %}background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);{% else %}background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);{% endif %}">
-    <span style="font-size:14px;flex-shrink:0;">{% if alert.severity == 'alert' %}🔴{% elif alert.severity == 'warn' %}🟡{% else %}🔵{% endif %}</span>
+    <span style="font-size:14px;flex-shrink:0;">{% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span>{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span>{% else %}<span style="color:#6366f1;">●</span>{% endif %}</span>
     <div style="flex:1;">
       <div style="font-size:12.5px;font-weight:600;margin-bottom:2px;">
         {% if alert.brand %}[{{ alert.brand }}] {% endif %}{{ alert.metric }} — {{ alert.platform }}
@@ -461,7 +461,7 @@
 <!-- ══ Performance Snapshot ══ -->
 <div class="card" style="margin-bottom:16px;">
   <div class="section-header">
-    <span class="section-title">◈ Performance Snapshot — {{ perf_snapshot.period }}</span>
+    <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span> Performance Snapshot — {{ perf_snapshot.period }}</span>
     <a href="/performance-snapshot" class="section-action">詳細 →</a>
   </div>
   <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:14px;">
@@ -476,16 +476,16 @@
     {% endfor %}
   </div>
   <div style="display:flex; gap:8px; flex-wrap:wrap;">
-    <a href="/blog" class="btn btn-ghost btn-sm">✒ Blog候補</a>
-    <a href="/daily-briefs" class="btn btn-ghost btn-sm">☀️ Daily Brief</a>
-    <a href="/anomaly-alerts" class="btn btn-ghost btn-sm">⚡ 異常検知</a>
+    <a href="/blog" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="pen"></i></span> Blog候補</a>
+    <a href="/daily-briefs" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span> Daily Brief</a>
+    <a href="/anomaly-alerts" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> 異常検知</a>
   </div>
 </div>
 
 <!-- ══ 全エージェント状態 ══ -->
 <div class="card">
   <div class="section-header">
-    <span class="section-title">🤖 全エージェントの状態</span>
+    <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> 全エージェントの状態</span>
     <a href="/logs" class="section-action">詳細ログ</a>
   </div>
   <div class="agent-mini-grid">
@@ -536,7 +536,7 @@ async function sendPresidentInstruction() {
   const btn = document.getElementById('instruct-btn');
   const status = document.getElementById('instruct-status');
   btn.disabled = true;
-  btn.textContent = '🏢 CEO が処理中…';
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span> CEO が処理中…';
   status.style.color = 'var(--muted2)';
   status.textContent = 'AI CEO が指示を解釈し、エージェントにタスクを割り当て中…';
 
@@ -551,7 +551,7 @@ async function sendPresidentInstruction() {
     if (data.ok) {
       const n = data.tasks_created || 0;
       const summary = data.summary ? `（${data.summary.slice(0, 50)}）` : '';
-      status.textContent = `✅ ${n}件のタスクを生成しました${summary}`;
+      status.textContent = ` ${n}件のタスクを生成しました${summary}`;
       status.style.color = 'var(--green2)';
       document.getElementById('president-instruction').value = '';
       setTimeout(() => location.reload(), 3000);
@@ -564,7 +564,7 @@ async function sendPresidentInstruction() {
     status.style.color = 'var(--red)';
   } finally {
     btn.disabled = false;
-    btn.textContent = '🏢 CEO に指示を送る';
+    btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span> CEO に指示を送る';
   }
 }
 
@@ -585,7 +585,7 @@ async function triggerDispatch() {
     });
     const data = await resp.json();
     if (data.ok) {
-      status.textContent = `✅ ディスパッチ完了: ${data.tasks_created || 0}件タスク作成`;
+      status.textContent = ` ディスパッチ完了: ${data.tasks_created || 0}件タスク作成`;
       status.style.color = 'var(--green2)';
       setTimeout(() => location.reload(), 3000);
     } else {

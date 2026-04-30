@@ -172,7 +172,7 @@
 <!-- Page header -->
 <div class="page-header">
   <div>
-    <div class="page-title">🧠 Asset Brain</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> Asset Brain</div>
     <div class="page-sub">写真・動画・テンプレ・台本を事業資産として管理する</div>
   </div>
   <div class="header-actions">
@@ -213,14 +213,14 @@
 <!-- Alerts -->
 {% for alert in alerts %}
 <div class="alert-strip">
-  ⚠️ <strong>{{ alert.brand }}</strong> — {{ alert.message }}
+  <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> <strong>{{ alert.brand }}</strong> — {{ alert.message }}
   <a href="/assets?brand={{ alert.brand }}&type={{ alert.type }}" style="color:var(--yellow2);font-weight:700;margin-left:auto;">確認 →</a>
 </div>
 {% endfor %}
 
 <!-- Filter bar -->
 <div class="filter-bar">
-  <input type="text" id="search-q" placeholder="🔍 タイトル・タグ検索…"
+  <input type="text" id="search-q" placeholder="<span style="display:inline-flex;align-items:center;"><i data-lucide="search"></i></span> タイトル・タグ検索…"
          value="{{ filters.q }}" style="width:200px;"
          onkeydown="if(event.key==='Enter') applyFilter()">
   <select id="f-brand" onchange="applyFilter()">
@@ -231,10 +231,10 @@
   </select>
   <select id="f-type" onchange="applyFilter()">
     <option value="">全タイプ</option>
-    <option value="photo"    {{ 'selected' if filters.type=='photo' else '' }}>📷 写真</option>
-    <option value="video"    {{ 'selected' if filters.type=='video' else '' }}>🎬 動画</option>
-    <option value="template" {{ 'selected' if filters.type=='template' else '' }}>🗂 テンプレ</option>
-    <option value="script"   {{ 'selected' if filters.type=='script' else '' }}>📝 台本</option>
+    <option value="photo"    {{ 'selected' if filters.type=='photo' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> 写真</option>
+    <option value="video"    {{ 'selected' if filters.type=='video' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> 動画</option>
+    <option value="template" {{ 'selected' if filters.type=='template' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span> テンプレ</option>
+    <option value="script"   {{ 'selected' if filters.type=='script' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> 台本</option>
   </select>
   <select id="f-channel" onchange="applyFilter()">
     <option value="">全チャネル</option>
@@ -244,16 +244,16 @@
   </select>
   <select id="f-season" onchange="applyFilter()">
     <option value="">全シーズン</option>
-    <option value="spring" {{ 'selected' if filters.season=='spring' else '' }}>🌸 春</option>
-    <option value="summer" {{ 'selected' if filters.season=='summer' else '' }}>☀️ 夏</option>
-    <option value="fall"   {{ 'selected' if filters.season=='fall' else '' }}>🍂 秋</option>
-    <option value="winter" {{ 'selected' if filters.season=='winter' else '' }}>❄️ 冬</option>
-    <option value="all"    {{ 'selected' if filters.season=='all' else '' }}>🗓 通年</option>
+    <option value="spring" {{ 'selected' if filters.season=='spring' else '' }}> 春</option>
+    <option value="summer" {{ 'selected' if filters.season=='summer' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span> 夏</option>
+    <option value="fall"   {{ 'selected' if filters.season=='fall' else '' }}> 秋</option>
+    <option value="winter" {{ 'selected' if filters.season=='winter' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="snowflake"></i></span>️ 冬</option>
+    <option value="all"    {{ 'selected' if filters.season=='all' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> 通年</option>
   </select>
   <select id="f-status" onchange="applyFilter()">
-    <option value="active"        {{ 'selected' if filters.status=='active' else '' }}>✅ アクティブ</option>
-    <option value="review_needed" {{ 'selected' if filters.status=='review_needed' else '' }}>⚠️ 要確認</option>
-    <option value="archived"      {{ 'selected' if filters.status=='archived' else '' }}>📦 アーカイブ</option>
+    <option value="active"        {{ 'selected' if filters.status=='active' else '' }}> アクティブ</option>
+    <option value="review_needed" {{ 'selected' if filters.status=='review_needed' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> 要確認</option>
+    <option value="archived"      {{ 'selected' if filters.status=='archived' else '' }}><span style="display:inline-flex;align-items:center;"><i data-lucide="package"></i></span> アーカイブ</option>
     <option value=""              {{ 'selected' if filters.status=='' else '' }}>全ステータス</option>
   </select>
   <div class="filter-sep"></div>
@@ -290,7 +290,7 @@
         </div>
         {% for r in recs[:2] %}
         <div class="rec-card" onclick="openDetail('{{ r.asset_id }}')" style="flex-direction:row;padding:8px 10px;gap:8px;align-items:center;">
-          <div style="font-size:20px;flex-shrink:0;">{{ {'photo':'📷','video':'🎬','template':'🗂','script':'📝'}.get(r.asset_type,'📄') }}</div>
+          <div style="font-size:20px;flex-shrink:0;">{{ {'photo':'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>','video':'<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>','template':'<span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span>','script':'<span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span>'}.get(r.asset_type,'<span style="display:inline-flex;align-items:center;"><i data-lucide="file"></i></span>') }}</div>
           <div>
             <div class="rec-title">{{ r.title[:30] }}</div>
             <div class="rec-type">{{ r.asset_type }}</div>
@@ -321,7 +321,7 @@
     {% if assets %}
     <div class="asset-grid" id="asset-grid">
       {% for a in assets %}
-      {% set type_icon = {'photo':'📷','video':'🎬','template':'🗂','script':'📝'}.get(a.asset_type, '📄') %}
+      {% set type_icon = {'photo':'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>','video':'<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>','template':'<span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span>','script':'<span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span>'}.get(a.asset_type, '<span style="display:inline-flex;align-items:center;"><i data-lucide="file"></i></span>') %}
       <div class="asset-card" onclick="openDetail('{{ a.asset_id }}')">
         <div class="asset-thumb">
           {% if a.thumbnail_url %}
@@ -339,7 +339,7 @@
             <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:{{ b.get('color','#6366f1') }};vertical-align:middle;margin-right:4px;"></span>
             {{ b.get('name_short', a.brand) }}
             {% if a.season and a.season != 'all' %}
-            · {{ {'spring':'🌸','summer':'☀️','fall':'🍂','winter':'❄️'}.get(a.season,'') }} {{ a.season }}
+            · {{ {'spring':'','summer':'<span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span>','fall':'','winter':'<span style="display:inline-flex;align-items:center;"><i data-lucide="snowflake"></i></span>️'}.get(a.season,'') }} {{ a.season }}
             {% endif %}
           </div>
           {% if a.tags %}
@@ -367,7 +367,7 @@
     </div>
     {% else %}
     <div style="text-align:center;padding:80px 20px;color:var(--muted);">
-      <div style="font-size:48px;margin-bottom:16px;">🧠</div>
+      <div style="font-size:48px;margin-bottom:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span></div>
       <div style="font-size:16px;font-weight:600;margin-bottom:8px;">アセットが見つかりません</div>
       <div style="font-size:13px;">フィルターを変えるか、新規登録してください</div>
     </div>
@@ -406,7 +406,7 @@
         <div class="modal-title" id="modal-title">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="modal-id">—</div>
       </div>
-      <span class="modal-close" onclick="closeModal()">✕</span>
+      <span class="modal-close" onclick="closeModal()"></span>
     </div>
 
     <div class="meta-grid" id="modal-meta"></div>
@@ -430,7 +430,7 @@
     </div>
 
     <div style="display:flex;gap:8px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);">
-      <button class="btn btn-ghost btn-sm" onclick="openUsageForm()">📊 使用記録</button>
+      <button class="btn btn-ghost btn-sm" onclick="openUsageForm()"><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> 使用記録</button>
       <button class="btn btn-danger btn-sm" style="margin-left:auto;" onclick="archiveAsset()">アーカイブ</button>
     </div>
   </div>
@@ -441,7 +441,7 @@
   <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--radius);padding:28px 32px;max-width:560px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,.8);animation:cmdSlideIn .2s cubic-bezier(.22,1,.36,1) both;">
     <div class="modal-header">
       <div class="modal-title">新規アセット登録</div>
-      <span class="modal-close" onclick="closeAddModal()">✕</span>
+      <span class="modal-close" onclick="closeAddModal()"></span>
     </div>
     <div class="form-group">
       <label class="form-label">タイトル *</label>
@@ -459,10 +459,10 @@
       <div class="form-group">
         <label class="form-label">タイプ *</label>
         <select class="form-select" id="add-type">
-          <option value="photo">📷 写真</option>
-          <option value="video">🎬 動画</option>
-          <option value="template">🗂 テンプレ</option>
-          <option value="script">📝 台本</option>
+          <option value="photo"><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> 写真</option>
+          <option value="video"><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> 動画</option>
+          <option value="template"><span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span> テンプレ</option>
+          <option value="script"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> 台本</option>
         </select>
       </div>
     </div>
@@ -475,10 +475,10 @@
         <label class="form-label">シーズン</label>
         <select class="form-select" id="add-season">
           <option value="all">通年</option>
-          <option value="spring">🌸 春</option>
-          <option value="summer">☀️ 夏</option>
-          <option value="fall">🍂 秋</option>
-          <option value="winter">❄️ 冬</option>
+          <option value="spring"> 春</option>
+          <option value="summer"><span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span> 夏</option>
+          <option value="fall"> 秋</option>
+          <option value="winter"><span style="display:inline-flex;align-items:center;"><i data-lucide="snowflake"></i></span>️ 冬</option>
         </select>
       </div>
       <div class="form-group">
@@ -527,7 +527,7 @@ function applyFilter() {
 
 // ── Type icon helper ──
 function typeIcon(t) {
-  return {photo:'📷', video:'🎬', template:'🗂', script:'📝'}[t] || '📄';
+  return {photo:'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>', video:'<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>', template:'<span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span>', script:'<span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span>'}[t] || '<span style="display:inline-flex;align-items:center;"><i data-lucide="file"></i></span>';
 }
 
 // ── Detail modal ──
@@ -548,10 +548,10 @@ function renderModal(a) {
   document.getElementById('modal-title').textContent = a.title || a.asset_id;
   document.getElementById('modal-id').textContent = a.asset_id + ' · ' + a.brand;
 
-  const cs = a.copyright_status === 'owned' ? '✅ 自社所有'
-    : a.copyright_status === 'licensed' ? '📄 ライセンス'
-    : a.copyright_status === 'creative_commons' ? '🔓 CC'
-    : '❓ 不明';
+  const cs = a.copyright_status === 'owned' ? ' 自社所有'
+    : a.copyright_status === 'licensed' ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="file"></i></span> ライセンス'
+    : a.copyright_status === 'creative_commons' ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="unlock"></i></span> CC'
+    : '<span style="display:inline-flex;align-items:center;"><i data-lucide="help-circle"></i></span> 不明';
 
   const meta = [
     ['タイプ',    typeIcon(a.asset_type) + ' ' + a.asset_type],
@@ -560,8 +560,8 @@ function renderModal(a) {
     ['シーズン',  a.season || 'all'],
     ['ターゲット', (a.target_audience || []).join('、') || '—'],
     ['著作権',    cs],
-    ['顔出し許可', a.face_permission ? '✅ あり' : '—'],
-    ['再利用可',  a.reusable ? '✅ はい' : '—'],
+    ['顔出し許可', a.face_permission ? ' あり' : '—'],
+    ['再利用可',  a.reusable ? ' はい' : '—'],
     ['ステータス', a.status],
     ['登録日',    a.created_at],
     ['説明',      a.description || '—'],
@@ -574,7 +574,7 @@ function renderModal(a) {
   // Tags
   const tagsEl = document.getElementById('modal-tags');
   tagsEl.innerHTML = (a.tags || []).map(t =>
-    `<span class="asset-tag" style="cursor:pointer;" title="クリックで削除" onclick="removeTag(${t.tag_id},'${t.name}',this)">${t.name} ✕</span>`
+    `<span class="asset-tag" style="cursor:pointer;" title="クリックで削除" onclick="removeTag(${t.tag_id},'${t.name}',this)">${t.name} </span>`
   ).join('') || '<span style="color:var(--muted);font-size:12px;">タグなし</span>';
 
   // Usages
@@ -606,7 +606,7 @@ function addTag() {
       span.className = 'asset-tag';
       span.style.cursor = 'pointer';
       span.setAttribute('onclick', `removeTag(${d.tag_id},'${name}',this)`);
-      span.textContent = name + ' ✕';
+      span.textContent = name + ' ';
       tagsEl.appendChild(span);
       toast('タグ追加: ' + name, 'ok');
     }

@@ -55,8 +55,8 @@
         <div class="form-group">
           <label class="form-label">投稿タイプ</label>
           <select name="media_type" class="form-select" id="mediaType" onchange="toggleVideoUrl()">
-            <option value="image">🖼️ 画像投稿</option>
-            <option value="reel">🎬 リール</option>
+            <option value="image"><span style="display:inline-flex;align-items:center;"><i data-lucide="image"></i></span>️ 画像投稿</option>
+            <option value="reel"><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> リール</option>
           </select>
         </div>
         <div id="f-video-url" class="form-group" style="display:none;">
@@ -143,7 +143,7 @@
       <!-- 投稿予約日時（Flatpickr） -->
       <div id="f-schedule-group" style="display:none;" class="form-group">
         <label class="form-label" style="display:flex;align-items:center;gap:6px;">
-          📅 投稿予約日時
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> 投稿予約日時
           <span style="font-size:11px;color:var(--muted);font-weight:400;">（空白 = 自動投稿キューに入れるだけ）</span>
         </label>
         <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;">
@@ -152,7 +152,7 @@
           <button type="button" onclick="document.getElementById('schedule-picker')._flatpickr.clear()"
                   style="background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;color:var(--muted2);cursor:pointer;font-size:12px;transition:all .15s;white-space:nowrap;"
                   onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted2)'">
-            ✕ クリア
+             クリア
           </button>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6;">
@@ -164,7 +164,7 @@
       {% if ai %}
       <div id="f-ai-group" style="display:none;margin-bottom:16px;">
         <button type="button" onclick="aiGenerate()" class="btn btn-purple btn-sm">
-          ✦ Claude AI で文章を生成
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> Claude AI で文章を生成
         </button>
       </div>
       {% endif %}
@@ -285,7 +285,7 @@ async function aiGenerate() {
   const topic = prompt('トピックを入力してください（例：集客を増やす3つの方法）');
   if (!topic) return;
   const btn = event.target;
-  btn.textContent = '⏳ 生成中...'; btn.disabled = true;
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
 
   if (currentChannel === 'line') {
     const r = await fetch('/api/ai/generate_line', {
@@ -305,7 +305,7 @@ async function aiGenerate() {
       if (ta) ta.value = d.full;
     }
   }
-  btn.textContent = '✨ Claude AI で文章を生成'; btn.disabled = false;
+  btn.textContent = ' Claude AI で文章を生成'; btn.disabled = false;
 }
 </script>
 {% endblock %}

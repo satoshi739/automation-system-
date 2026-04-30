@@ -6,7 +6,7 @@
   <div>
     <div class="page-title" style="display:flex;align-items:center;gap:10px;">
       <span style="width:12px;height:12px;border-radius:50%;background:{{ brand.color }};display:inline-block;"></span>
-      ⚙️ {{ brand.name_short }} — API設定
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> {{ brand.name_short }} — API設定
     </div>
     <div class="page-sub">APIキーを入力すると自動投稿・自動連携が有効になります</div>
   </div>
@@ -18,13 +18,13 @@
 <!-- 保存メッセージ -->
 {% if saved %}
 <div class="alert alert-ok" style="margin-bottom:20px;">
-  <span>✅</span>
+  <span></span>
   <div><strong>保存しました。</strong> APIキーが更新されました。ダッシュボードを再起動すると反映されます。</div>
 </div>
 {% endif %}
 {% if error %}
 <div class="alert alert-warn" style="margin-bottom:20px;">
-  <span>⚠️</span><div>{{ error }}</div>
+  <span><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span></span><div>{{ error }}</div>
 </div>
 {% endif %}
 
@@ -35,9 +35,9 @@
 <!-- ═══ Claude AI ═══ -->
 <div class="card" style="margin-bottom:16px;border-top:3px solid var(--purple);">
   <div class="card-header">
-    <span class="card-title">✨ Claude AI（全ブランド共通）</span>
+    <span class="card-title"> Claude AI（全ブランド共通）</span>
     {% if status.anthropic %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -57,9 +57,9 @@
 {% if brand.channels.instagram or brand.channels.threads or brand.channels.facebook %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #e1306c;">
   <div class="card-header">
-    <span class="card-title">📷 Instagram / 🧵 Threads / 📘 Facebook（Meta）</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> Instagram / <span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span> Threads / <span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span> Facebook（Meta）</span>
     {% if status.meta %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -104,7 +104,7 @@
     </div>
     {% endif %}
   </div>
-  <button type="button" onclick="testConnection('meta', '{{ brand_id }}')" class="btn btn-ghost btn-sm">🔌 接続テスト</button>
+  <button type="button" onclick="testConnection('meta', '{{ brand_id }}')" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="plug"></i></span> 接続テスト</button>
 </div>
 {% endif %}
 
@@ -114,7 +114,7 @@
   <div class="card-header">
     <span class="card-title">𝕏 Twitter / X</span>
     {% if status.twitter %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -145,7 +145,7 @@
              value="{{ env.get(prefix+'_TWITTER_ACCESS_SECRET','') }}" placeholder="Access Token Secret" autocomplete="off">
     </div>
   </div>
-  <button type="button" onclick="testConnection('twitter', '{{ brand_id }}')" class="btn btn-ghost btn-sm">🔌 接続テスト</button>
+  <button type="button" onclick="testConnection('twitter', '{{ brand_id }}')" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="plug"></i></span> 接続テスト</button>
 </div>
 {% endif %}
 
@@ -153,9 +153,9 @@
 {% if brand.channels.line %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #06c755;">
   <div class="card-header">
-    <span class="card-title">📱 LINE Messaging API</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> LINE Messaging API</span>
     {% if status.line %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -183,7 +183,7 @@
              value="{{ env.get('OWNER_LINE_USER_ID','') }}" placeholder="Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
     </div>
   </div>
-  <button type="button" onclick="testConnection('line', '{{ brand_id }}')" class="btn btn-ghost btn-sm">🔌 接続テスト</button>
+  <button type="button" onclick="testConnection('line', '{{ brand_id }}')" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="plug"></i></span> 接続テスト</button>
 </div>
 {% endif %}
 
@@ -191,9 +191,9 @@
 {% if brand.channels.wordpress %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #21759b;">
   <div class="card-header">
-    <span class="card-title">🌐 WordPress REST API</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span> WordPress REST API</span>
     {% if status.wordpress %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -220,7 +220,7 @@
       <div style="font-size:11px;color:var(--muted);margin-top:4px;">スペースはそのまま入力してOKです</div>
     </div>
   </div>
-  <button type="button" onclick="testConnection('wordpress', '{{ brand_id }}')" class="btn btn-ghost btn-sm">🔌 接続テスト</button>
+  <button type="button" onclick="testConnection('wordpress', '{{ brand_id }}')" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="plug"></i></span> 接続テスト</button>
 </div>
 {% endif %}
 
@@ -230,7 +230,7 @@
   <div class="card-header">
     <span class="card-title">▶️ YouTube Data API</span>
     {% if status.youtube %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -245,7 +245,7 @@
            value="{{ env.get(prefix+'_YOUTUBE_CHANNEL_ID','') }}" placeholder="UCxxxxxxxxxxxxxxxxxxxxxxxxx">
   </div>
   <div class="alert alert-info" style="margin-top:8px;">
-    <span>📁</span>
+    <span><span style="display:inline-flex;align-items:center;"><i data-lucide="folder"></i></span></span>
     <div>OAuth2 credentials.json ファイルを <code>automation-system/credentials.json</code> に配置してください</div>
   </div>
 </div>
@@ -255,9 +255,9 @@
 {% if brand.channels.tiktok %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #010101;">
   <div class="card-header">
-    <span class="card-title">🎵 TikTok Content Posting API</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="music"></i></span> TikTok Content Posting API</span>
     {% if status.tiktok %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -277,9 +277,9 @@
 <!-- ═══ Google Analytics / Search Console ═══ -->
 <div class="card" style="margin-bottom:16px;border-top:3px solid #4285f4;">
   <div class="card-header">
-    <span class="card-title">📊 Google Analytics 4 / 🔍 Search Console</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> Google Analytics 4 / <span style="display:inline-flex;align-items:center;"><i data-lucide="search"></i></span> Search Console</span>
     {% if status.google %}
-    <span class="badge badge-ok">✅ 接続済み</span>
+    <span class="badge badge-ok"> 接続済み</span>
     {% else %}
     <span class="badge badge-warn">未設定</span>
     {% endif %}
@@ -306,7 +306,7 @@
     </div>
   </div>
   <div class="alert alert-info" style="margin-top:8px;">
-    <span>📁</span>
+    <span><span style="display:inline-flex;align-items:center;"><i data-lucide="folder"></i></span></span>
     <div>サービスアカウントの <code>credentials.json</code> を <code>automation-system/</code> フォルダに配置してください</div>
   </div>
 </div>
@@ -314,7 +314,7 @@
 <!-- ═══ 共通設定 ═══ -->
 <div class="card" style="margin-bottom:24px;border-top:3px solid var(--border);">
   <div class="card-header">
-    <span class="card-title">🔧 共通設定</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="wrench"></i></span> 共通設定</span>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
     <div class="form-group">
@@ -335,7 +335,7 @@
 <!-- ═══ Railway デプロイ連携 ═══ -->
 <div class="card" style="margin-bottom:24px;border-top:3px solid #7B61FF;">
   <div class="card-header">
-    <span class="card-title">🚂 Railway 本番環境への同期</span>
+    <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="train"></i></span> Railway 本番環境への同期</span>
     <span id="railway-status-badge" class="badge badge-warn">未設定</span>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.8;">
@@ -372,7 +372,7 @@
     <button type="button" onclick="syncToRailway()" id="railway-sync-btn"
       style="background:linear-gradient(135deg,#7B61FF,#5B43CC);color:#fff;font-weight:700;font-size:13px;
              padding:9px 20px;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s;">
-      🚂 Railway に今すぐ同期
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="train"></i></span> Railway に今すぐ同期
     </button>
     <span id="railway-sync-status" style="font-size:12px;color:var(--muted2);"></span>
   </div>
@@ -381,7 +381,7 @@
 <!-- 保存ボタン -->
 <div style="position:sticky;bottom:20px;display:flex;gap:12px;">
   <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;padding:16px;font-size:16px;box-shadow:0 8px 24px rgba(91,138,245,.4);">
-    💾 APIキーを保存する
+    <span style="display:inline-flex;align-items:center;"><i data-lucide="save"></i></span> APIキーを保存する
   </button>
   <a href="/brands/{{ brand_id }}" class="btn btn-ghost" style="padding:16px 20px;">キャンセル</a>
 </div>
@@ -398,20 +398,20 @@ async function testConnection(type, brandId) {
   const res = document.getElementById('test-result');
   const txt = document.getElementById('test-result-text');
   res.style.display = 'block';
-  txt.innerHTML = '⏳ 接続テスト中...';
+  txt.innerHTML = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 接続テスト中...';
 
   try {
     const r = await fetch(`/api/test_connection/${brandId}/${type}`, {method: 'POST'});
     const d = await r.json();
     if (d.ok) {
-      txt.innerHTML = `✅ <strong>${type}</strong> 接続成功！<br><span style="font-size:11px;color:var(--muted);">${d.detail||''}</span>`;
+      txt.innerHTML = ` <strong>${type}</strong> 接続成功！<br><span style="font-size:11px;color:var(--muted);">${d.detail||''}</span>`;
       txt.style.color = 'var(--green)';
     } else {
-      txt.innerHTML = `❌ <strong>${type}</strong> 接続失敗<br><span style="font-size:11px;color:var(--muted);">${d.error||''}</span>`;
+      txt.innerHTML = ` <strong>${type}</strong> 接続失敗<br><span style="font-size:11px;color:var(--muted);">${d.error||''}</span>`;
       txt.style.color = 'var(--red)';
     }
   } catch(e) {
-    txt.innerHTML = '❌ テストに失敗しました';
+    txt.innerHTML = ' テストに失敗しました';
     txt.style.color = 'var(--red)';
   }
 
@@ -443,18 +443,18 @@ async function syncToRailway() {
     const resp = await fetch('/api/railway/sync', { method: 'POST' });
     const data = await resp.json();
     if (data.ok) {
-      status.textContent = `✅ ${data.synced}件の環境変数を Railway に同期しました`;
+      status.textContent = ` ${data.synced}件の環境変数を Railway に同期しました`;
       status.style.color = 'var(--green2)';
     } else {
-      status.textContent = `❌ ${data.error}`;
+      status.textContent = ` ${data.error}`;
       status.style.color = 'var(--red)';
     }
   } catch (e) {
-    status.textContent = `❌ 通信エラー: ${e.message}`;
+    status.textContent = ` 通信エラー: ${e.message}`;
     status.style.color = 'var(--red)';
   } finally {
     btn.disabled = false;
-    btn.textContent = '🚂 Railway に今すぐ同期';
+    btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="train"></i></span> Railway に今すぐ同期';
   }
 }
 
@@ -467,10 +467,10 @@ document.querySelectorAll('input[type=password]').forEach(input => {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.style = 'position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0;';
-  btn.textContent = '👁';
+  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="eye"></i></span>';
   btn.onclick = () => {
     input.type = input.type === 'password' ? 'text' : 'password';
-    btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    btn.textContent = input.type === 'password' ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="eye"></i></span>' : '';
   };
   wrap.appendChild(btn);
 });

@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">💬 Review Reply Center</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> Review Reply Center</div>
     <div class="page-sub">未返信レビュー・低評価・AI返信下書き の一括管理</div>
   </div>
   <div class="header-actions">
@@ -16,7 +16,7 @@
       {% endfor %}
     </select>
     {% endif %}
-    <a href="/meo" class="btn btn-ghost btn-sm">📍 MEO Tower</a>
+    <a href="/meo" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span> MEO Tower</a>
   </div>
 </div>
 
@@ -43,7 +43,7 @@
 <!-- ── Review List ── -->
 {% if not reviews %}
 <div class="alert alert-ok">
-  <span>✓</span>
+  <span></span>
   <div>
     {% if tab == 'unanswered' %}未返信のレビューはありません。{% elif tab == 'low_rating' %}低評価レビューはありません。{% elif tab == 'drafts' %}承認待ちの下書きはありません。{% else %}レビューがありません。{% endif %}
   </div>
@@ -71,13 +71,13 @@
         </div>
         <div style="font-size:12.5px;color:var(--muted2);margin-bottom:8px;line-height:1.6;">{{ d.comment or '（コメントなし）' }}</div>
         <div style="padding:10px 13px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);border-radius:9px;">
-          <div style="font-size:9.5px;color:var(--accent2);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">✦ AI 下書き</div>
+          <div style="font-size:9.5px;color:var(--accent2);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AI 下書き</div>
           <div style="font-size:12.5px;line-height:1.7;" id="draft-text-{{ d.id }}">{{ d.draft_text }}</div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
         {% if not d.approved %}
-        <button class="btn btn-green btn-sm" onclick="approveDraft({{ d.id }})">✓ 承認</button>
+        <button class="btn btn-green btn-sm" onclick="approveDraft({{ d.id }})"> 承認</button>
         {% endif %}
         <button class="btn btn-primary btn-sm" onclick="sendDraft({{ d.id }}, '{{ d.review_id }}')">送信</button>
         <button class="btn btn-ghost btn-sm" onclick="editDraft({{ d.id }})">編集</button>
@@ -110,7 +110,7 @@
           {% endif %}
           {% if r.status == 'unanswered' %}
             {% if r.rating <= 2 %}
-            <span class="badge badge-lost" style="font-size:9.5px;">⚠️ 低評価・未返信</span>
+            <span class="badge badge-lost" style="font-size:9.5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> 低評価・未返信</span>
             {% else %}
             <span class="badge badge-warn" style="font-size:9.5px;">未返信</span>
             {% endif %}
@@ -132,7 +132,7 @@
         <!-- Existing reply -->
         {% if r.reply %}
         <div style="padding:8px 11px;background:rgba(16,185,129,.05);border-left:2px solid var(--green);border-radius:0 7px 7px 0;font-size:12px;color:var(--muted2);line-height:1.55;">
-          💬 返信済み: {{ r.reply[:120] }}{% if r.reply | length > 120 %}…{% endif %}
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 返信済み: {{ r.reply[:120] }}{% if r.reply | length > 120 %}…{% endif %}
         </div>
         {% endif %}
 
@@ -142,7 +142,7 @@
           <textarea id="reply-text-{{ r.id }}" class="form-textarea" rows="3"
                     placeholder="返信を入力…" style="margin-bottom:6px;"></textarea>
           <div style="display:flex;gap:6px;">
-            <button class="btn btn-ghost btn-sm" onclick="generateInline('{{ r.id }}')">✦ AI下書き</button>
+            <button class="btn btn-ghost btn-sm" onclick="generateInline('{{ r.id }}')"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AI下書き</button>
             <button class="btn btn-primary btn-sm" onclick="sendInlineReply('{{ r.id }}')">送信</button>
             <button class="btn btn-ghost btn-sm" onclick="toggleReply('{{ r.id }}')">閉じる</button>
           </div>
@@ -153,7 +153,7 @@
       <!-- Actions -->
       {% if r.status == 'unanswered' %}
       <div style="flex-shrink:0;">
-        <button class="btn btn-primary btn-sm" onclick="toggleReply('{{ r.id }}')">💬 返信する</button>
+        <button class="btn btn-primary btn-sm" onclick="toggleReply('{{ r.id }}')"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 返信する</button>
       </div>
       {% endif %}
 
@@ -199,7 +199,7 @@ async function generateInline(rid) {
       document.getElementById('reply-text-' + rid).dataset.draftId = d.draft_id;
       toast('AI下書き生成完了', 'ok');
     } else { toast('生成失敗', 'err'); }
-  } finally { btn.textContent = '✦ AI下書き'; btn.disabled = false; }
+  } finally { btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AI下書き'; btn.disabled = false; }
 }
 
 // 返信送信（インライン）

@@ -55,7 +55,7 @@
 <div class="page-header">
   <div>
     <div style="font-size:12px; color:var(--muted2); margin-bottom:6px;">
-      <a href="/blog" style="color:var(--muted2); text-decoration:none;">✒ Blog Auto Growth</a>
+      <a href="/blog" style="color:var(--muted2); text-decoration:none;"><span style="display:inline-flex;align-items:center;"><i data-lucide="pen"></i></span> Blog Auto Growth</a>
       <span style="margin:0 6px;">›</span>
       <span style="color:{{ draft.brand_color }}">{{ draft.brand }}</span>
     </div>
@@ -76,12 +76,12 @@
       {{ draft.brand }}
     </span>
     {% if draft.word_count > 0 %}
-    <span class="meta-pill">📝 {{ draft.word_count }} 文字</span>
+    <span class="meta-pill"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> {{ draft.word_count }} 文字</span>
     {% endif %}
-    <span class="meta-pill">📅 {{ draft.created_at }}</span>
-    <span class="meta-pill">🤖 {{ draft.created_by }}</span>
+    <span class="meta-pill"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> {{ draft.created_at }}</span>
+    <span class="meta-pill"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> {{ draft.created_by }}</span>
     {% if draft.project %}
-    <span class="meta-pill">📌 元ネタ: {{ draft.project.source_platform }}</span>
+    <span class="meta-pill"><span style="display:inline-flex;align-items:center;"><i data-lucide="pin"></i></span> 元ネタ: {{ draft.project.source_platform }}</span>
     {% endif %}
   </div>
 
@@ -111,7 +111,7 @@
   <div>
     <div class="card">
       <div class="card-header">
-        <span class="card-title">📐 見出し構成</span>
+        <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="ruler"></i></span> 見出し構成</span>
         {% if draft.outline %}
         <span style="font-size:11px;color:var(--muted2);">{{ draft.outline|length }} セクション</span>
         {% endif %}
@@ -142,7 +142,7 @@
     {% if draft.body_preview %}
     <div class="card" style="margin-bottom:16px;">
       <div class="card-header">
-        <span class="card-title">📝 本文プレビュー</span>
+        <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> 本文プレビュー</span>
       </div>
       <div class="body-preview-box">"{{ draft.body_preview }}"</div>
     </div>
@@ -152,7 +152,7 @@
     {% if draft.project %}
     <div class="card">
       <div class="card-header">
-        <span class="card-title">📌 元ネタ情報</span>
+        <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="pin"></i></span> 元ネタ情報</span>
         <span style="font-size:11px;color:var(--muted2);">{{ draft.project.source_platform }}</span>
       </div>
       {% if draft.project.source_caption %}
@@ -170,7 +170,7 @@
     <!-- まだ本文がない場合の誘導 -->
     {% if draft.status == 'idea' %}
     <div style="margin-top:16px; padding:18px; background:rgba(139,92,246,.06); border:1px solid rgba(139,92,246,.2); border-radius:var(--radius-sm); text-align:center;">
-      <div style="font-size:20px; margin-bottom:8px;">🤖</div>
+      <div style="font-size:20px; margin-bottom:8px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
       <div style="font-size:13px; font-weight:600; margin-bottom:6px;">AI に下書きを生成させる</div>
       <div style="font-size:11.5px; color:var(--muted2); margin-bottom:14px;">見出し構成をもとに本文の草稿を自動生成します</div>
       <button class="btn btn-purple btn-sm" onclick="toast('AI生成機能は近日公開予定です', 'info')">下書きを生成する</button>
@@ -185,10 +185,10 @@
   <a href="/blog" class="btn btn-ghost btn-sm">← 一覧に戻る</a>
   <div style="flex:1;"></div>
   {% if draft.status == 'draft' %}
-  <button class="btn btn-ghost btn-sm" onclick="toast('保存しました', 'ok')">💾 保存</button>
-  <button class="btn btn-primary btn-sm" onclick="toast('承認申請しました', 'ok')">✓ 承認申請</button>
+  <button class="btn btn-ghost btn-sm" onclick="toast('保存しました', 'ok')"><span style="display:inline-flex;align-items:center;"><i data-lucide="save"></i></span> 保存</button>
+  <button class="btn btn-primary btn-sm" onclick="toast('承認申請しました', 'ok')"> 承認申請</button>
   {% elif draft.status == 'idea' %}
-  <button class="btn btn-purple btn-sm" onclick="toast('AI下書き生成機能は近日公開予定です', 'info')">🤖 AI で下書き生成</button>
+  <button class="btn btn-purple btn-sm" onclick="toast('AI下書き生成機能は近日公開予定です', 'info')"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> AI で下書き生成</button>
   {% endif %}
 </div>
 

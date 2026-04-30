@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-header">
   <div>
-    <div class="page-title">{% if is_new %}＋ テンプレート作成{% else %}⚙️ {{ template.name }}{% endif %}</div>
+    <div class="page-title">{% if is_new %}＋ テンプレート作成{% else %}<span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> {{ template.name }}{% endif %}</div>
     <div class="page-sub">
       {% if is_new %}Story Autopilot テンプレートを新規作成します{% else %}テンプレートの設定を編集します{% endif %}
     </div>
@@ -48,7 +48,7 @@
         <div class="form-group">
           <label class="form-label">ストーリータイプ</label>
           <select class="form-select" name="story_type">
-            {% for val, label in [('promotion','📣 プロモーション'),('info','💡 情報・豆知識'),('poll','🗳️ アンケート'),('event','🎉 イベント'),('behind','🎥 舞台裏')] %}
+            {% for val, label in [('promotion','<span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> プロモーション'),('info','<span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> 情報・豆知識'),('poll','<span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard"></i></span>️ アンケート'),('event','<span style="display:inline-flex;align-items:center;"><i data-lucide="party-popper"></i></span> イベント'),('behind','<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span> 舞台裏')] %}
             <option value="{{ val }}" {{ 'selected' if template and template.story_type==val else '' }}>{{ label }}</option>
             {% endfor %}
           </select>
@@ -89,9 +89,9 @@
         <label class="form-label">実行モード <span style="color:var(--red)">*</span></label>
         <div style="display:flex;flex-direction:column;gap:8px;">
           {% for val, icon, label, desc in [
-            ('full_auto',               '🤖', '全自動 (full_auto)',               '生成後、自動で公開します'),
-            ('semi_auto',               '⚡', 'セミ自動 (semi_auto)',             '生成後、承認待ちに入ります'),
-            ('human_approval_required', '👤', '要承認 (human_approval_required)', '毎回、人間の承認が必要です'),
+            ('full_auto',               '<span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span>', '全自動 (full_auto)',               '生成後、自動で公開します'),
+            ('semi_auto',               '<span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span>', 'セミ自動 (semi_auto)',             '生成後、承認待ちに入ります'),
+            ('human_approval_required', '<span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span>', '要承認 (human_approval_required)', '毎回、人間の承認が必要です'),
           ] %}
           <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--s2);transition:border-color .15s;"
                  onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
@@ -157,7 +157,7 @@
 
     <div style="display:flex;gap:10px;">
       <button type="submit" class="btn btn-accent" style="flex:1;">
-        {% if is_new %}✅ テンプレートを作成{% else %}💾 変更を保存{% endif %}
+        {% if is_new %} テンプレートを作成{% else %}<span style="display:inline-flex;align-items:center;"><i data-lucide="save"></i></span> 変更を保存{% endif %}
       </button>
       <a href="/story-autopilot/templates" class="btn btn-ghost">キャンセル</a>
     </div>

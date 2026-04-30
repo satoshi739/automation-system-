@@ -118,14 +118,14 @@
 <div class="page-header">
   <div>
     <div style="font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">Agent Workspace</div>
-    <div class="page-title">🤖 Agent Workspace</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> Agent Workspace</div>
     <div class="page-sub">AIエージェントの稼働状態・タスク状況を一元管理</div>
   </div>
   <div class="header-actions">
     <span class="live-dot" id="live-indicator">LIVE</span>
-    <a href="/president" class="btn btn-ghost btn-sm">👑 社長画面</a>
-    <button class="btn btn-ghost btn-sm" onclick="runTick()">⚡ Tick</button>
-    <button class="btn btn-ghost btn-sm" onclick="runSeed()" id="seed-btn">🌱 初期化</button>
+    <a href="/president" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span> 社長画面</a>
+    <button class="btn btn-ghost btn-sm" onclick="runTick()"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Tick</button>
+    <button class="btn btn-ghost btn-sm" onclick="runSeed()" id="seed-btn"><span style="display:inline-flex;align-items:center;"><i data-lucide="sprout"></i></span> 初期化</button>
     <a href="/agent-workspace/tasks/new" class="btn btn-primary btn-sm">＋ タスク作成</a>
   </div>
 </div>
@@ -133,7 +133,7 @@
 <!-- ══ ステータスバー ══ -->
 <div class="ws-stat-bar">
   <div class="ws-stat" style="--accent-c:var(--green2)">
-    <span class="ws-stat-icon">🤖</span>
+    <span class="ws-stat-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></span>
     <div class="ws-stat-body">
       <div class="ws-stat-val" style="color:var(--green2);">{{ overview.active_agents }}</div>
       <div class="ws-stat-lbl">稼働エージェント</div>
@@ -147,7 +147,7 @@
     </div>
   </div>
   <div class="ws-stat" style="--accent-c:var(--yellow2)">
-    <span class="ws-stat-icon">🔒</span>
+    <span class="ws-stat-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="lock"></i></span></span>
     <div class="ws-stat-body">
       <div class="ws-stat-val" style="color:var(--yellow2);">{{ overview.status_counts.blocked or 0 }}</div>
       <div class="ws-stat-lbl">ブロック中</div>
@@ -161,21 +161,21 @@
     </div>
   </div>
   <div class="ws-stat" style="--accent-c:var(--purple2)">
-    <span class="ws-stat-icon">⬆</span>
+    <span class="ws-stat-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="arrow-up"></i></span></span>
     <div class="ws-stat-body">
       <div class="ws-stat-val" style="color:var(--purple2);">{{ overview.open_escalations }}</div>
       <div class="ws-stat-lbl">エスカレーション</div>
     </div>
   </div>
   <div class="ws-stat" style="--accent-c:var(--green)">
-    <span class="ws-stat-icon">✓</span>
+    <span class="ws-stat-icon"></span>
     <div class="ws-stat-body">
       <div class="ws-stat-val" style="color:var(--green2);">{{ overview.today_completed }}</div>
       <div class="ws-stat-lbl">本日完了</div>
     </div>
   </div>
   <div class="ws-stat" style="--accent-c:var(--muted2)">
-    <span class="ws-stat-icon">◈</span>
+    <span class="ws-stat-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span></span>
     <div class="ws-stat-body">
       <div class="ws-stat-val" style="color:var(--muted2);">{{ overview.throughput_pct }}%</div>
       <div class="ws-stat-lbl">本日スループット</div>
@@ -189,7 +189,7 @@
   {% if overview.blocked_detail %}
   <div class="card" style="margin-bottom:0;border-color:rgba(245,158,11,.25);">
     <div class="card-header">
-      <span class="card-title" style="color:var(--yellow2);">🔒 ブロック中タスク</span>
+      <span class="card-title" style="color:var(--yellow2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="lock"></i></span> ブロック中タスク</span>
     </div>
     {% for t in overview.blocked_detail %}
     <div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;">
@@ -202,7 +202,7 @@
   {% if overview.president_tasks %}
   <div class="card" style="margin-bottom:0;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.03);">
     <div class="card-header">
-      <span class="card-title" style="color:var(--red);">👑 あなたの承認が必要なタスク</span>
+      <span class="card-title" style="color:var(--red);"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span> あなたの承認が必要なタスク</span>
       <span style="font-size:11px;color:var(--red);font-weight:700;background:rgba(239,68,68,.1);
         border:1px solid rgba(239,68,68,.25);padding:2px 10px;border-radius:20px;">
         {{ overview.president_tasks|length }}件 待機中
@@ -210,7 +210,7 @@
     </div>
     <div style="font-size:12px;color:var(--muted2);margin-bottom:12px;padding:8px 10px;
         background:rgba(239,68,68,.05);border-radius:8px;border-left:3px solid var(--red);">
-      ⚠️ 以下のタスクはAI CEOが実行前に社長の承認を必要としています。
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> 以下のタスクはAI CEOが実行前に社長の承認を必要としています。
       確認の上、承認または差し戻してください。
     </div>
     {% for t in overview.president_tasks %}
@@ -224,7 +224,7 @@
       </div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;">
         <form method="POST" action="/api/tasks/{{ t.id }}/approve" style="display:inline;">
-          <button type="submit" class="btn btn-green btn-sm">✓ 承認して実行</button>
+          <button type="submit" class="btn btn-green btn-sm"> 承認して実行</button>
         </form>
         <a href="/agent-workspace?task={{ t.id }}" class="btn btn-ghost btn-sm">詳細を確認</a>
       </div>
@@ -252,7 +252,7 @@
     {% if has_issue %}border-color:rgba(245,158,11,.25);{% endif %}">
     <!-- Head -->
     <div class="agent-card-head">
-      <div class="agent-avatar">{{ agent_icons.get(agent.agent_type, '🤖') }}</div>
+      <div class="agent-avatar">{{ agent_icons.get(agent.agent_type, '<span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span>') }}</div>
       <div style="flex:1;min-width:0;">
         <div class="agent-card-name">{{ agent.display_name or agent.agent_type }}</div>
         <div class="agent-card-type">{{ agent.agent_type }}</div>
@@ -266,12 +266,12 @@
 
     <!-- Task chips -->
     <div class="task-chips">
-      {% if queued_cnt  %}<span class="task-chip chip-queued">⏳ {{ queued_cnt }}件待機</span>{% endif %}
+      {% if queued_cnt  %}<span class="task-chip chip-queued"><span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> {{ queued_cnt }}件待機</span>{% endif %}
       {% if running_cnt %}<span class="task-chip chip-running">▶ {{ running_cnt }}件実行中</span>{% endif %}
-      {% if blocked_cnt %}<span class="task-chip chip-blocked">🔒 {{ blocked_cnt }}件ブロック</span>{% endif %}
+      {% if blocked_cnt %}<span class="task-chip chip-blocked"><span style="display:inline-flex;align-items:center;"><i data-lucide="lock"></i></span> {{ blocked_cnt }}件ブロック</span>{% endif %}
       {% if waiting_cnt %}<span class="task-chip chip-waiting">△ {{ waiting_cnt }}件承認待ち</span>{% endif %}
-      {% if done_cnt    %}<span class="task-chip chip-completed">✓ {{ done_cnt }}件完了</span>{% endif %}
-      {% if failed_cnt  %}<span class="task-chip chip-failed">✗ {{ failed_cnt }}件失敗</span>{% endif %}
+      {% if done_cnt    %}<span class="task-chip chip-completed"> {{ done_cnt }}件完了</span>{% endif %}
+      {% if failed_cnt  %}<span class="task-chip chip-failed"> {{ failed_cnt }}件失敗</span>{% endif %}
       {% if not (queued_cnt or running_cnt or blocked_cnt or waiting_cnt or done_cnt or failed_cnt) %}
         <span style="font-size:11.5px;color:var(--muted);">タスクなし</span>
       {% endif %}
@@ -302,7 +302,7 @@
     <div class="agent-footer">
       <span class="agent-last-run">
         {% if agent.capabilities %}
-        💡 {{ agent.capabilities[:3] | join(' · ') }}{% if agent.capabilities|length > 3 %} +{{ agent.capabilities|length - 3 }}{% endif %}
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> {{ agent.capabilities[:3] | join(' · ') }}{% if agent.capabilities|length > 3 %} +{{ agent.capabilities|length - 3 }}{% endif %}
         {% else %}
         能力未設定
         {% endif %}
@@ -316,10 +316,10 @@
 {% else %}
 <!-- 空状態 -->
 <div class="empty-state">
-  <div style="font-size:48px;margin-bottom:16px;">🤖</div>
+  <div style="font-size:48px;margin-bottom:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
   <h3>エージェントが未登録です</h3>
   <p>「初期化」ボタンを押すと、UPJグループのAIエージェントが自動セットアップされます。</p>
-  <button class="btn btn-primary" onclick="runSeed()">🌱 エージェントを初期化する</button>
+  <button class="btn btn-primary" onclick="runSeed()"><span style="display:inline-flex;align-items:center;"><i data-lucide="sprout"></i></span> エージェントを初期化する</button>
 </div>
 {% endif %}
 
@@ -334,7 +334,7 @@ async function runTick() {
     toast(`Tick完了 — enqueued:${d.enqueued} assigned:${d.assigned} blocked:${d.blocked}`, 'ok');
     setTimeout(() => location.reload(), 1200);
   } catch(e) { toast('Tick失敗: ' + e, 'err'); }
-  btn.disabled = false; btn.textContent = '⚡ Tick';
+  btn.disabled = false; btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Tick';
 }
 
 async function runSeed() {
@@ -347,7 +347,7 @@ async function runSeed() {
     toast('初期化完了！', 'ok');
     setTimeout(() => location.reload(), 1500);
   } catch(e) { toast('初期化失敗: ' + e, 'err'); }
-  btn.disabled = false; btn.textContent = '🌱 初期化';
+  btn.disabled = false; btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="sprout"></i></span> 初期化';
 }
 </script>
 

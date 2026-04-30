@@ -191,7 +191,7 @@
         {% for b in brands %}
         <span class="brand-chip">
           <span style="width:7px;height:7px;border-radius:50%;background:{{ b.color or '#6366f1' }};box-shadow:0 0 5px {{ b.color or '#6366f1' }};"></span>
-          {{ b.short_name or b.name }}{% if b.is_primary %} ★{% endif %}
+          {{ b.short_name or b.name }}{% if b.is_primary %} <span style="display:inline-flex;align-items:center;color:#fbbf24;"><i data-lucide="star"></i></span>{% endif %}
         </span>
         {% endfor %}
       </div>
@@ -201,7 +201,7 @@
       {% endif %}
     </div>
     <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
-      <button class="btn btn-ghost btn-sm" onclick="runTick()">⚡ Tick</button>
+      <button class="btn btn-ghost btn-sm" onclick="runTick()"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Tick</button>
       <button class="btn btn-ghost btn-sm" onclick="document.getElementById('create-task-panel').scrollIntoView({behavior:'smooth'})">＋ タスク作成</button>
     </div>
   </div>
@@ -213,10 +213,10 @@
   <!-- 待機中 (idle + queued) -->
   <div class="section-card">
     <div class="section-head">
-      <span class="section-label">⏳ 待機中タスク
+      <span class="section-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 待機中タスク
         <span class="section-count" style="color:var(--accent2);">{{ (tasks.idle|length) + (tasks.queued|length) }}</span>
       </span>
-      <button class="btn btn-ghost btn-sm" onclick="runTick()">⚡ キュー実行</button>
+      <button class="btn btn-ghost btn-sm" onclick="runTick()"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> キュー実行</button>
     </div>
     {% set idle_tasks = tasks.idle + tasks.queued %}
     {% if idle_tasks %}
@@ -234,7 +234,7 @@
         </div>
         <div class="task-actions">
           <button class="btn btn-green btn-sm" onclick="startTask('{{ t.id }}', this)">▶ 開始</button>
-          <button class="btn btn-ghost btn-sm" onclick="escalateTask('{{ t.id }}', this)">⬆</button>
+          <button class="btn btn-ghost btn-sm" onclick="escalateTask('{{ t.id }}', this)"><span style="display:inline-flex;align-items:center;"><i data-lucide="arrow-up"></i></span></button>
         </div>
       </div>
       {% endfor %}
@@ -262,8 +262,8 @@
           </div>
         </div>
         <div class="task-actions">
-          <button class="btn btn-green btn-sm" onclick="completeTask('{{ t.id }}', this)">✓ 完了</button>
-          <button class="btn btn-danger btn-sm" onclick="failTask('{{ t.id }}', this)">✗ 失敗</button>
+          <button class="btn btn-green btn-sm" onclick="completeTask('{{ t.id }}', this)"> 完了</button>
+          <button class="btn btn-danger btn-sm" onclick="failTask('{{ t.id }}', this)"> 失敗</button>
           <button class="btn btn-ghost btn-sm" onclick="requestApproval('{{ t.id }}', '{{ t.title }}', this)">△ 承認申請</button>
         </div>
       </div>
@@ -280,7 +280,7 @@
   <!-- ブロック中 -->
   <div class="section-card" style="border-color:{% if tasks.blocked %}rgba(245,158,11,.25){% else %}var(--border){% endif %};">
     <div class="section-head">
-      <span class="section-label" style="color:{% if tasks.blocked %}var(--yellow2){% else %}var(--muted2){% endif %};">🔒 ブロック中
+      <span class="section-label" style="color:{% if tasks.blocked %}var(--yellow2){% else %}var(--muted2){% endif %};"><span style="display:inline-flex;align-items:center;"><i data-lucide="lock"></i></span> ブロック中
         <span class="section-count" style="color:var(--yellow2);">{{ tasks.blocked|length }}</span>
       </span>
     </div>
@@ -295,7 +295,7 @@
           </div>
           {% for blocker in t.blockers %}
           <div class="blocker-item">
-            <span>🔒</span>
+            <span><span style="display:inline-flex;align-items:center;"><i data-lucide="lock"></i></span></span>
             <span>待機中: <strong>{{ blocker.title }}</strong></span>
             <span class="badge badge-warn" style="font-size:9px;">{{ blocker.status }}</span>
           </div>
@@ -307,7 +307,7 @@
       </div>
       {% endfor %}
     {% else %}
-      <div class="empty-section">ブロック中のタスクはありません ✓</div>
+      <div class="empty-section">ブロック中のタスクはありません </div>
     {% endif %}
   </div>
 
@@ -333,8 +333,8 @@
           </div>
           <div style="font-size:11px;color:var(--muted2);">期限: {{ (t.approval.expires_at or 'なし')[:16] }}</div>
           <div class="task-actions" style="margin-top:10px;">
-            <button class="btn btn-green btn-sm" onclick="approveTask('{{ t.id }}', this)">✓ 承認する</button>
-            <button class="btn btn-danger btn-sm" onclick="rejectTask('{{ t.id }}', this)">✗ 却下する</button>
+            <button class="btn btn-green btn-sm" onclick="approveTask('{{ t.id }}', this)"> 承認する</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectTask('{{ t.id }}', this)"> 却下する</button>
           </div>
         </div>
         {% else %}
@@ -345,15 +345,15 @@
             <div class="task-meta">承認レコードなし</div>
           </div>
           <div class="task-actions">
-            <button class="btn btn-green btn-sm" onclick="approveTask('{{ t.id }}', this)">✓ 承認</button>
-            <button class="btn btn-danger btn-sm" onclick="rejectTask('{{ t.id }}', this)">✗ 却下</button>
+            <button class="btn btn-green btn-sm" onclick="approveTask('{{ t.id }}', this)"> 承認</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectTask('{{ t.id }}', this)"> 却下</button>
           </div>
         </div>
         {% endif %}
       </div>
       {% endfor %}
     {% else %}
-      <div class="empty-section">承認待ちはありません ✓</div>
+      <div class="empty-section">承認待ちはありません </div>
     {% endif %}
   </div>
 </div>
@@ -364,7 +364,7 @@
   <!-- 完了済み -->
   <div class="section-card">
     <div class="section-head">
-      <span class="section-label" style="color:var(--green2);">✓ 完了済み (直近)
+      <span class="section-label" style="color:var(--green2);"> 完了済み (直近)
         <span class="section-count">{{ tasks.completed|length }}</span>
       </span>
     </div>
@@ -386,7 +386,7 @@
   <!-- 失敗・エスカレーション -->
   <div class="section-card" style="border-color:{% if tasks.failed or tasks.escalated %}rgba(239,68,68,.2){% else %}var(--border){% endif %};">
     <div class="section-head">
-      <span class="section-label" style="color:{% if tasks.failed or tasks.escalated %}var(--red){% else %}var(--muted2){% endif %};">✗ 失敗・エスカレーション
+      <span class="section-label" style="color:{% if tasks.failed or tasks.escalated %}var(--red){% else %}var(--muted2){% endif %};"> 失敗・エスカレーション
         <span class="section-count" style="color:var(--red);">{{ (tasks.failed|length) + (tasks.escalated|length) }}</span>
       </span>
     </div>
@@ -397,7 +397,7 @@
         <div class="task-prio prio-{{ t.priority }}"></div>
         <div class="task-body">
           <div class="task-title" style="color:{% if t.status=='escalated' %}var(--purple2){% else %}var(--red){% endif %};">
-            {% if t.status == 'escalated' %}⬆{% else %}✗{% endif %} {{ t.title }}
+            {% if t.status == 'escalated' %}<span style="display:inline-flex;align-items:center;"><i data-lucide="arrow-up"></i></span>{% else %}{% endif %} {{ t.title }}
           </div>
           {% if t.error_message %}
           <div class="task-desc" style="color:var(--red);">{{ t.error_message[:100] }}</div>
@@ -414,17 +414,17 @@
           {% endif %}
         </div>
         <div class="task-actions">
-          <button class="btn btn-ghost btn-sm" onclick="requeueTask('{{ t.id }}', this)">🔄 再試行</button>
+          <button class="btn btn-ghost btn-sm" onclick="requeueTask('{{ t.id }}', this)"><span style="display:inline-flex;align-items:center;"><i data-lucide="refresh-cw"></i></span> 再試行</button>
           {% if t.status == 'escalated' %}
           {% for esc in t.escalations %}
-          <button class="btn btn-ghost btn-sm" onclick="resolveEsc('{{ esc.id }}', this)">✓ 解決</button>
+          <button class="btn btn-ghost btn-sm" onclick="resolveEsc('{{ esc.id }}', this)"> 解決</button>
           {% endfor %}
           {% endif %}
         </div>
       </div>
       {% endfor %}
     {% else %}
-      <div class="empty-section">失敗・エスカレーションなし ✓</div>
+      <div class="empty-section">失敗・エスカレーションなし </div>
     {% endif %}
   </div>
 </div>
@@ -527,7 +527,7 @@ async function approveTask(taskId, btn) {
   if (comment === null) return;
   btn.disabled = true;
   const d = await apiPost(`/api/tasks/${taskId}/approve`, {comment});
-  if (d.ok) { toast('承認しました ✓', 'ok'); setTimeout(()=>location.reload(),900); }
+  if (d.ok) { toast('承認しました ', 'ok'); setTimeout(()=>location.reload(),900); }
   else { toast(d.error||'失敗','err'); btn.disabled=false; }
 }
 
@@ -569,7 +569,7 @@ async function resolveEsc(escId, btn) {
   if (note === null) return;
   btn.disabled = true;
   const d = await apiPost(`/api/escalations/${escId}/resolve`, {note});
-  if (d.ok) { toast('エスカレーション解決 ✓', 'ok'); setTimeout(()=>location.reload(),900); }
+  if (d.ok) { toast('エスカレーション解決 ', 'ok'); setTimeout(()=>location.reload(),900); }
   else { toast(d.error||'失敗','err'); btn.disabled=false; }
 }
 

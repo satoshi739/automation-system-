@@ -210,7 +210,7 @@
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;">
     <div>
       <div style="font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">
-        ☀️ AI CEO からの朝ブリーフ — {{ brief.generated_at }} 生成
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span> AI CEO からの朝ブリーフ — {{ brief.generated_at }} 生成
       </div>
       <div style="font-size:14px;line-height:1.85;color:var(--text);max-width:720px;">{{ brief.summary }}</div>
     </div>
@@ -319,7 +319,7 @@
         </div>
         {% endif %}
         {% if unreplied.total == 0 %}
-        <div class="empty-cta" style="padding:10px;width:100%;">未返信なし ✓<br><a href="/leads">リード一覧</a></div>
+        <div class="empty-cta" style="padding:10px;width:100%;">未返信なし <br><a href="/leads">リード一覧</a></div>
         {% endif %}
       </div>
     </div>
@@ -392,7 +392,7 @@
       {% endfor %}
       <a href="/inbox" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:4px;">素材を補充する →</a>
     {% else %}
-      <div class="empty-cta">全ブランド素材充足 ✓<br><a href="/inbox">インボックスを開く</a></div>
+      <div class="empty-cta">全ブランド素材充足 <br><a href="/inbox">インボックスを開く</a></div>
     {% endif %}
   </div>
 
@@ -416,16 +416,16 @@
         </div>
       </div>
       {% endfor %}
-      <a href="/generate" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px;">✦ コンテンツ生成</a>
+      <a href="/generate" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> コンテンツ生成</a>
     {% else %}
-      <div class="empty-cta">全ブランド投稿目標達成 ✓<br><a href="/queue">キューを確認</a></div>
+      <div class="empty-cta">全ブランド投稿目標達成 <br><a href="/queue">キューを確認</a></div>
     {% endif %}
   </div>
 
   <!-- ブログ候補 -->
   <div class="card" style="margin-bottom:0;">
     <div class="section-header">
-      <span class="section-title">✒ Blog Auto Growth</span>
+      <span class="section-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="pen"></i></span> Blog Auto Growth</span>
       <a href="/blog" class="section-action">全候補 →</a>
     </div>
     {% if blog_candidates %}
@@ -442,7 +442,7 @@
         <span class="blog-status-chip blog-status-{{ b.status }}">{{ '下書き' if b.status == 'draft' else 'アイデア' }}</span>
       </a>
       {% endfor %}
-      <a href="/blog" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px;">✒ 全記事候補を見る</a>
+      <a href="/blog" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="pen"></i></span> 全記事候補を見る</a>
     {% else %}
       <div class="empty-cta">候補なし<br><a href="/blog">Blog Auto Growth</a></div>
     {% endif %}
@@ -458,7 +458,7 @@
   </div>
   <div style="display:flex; gap:8px; flex-shrink:0;">
     <a href="/anomaly-alerts" class="btn btn-ghost btn-sm">異常検知</a>
-    <a href="/performance-snapshot" class="btn btn-ghost btn-sm">◈ スナップショット</a>
+    <a href="/performance-snapshot" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span> スナップショット</a>
     <a href="/chief-of-staff" class="btn btn-primary btn-sm">開く →</a>
   </div>
 </div>

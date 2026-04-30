@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🎯 Campaign Pipeline</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> Campaign Pipeline</div>
     <div class="page-sub">企画をキャンペーン単位で束ねて、承認〜公開まで管理する</div>
   </div>
   <div class="header-actions">
@@ -115,8 +115,8 @@
         </div>
 
         <div style="display:flex;gap:16px;font-size:11.5px;color:var(--muted2);margin-bottom:8px;">
-          {% if c.start_date %}<span>📅 {{ c.start_date }} {% if c.end_date %}〜 {{ c.end_date }}{% endif %}</span>{% endif %}
-          <span>💡 アイデア {{ c.ideas|length }} 件</span>
+          {% if c.start_date %}<span><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> {{ c.start_date }} {% if c.end_date %}〜 {{ c.end_date }}{% endif %}</span>{% endif %}
+          <span><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> アイデア {{ c.ideas|length }} 件</span>
         </div>
 
         <!-- Idea mini-list -->
@@ -124,7 +124,7 @@
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           {% for idea in c.ideas[:5] %}
           <a href="/ideas/{{ idea.id }}" style="font-size:11px;padding:3px 9px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted2);text-decoration:none;transition:all .15s;" onmouseover="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'">
-            {% if idea.status == 'approved' %}✓ {% endif %}{{ idea.title[:30] }}{% if idea.title|length > 30 %}…{% endif %}
+            {% if idea.status == 'approved' %} {% endif %}{{ idea.title[:30] }}{% if idea.title|length > 30 %}…{% endif %}
           </a>
           {% endfor %}
           {% if c.ideas|length > 5 %}<span style="font-size:11px;color:var(--muted);padding:3px 9px;">+{{ c.ideas|length - 5 }} 件</span>{% endif %}
@@ -138,7 +138,7 @@
 </div>
 {% else %}
 <div class="card" style="text-align:center;padding:60px 24px;">
-  <div style="font-size:36px;margin-bottom:14px;">🎯</div>
+  <div style="font-size:36px;margin-bottom:14px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span></div>
   <div style="font-size:15px;font-weight:600;margin-bottom:8px;">キャンペーンがありません</div>
   <div style="font-size:13px;color:var(--muted2);margin-bottom:22px;">キャンペーンを作成してアイデアを束ねましょう</div>
   <button class="btn btn-primary" onclick="toggleSection('new-camp-form')">＋ キャンペーンを作成する</button>

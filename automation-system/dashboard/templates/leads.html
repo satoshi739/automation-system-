@@ -4,11 +4,11 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">👤 リード一覧</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span> リード一覧</div>
     <div class="page-sub">{{ leads|length }}件 表示中</div>
   </div>
   <div class="header-actions">
-    <a href="/leads/kanban" class="btn btn-ghost">🎯 カンバン表示</a>
+    <a href="/leads/kanban" class="btn btn-ghost"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> カンバン表示</a>
   </div>
 </div>
 
@@ -50,22 +50,22 @@
       </td>
       <td><span style="font-size:12px;color:var(--muted);">{{ l.brand or '-' }}</span></td>
       <td style="font-size:13px;">
-        {% if l.channel=='line' %}📱
-        {% elif l.channel=='instagram' %}📷
-        {% elif l.channel=='form' %}🌐
-        {% elif l.channel=='referral' %}🤝
+        {% if l.channel=='line' %}<span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span>
+        {% elif l.channel=='instagram' %}<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>
+        {% elif l.channel=='form' %}<span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span>
+        {% elif l.channel=='referral' %}<span style="display:inline-flex;align-items:center;"><i data-lucide="handshake"></i></span>
         {% endif %}
         {{ l.channel or '-' }}
       </td>
       <td>
-        {% if l.outcome=='contracted' %}<span class="badge badge-contracted">✅ 契約</span>
+        {% if l.outcome=='contracted' %}<span class="badge badge-contracted"> 契約</span>
         {% elif l.outcome=='lost' %}<span class="badge badge-lost">失注</span>
         {% else %}<span class="badge badge-{{ (l.stage or '')|lower }}">{{ l.stage or '-' }}</span>{% endif %}
       </td>
       <td style="font-size:13px;">
         {{ (l.next_action or '-')[:28] }}
         {% if l.next_action_date %}
-        <br><span style="font-size:11px;color:var(--muted);">📅 {{ l.next_action_date }}</span>
+        <br><span style="font-size:11px;color:var(--muted);"><span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> {{ l.next_action_date }}</span>
         {% endif %}
       </td>
       <td style="font-size:12px;color:var(--muted);">{{ l.last_contact or l.created_at or '-' }}</td>
@@ -75,7 +75,7 @@
   </table>
   {% else %}
   <div style="text-align:center;padding:72px 20px;">
-    <div style="font-size:48px;opacity:.3;margin-bottom:16px;">👤</div>
+    <div style="font-size:48px;opacity:.3;margin-bottom:16px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span></div>
     <div style="font-size:16px;font-weight:600;color:var(--muted2);margin-bottom:8px;">リードがまだありません</div>
     <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">
       {% if stage_filter %}
@@ -87,7 +87,7 @@
     {% if stage_filter %}
     <a href="/leads" class="btn btn-ghost btn-sm">フィルターをクリア</a>
     {% else %}
-    <a href="/decisions" class="btn btn-primary btn-sm">📋 判断待ちを確認</a>
+    <a href="/decisions" class="btn btn-primary btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span> 判断待ちを確認</a>
     {% endif %}
   </div>
   {% endif %}

@@ -50,15 +50,15 @@
         <div style="font-size:11px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">実績数値（任意）</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label" style="font-size:10px;">❤ いいね</label>
+            <label class="form-label" style="font-size:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> いいね</label>
             <input class="form-input" name="metrics_likes" type="number" min="0" placeholder="0">
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label" style="font-size:10px;">🔖 保存</label>
+            <label class="form-label" style="font-size:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bookmark"></i></span> 保存</label>
             <input class="form-input" name="metrics_saves" type="number" min="0" placeholder="0">
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label" style="font-size:10px;">💬 コメント</label>
+            <label class="form-label" style="font-size:10px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> コメント</label>
             <input class="form-input" name="metrics_comments" type="number" min="0" placeholder="0">
           </div>
           <div class="form-group" style="margin-bottom:0;">
@@ -77,22 +77,22 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">🎣 Hook（最初の引き）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="fish"></i></span> Hook（最初の引き）</label>
           <textarea class="form-textarea" name="hook" rows="2" placeholder="冒頭で視聴者を引き止めた表現・切り口..."></textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">⚡ Problem Framing（問題提示）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Problem Framing（問題提示）</label>
           <textarea class="form-textarea" name="problem_framing" rows="2" placeholder="どんな悩み・課題を掘り起こしたか..."></textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">🌊 Emotional Arc（感情の流れ）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="waves"></i></span> Emotional Arc（感情の流れ）</label>
           <textarea class="form-textarea" name="emotional_arc" rows="2" placeholder="共感→驚き→納得 など感情の変化..."></textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">📣 CTA（行動喚起）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> CTA（行動喚起）</label>
           <input class="form-input" name="cta" placeholder="保存してね / コメントで教えて / DMへ など">
         </div>
       </div>
@@ -112,7 +112,7 @@
 
       <!-- Risk flags -->
       <div class="card">
-        <div class="card-header"><span class="card-title">⚠ リスクフラグ</span></div>
+        <div class="card-header"><span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> リスクフラグ</span></div>
         <div style="display:flex;gap:7px;flex-wrap:wrap;">
           {% for flag in risk_flag_options %}
           <label style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;border:1px solid rgba(239,68,68,.2);cursor:pointer;font-size:11.5px;color:var(--muted2);" class="risk-label">

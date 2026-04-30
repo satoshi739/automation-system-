@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🎯 リード カンバン</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> リード カンバン</div>
     <div class="page-sub">ドラッグ＆ドロップでステージを更新できます</div>
   </div>
   <div class="header-actions">
@@ -42,7 +42,7 @@
       {% endif %}
       {% if lead.next_action_date %}
       <div style="font-size:11px;color:{% if lead.next_action_date < now_date %}var(--red){% else %}var(--muted){% endif %};margin-top:4px;">
-        📅 {{ lead.next_action_date }}
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> {{ lead.next_action_date }}
       </div>
       {% endif %}
     </div>
@@ -62,7 +62,7 @@
   background:var(--green); color:#0a2010; padding:12px 20px;
   border-radius:10px; font-size:14px; font-weight:700;
   box-shadow: 0 4px 20px rgba(52,211,153,.4);
-  z-index:9999;">✅ ステージを更新しました</div>
+  z-index:9999;"> ステージを更新しました</div>
 
 <script>
 const nowDate = '{{ now_date }}';

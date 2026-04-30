@@ -4,12 +4,12 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">💡 コンテンツアイデア</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> コンテンツアイデア</div>
     <div class="page-sub">ブランド変換済みのアイデアと媒体バリアントを管理する</div>
   </div>
   <div class="header-actions">
-    <a href="/noimos" class="btn btn-ghost btn-sm">🧠 元ネタ登録</a>
-    <a href="/publishing" class="btn btn-primary btn-sm">📤 承認キュー {% if stats.pending_approvals %}<span style="background:rgba(255,255,255,.2);padding:1px 6px;border-radius:8px;font-size:10px;">{{ stats.pending_approvals }}</span>{% endif %}</a>
+    <a href="/noimos" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> 元ネタ登録</a>
+    <a href="/publishing" class="btn btn-primary btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> 承認キュー {% if stats.pending_approvals %}<span style="background:rgba(255,255,255,.2);padding:1px 6px;border-radius:8px;font-size:10px;">{{ stats.pending_approvals }}</span>{% endif %}</a>
   </div>
 </div>
 
@@ -76,10 +76,10 @@
 </div>
 {% else %}
 <div class="card" style="text-align:center;padding:60px 24px;">
-  <div style="font-size:36px;margin-bottom:14px;">💡</div>
+  <div style="font-size:36px;margin-bottom:14px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span></div>
   <div style="font-size:15px;font-weight:600;margin-bottom:8px;">アイデアがありません</div>
   <div style="font-size:13px;color:var(--muted2);margin-bottom:22px;">元ネタを登録して構造を抽出し、ブランド変換するとここに現れます</div>
-  <a href="/noimos/new" class="btn btn-primary">🧠 元ネタを登録する</a>
+  <a href="/noimos/new" class="btn btn-primary"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> 元ネタを登録する</a>
 </div>
 {% endif %}
 

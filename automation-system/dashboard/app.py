@@ -61,8 +61,8 @@ CALENDAR_DIR  = AUTO / "content_queue" / "calendar"
 
 PLATFORMS = ["instagram","threads","facebook","twitter","youtube","tiktok","line","wordpress"]
 PLATFORM_ICONS = {
-    "instagram":"📷","threads":"🧵","facebook":"📘","twitter":"𝕏","youtube":"▶️",
-    "tiktok":"🎵","line":"📱","wordpress":"🌐",
+    "instagram":"IG","threads":"TH","facebook":"FB","twitter":"𝕏","youtube":"YT",
+    "tiktok":"TK","line":"LINE","wordpress":"WP",
 }
 
 # ── 認証 ──────────────────────────────────────────────────
@@ -610,24 +610,113 @@ def analytics():
     # ブランド別サイトアクセス（GA4）
     brands = load_brands()
     brand_traffic = {}
+
+    # 全ブランドのGA4/GSCデータを取得
+    BRAND_ENV_PREFIXES = {
+        "upjapan":        "UPJAPAN",
+        "dsc-marketing":  "DSC_MARKETING",
+        "cashflowsupport":"CASHFLOWSUPPORT",
+        "bangkok-peach":  "BANGKOK_PEACH",
+        "satoshi-blog":   "SATOSHI_BLOG",
+    }
+
+    ga_all_data = {}   # bid -> {overview, series, pages}
+    gsc_all_data = {}  # bid -> {overview, queries}
+
+    for bid, prefix in BRAND_ENV_PREFIXES.items():
+        # GA4
+        ga_env = f"{prefix}_GA4_PROPERTY_ID"
+        try:
+            from sns.analytics import GA4Client
+            ga_client = GA4Client(ga_env)
+            overview  = ga_client.get_overview(28)
+            series    = ga_client.get_daily_series(28)
+            pages     = ga_client.get_top_pages(28, 5)
+            ga_all_data[bid] = {"overview": overview, "series": series, "pages": pages}
+        except Exception as e:
+            ga_all_data[bid] = {"overview": {}, "series": {"dates": [], "sessions": []}, "pages": []}
+
+        # GSC
+        gsc_env = f"{prefix}_GSC_SITE_URL"
+        try:
+            from sns.analytics import SearchConsoleClient
+            gsc_client = SearchConsoleClient(gsc_env)
+            gsc_all_data[bid] = {
+                "overview": gsc_client.get_overview(28),
+                "queries":  gsc_client.get_top_queries(28, 10),
+            }
+        except Exception as e:
+            gsc_all_data[bid] = {"overview": {}, "queries": []}
+
     for bid, b in brands.items():
-        ga = _get_ga_data(bid)
+        ga = ga_all_data.get(bid, {})
         ov = ga.get("overview", {})
+        gsc = gsc_all_data.get(bid, {})
+        gsc_ov = gsc.get("overview", {})
+        prefix = BRAND_ENV_PREFIXES.get(bid, bid.upper().replace("-", "_"))
+        is_configured = bool(os.environ.get(f"{prefix}_GA4_PROPERTY_ID") and not ov.get("error"))
         brand_traffic[bid] = {
-            "name":     b.get("name_short", bid),
-            "color":    b.get("color", "#6366f1"),
-            "url":      b.get("url", ""),
-            "sessions": ov.get("sessions", 0),
-            "pageviews": ov.get("pageviews", 0),
-            "users":    ov.get("users", 0),
+            "name":        b.get("name_short", bid),
+            "color":       b.get("color", "#6366f1"),
+            "url":         b.get("url", ""),
+            "sessions":    ov.get("sessions", 0),
+            "pageviews":   ov.get("pageviews", 0),
+            "users":       ov.get("users", 0),
             "avg_duration": ov.get("avg_duration", 0),
-            "bounce_rate":  ov.get("bounce_rate", 0),
-            "configured": bool(ov.get("sessions", None) is not None and not ov.get("error")),
+            "bounce_rate": ov.get("bounce_rate", 0),
+            "configured":  is_configured,
+            # GA4詳細
+            "pages":       ga.get("pages", []),
+            "series":      ga.get("series", {"dates": [], "sessions": []}),
+            # GSC
+            "gsc_clicks":  gsc_ov.get("clicks", 0),
+            "gsc_impressions": gsc_ov.get("impressions", 0),
+            "gsc_ctr":     gsc_ov.get("ctr", 0),
+            "gsc_position": gsc_ov.get("position", 0),
+            "gsc_queries": gsc.get("queries", []),
         }
+
+    # KPIサマリー（全ブランド合算）
+    ga_summary = {
+        "total_sessions":  sum(v.get("sessions", 0) for v in brand_traffic.values()),
+        "total_pageviews": sum(v.get("pageviews", 0) for v in brand_traffic.values()),
+        "avg_bounce_rate": round(
+            sum(v.get("bounce_rate", 0) for v in brand_traffic.values() if v.get("configured"))
+            / max(sum(1 for v in brand_traffic.values() if v.get("configured")), 1), 1
+        ),
+        "avg_duration": round(
+            sum(v.get("avg_duration", 0) for v in brand_traffic.values() if v.get("configured"))
+            / max(sum(1 for v in brand_traffic.values() if v.get("configured")), 1), 1
+        ),
+    }
+
+    # 日別トレンド（全ブランド合算・直近28日）
+    from collections import defaultdict
+    daily_totals = defaultdict(int)
+    for bid, bt in brand_traffic.items():
+        series = bt.get("series", {})
+        for d, s in zip(series.get("dates", []), series.get("sessions", [])):
+            daily_totals[d] += s
+    daily_sorted = sorted(daily_totals.items())
+    ga_daily = {
+        "dates":    [d for d, _ in daily_sorted],
+        "sessions": [s for _, s in daily_sorted],
+    }
+
+    # ブランド別日別トレンド（チャート用）
+    ga_brand_series = {}
+    for bid, bt in brand_traffic.items():
+        if bt.get("configured"):
+            ga_brand_series[bid] = {
+                "name":    bt["name"],
+                "color":   bt["color"],
+                "series":  bt.get("series", {"dates": [], "sessions": []}),
+            }
 
     return render_template("analytics.html",
         funnel=funnel, monthly=monthly, channels=channels,
-        stats=stats, mrr_history=mrr_history, brand_traffic=brand_traffic)
+        stats=stats, mrr_history=mrr_history, brand_traffic=brand_traffic,
+        ga_summary=ga_summary, ga_daily=ga_daily, ga_brand_series=ga_brand_series)
 
 
 @app.route("/brands")
@@ -1464,7 +1553,7 @@ def inbox_page():
             "processed_count": processed_count,
             "path": str(INBOX_DIR / bid),
         }
-    return render_template("inbox.html", inbox_data=inbox_data, brands=brands)
+    return render_template("inbox.html", inbox_data=inbox_data, brands=brands, ai=ai_available())
 
 
 @app.route("/api/railway/sync", methods=["POST"])
@@ -1556,6 +1645,42 @@ def api_inbox_process():
         return jsonify({"ok": True, "processed": count})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/inbox/upload/<brand>", methods=["POST"])
+def api_inbox_upload(brand: str):
+    """ブランドのインボックスにファイルをアップロードする"""
+    brands = load_brands()
+    if brand not in brands:
+        return jsonify({"ok": False, "error": "不明なブランドです"}), 400
+
+    files = request.files.getlist("files")
+    if not files:
+        return jsonify({"ok": False, "error": "ファイルが選択されていません"}), 400
+
+    allowed_exts = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".mp4", ".mov", ".m4v"}
+    saved = []
+    errors = []
+    inbox_dir = INBOX_DIR / brand
+    inbox_dir.mkdir(parents=True, exist_ok=True)
+
+    for f in files:
+        if not f.filename:
+            continue
+        ext = Path(f.filename).suffix.lower()
+        if ext not in allowed_exts:
+            errors.append(f"{f.filename}: 非対応フォーマット")
+            continue
+        safe_name = "".join(c if c.isalnum() or c in "-_." else "_" for c in f.filename)
+        dest = inbox_dir / safe_name
+        if dest.exists():
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            dest = inbox_dir / f"{Path(safe_name).stem}_{ts}{ext}"
+        f.save(str(dest))
+        saved.append(f.filename)
+        log.info(f"インボックス保存: {dest}")
+
+    return jsonify({"ok": True, "saved": saved, "errors": errors, "count": len(saved)})
 
 
 @app.route("/performance")
@@ -2250,18 +2375,18 @@ def webhook():
 # ── Agent Workspace ──────────────────────────────────────────────────────────
 
 AGENT_ICONS = {
-    "sns_poster":       "📣",
-    "line_responder":   "📱",
-    "lead_manager":     "🎯",
-    "content_creator":  "✍",
-    "analytics":        "📊",
-    "meo_manager":      "📍",
-    "wp_blogger":       "📝",
-    "finance":          "💰",
-    "ceo":              "🏢",
-    "scheduler":        "📅",
-    "reviewer":         "⭐",
-    "escalation":       "🚨",
+    "sns_poster":       "SNS",
+    "line_responder":   "LINE",
+    "lead_manager":     "CRM",
+    "content_creator":  "EDT",
+    "analytics":        "GA4",
+    "meo_manager":      "MEO",
+    "wp_blogger":       "WP",
+    "finance":          "FIN",
+    "ceo":              "CEO",
+    "scheduler":        "SCH",
+    "reviewer":         "REV",
+    "escalation":       "ESC",
 }
 
 
@@ -2668,8 +2793,8 @@ RISK_FLAG_OPTIONS = [
     "景品表示法", "誇大表現", "コンプライアンス要確認",
 ]
 FORMAT_ICONS = {
-    "feed": "🖼", "story": "📸", "reel": "🎬",
-    "meo": "📍", "blog": "📝", "line": "📱",
+    "feed": "IMG", "story": "STY", "reel": "VID",
+    "meo": "MEO", "blog": "WP", "line": "LINE",
 }
 
 

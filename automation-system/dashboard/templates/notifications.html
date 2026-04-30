@@ -44,7 +44,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🔔 通知</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bell"></i></span> 通知</div>
     <div class="page-sub">システム・AIエージェントからの通知一覧</div>
   </div>
   <div class="header-actions">
@@ -59,8 +59,8 @@
 <div class="notif-list">
   {% if notifs %}
     {% for n in notifs %}
-    {% set icon_map = {'info':'ℹ️','success':'✅','warning':'⚠️','error':'❌','approval':'📋','escalation':'🚨','publish':'📤','lead':'👤'} %}
-    {% set icon = icon_map.get(n.type, '🔔') %}
+    {% set icon_map = {'info':'ℹ️','success':'','warning':'<span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span>','error':'','approval':'<span style="display:inline-flex;align-items:center;"><i data-lucide="clipboard-list"></i></span>','escalation':'<span style="display:inline-flex;align-items:center;"><i data-lucide="siren"></i></span>','publish':'<span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span>','lead':'<span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span>'} %}
+    {% set icon = icon_map.get(n.type, '<span style="display:inline-flex;align-items:center;"><i data-lucide="bell"></i></span>') %}
     <a href="{{ n.link or '#' }}" class="notif-item {{ 'unread' if not n.is_read else '' }}"
        onclick="markRead({{ n.id }}, event)">
       <div class="notif-icon-wrap {{ n.type or 'info' }}">{{ icon }}</div>
@@ -86,7 +86,7 @@
     {% endfor %}
   {% else %}
   <div class="empty-state">
-    <div class="empty-icon">🔔</div>
+    <div class="empty-icon"><span style="display:inline-flex;align-items:center;"><i data-lucide="bell"></i></span></div>
     <div class="empty-title">通知はありません</div>
     <div class="empty-body">
       システムやAIエージェントからの通知が<br>届くと、ここに表示されます。

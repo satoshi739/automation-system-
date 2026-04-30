@@ -5,7 +5,7 @@
 <div class="page-header">
   <div>
     <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">APPROVALS & LOG</div>
-    <div class="page-title">⚖ 承認・ログ</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="scale"></i></span> 承認・ログ</div>
     <div class="page-sub">AI が自動処理できなかった判断・承認待ち案件を一覧表示します</div>
   </div>
   <div class="header-actions">
@@ -52,7 +52,7 @@
     <div style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15);border-left:3px solid var(--red);border-radius:12px;padding:16px 18px;">
       <!-- ヘッダー行 -->
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <span style="font-size:18px;">⚡</span>
+        <span style="font-size:18px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span></span>
         <span style="font-size:10.5px;font-weight:700;background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:2px 8px;border-radius:20px;">{{ d.type or '要確認' }}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:auto;">{{ (d.created_at or '')[:16] }}</span>
       </div>
@@ -71,7 +71,7 @@
       <form method="POST" action="/decisions/resolve/{{ d.id }}" style="display:flex;gap:8px;align-items:center;">
         <input type="text" name="note" class="form-input" placeholder="対応メモ（省略可）"
                style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:inherit;outline:none;">
-        <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--green2);border-color:rgba(16,185,129,.3);white-space:nowrap;">✅ 対応済みにする</button>
+        <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--green2);border-color:rgba(16,185,129,.3);white-space:nowrap;"> 対応済みにする</button>
       </form>
     </div>
     {% endfor %}
@@ -81,7 +81,7 @@
 {% else %}
 <!-- 空状態 -->
 <div style="text-align:center;padding:56px 20px;background:var(--s1);border:1px dashed rgba(16,185,129,.25);border-radius:16px;margin-bottom:24px;">
-  <div style="font-size:56px;margin-bottom:16px;">✅</div>
+  <div style="font-size:56px;margin-bottom:16px;"></div>
   <div style="font-size:18px;font-weight:700;color:var(--green2);margin-bottom:6px;">すべて対応済みです</div>
   <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6;">自動化システムが正常に稼働しています。<br>判断が必要な案件は自動的にここに届きます。</div>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
@@ -105,7 +105,7 @@
   <div style="display:flex;flex-direction:column;gap:6px;">
     {% for d in closed %}
     <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--s2);">
-      <span style="font-size:14px;flex-shrink:0;margin-top:1px;">✅</span>
+      <span style="font-size:14px;flex-shrink:0;margin-top:1px;"></span>
       <div style="flex:1;min-width:0;">
         <div style="font-size:12.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">{{ d.reason[:60] }}{% if d.reason|length > 60 %}…{% endif %}</div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -125,7 +125,7 @@
 {% if not decisions %}
 <!-- 完全に空の場合 -->
 <div style="text-align:center;padding:60px 20px;background:var(--s1);border:1px dashed var(--border);border-radius:16px;">
-  <div style="font-size:56px;margin-bottom:16px;opacity:.5;">📬</div>
+  <div style="font-size:56px;margin-bottom:16px;opacity:.5;"><span style="display:inline-flex;align-items:center;"><i data-lucide="mail"></i></span></div>
   <div style="font-size:18px;font-weight:700;margin-bottom:8px;">まだ判断待ちはありません</div>
   <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6;">自動化が判断できない案件が発生すると、<br>ここに通知が届きます。</div>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">

@@ -61,11 +61,11 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">☀️ Daily Brief 履歴</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span> Daily Brief 履歴</div>
     <div class="page-sub">朝ブリーフの過去7日分。AIが毎朝07:30に自動生成します。</div>
   </div>
   <div class="header-actions">
-    <a href="/chief-of-staff" class="btn btn-purple btn-sm">🧠 Chief of Staff</a>
+    <a href="/chief-of-staff" class="btn btn-purple btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> Chief of Staff</a>
   </div>
 </div>
 
@@ -75,7 +75,7 @@
 <div style="background:linear-gradient(135deg, rgba(16,185,129,.08), rgba(10,16,36,.95)); border:1px solid rgba(16,185,129,.25); border-radius:var(--radius); padding:22px 26px; margin-bottom:28px; position:relative; overflow:hidden;">
   <div style="position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, transparent, var(--green), transparent);"></div>
   <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-    <span style="font-size:22px;">☀️</span>
+    <span style="font-size:22px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span></span>
     <div>
       <div style="font-size:11px; font-weight:700; color:var(--green2); text-transform:uppercase; letter-spacing:1px;">本日のブリーフ</div>
       <div style="font-size:13px; color:var(--muted2);">{{ today.date_label }} / 生成: {{ today.generated_at }}</div>
@@ -86,9 +86,9 @@
   </div>
   <div style="font-size:13.5px; line-height:1.8; color:var(--text); margin-bottom:16px;">{{ today.summary }}</div>
   <div style="display:flex; gap:20px; flex-wrap:wrap; padding-top:12px; border-top:1px solid rgba(255,255,255,.06);">
-    <div style="font-size:12px; color:var(--muted2);">📤 投稿実行: <strong style="color:var(--text);">{{ today.kpis.posts }}件</strong></div>
-    <div style="font-size:12px; color:var(--muted2);">👤 新規リード: <strong style="color:var(--text);">{{ today.kpis.leads }}件</strong></div>
-    <div style="font-size:12px; color:var(--muted2);">📊 エンゲージメント: <strong style="color:var(--text);">{{ today.kpis.engagement_rate }}%</strong></div>
+    <div style="font-size:12px; color:var(--muted2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> 投稿実行: <strong style="color:var(--text);">{{ today.kpis.posts }}件</strong></div>
+    <div style="font-size:12px; color:var(--muted2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span> 新規リード: <strong style="color:var(--text);">{{ today.kpis.leads }}件</strong></div>
+    <div style="font-size:12px; color:var(--muted2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> エンゲージメント: <strong style="color:var(--text);">{{ today.kpis.engagement_rate }}%</strong></div>
   </div>
 </div>
 {% endif %}
@@ -110,9 +110,9 @@
       </div>
       <div class="brief-summary">{{ brief.summary }}</div>
       <div class="brief-kpis">
-        <span class="brief-kpi">📤 投稿: <strong>{{ brief.kpis.posts }}件</strong></span>
-        <span class="brief-kpi">👤 リード: <strong>{{ brief.kpis.leads }}件</strong></span>
-        <span class="brief-kpi">📊 エンゲ率: <strong>{{ brief.kpis.engagement_rate }}%</strong></span>
+        <span class="brief-kpi"><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> 投稿: <strong>{{ brief.kpis.posts }}件</strong></span>
+        <span class="brief-kpi"><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span> リード: <strong>{{ brief.kpis.leads }}件</strong></span>
+        <span class="brief-kpi"><span style="display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> エンゲ率: <strong>{{ brief.kpis.engagement_rate }}%</strong></span>
       </div>
     </div>
   </div>

@@ -7,12 +7,12 @@
     <div style="font-size:12px;color:var(--muted2);margin-bottom:6px;">
       <a href="/meo" style="color:var(--muted2);text-decoration:none;">MEO Control Tower</a> /
     </div>
-    <div class="page-title">📍 {{ profile.location_name }}</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span> {{ profile.location_name }}</div>
     <div class="page-sub">{{ profile.address }}{% if profile.phone %} · {{ profile.phone }}{% endif %}</div>
   </div>
   <div class="header-actions">
     <a href="/reviews?tab=unanswered&profile_id={{ profile.id }}" class="btn btn-danger btn-sm">
-      💬 未返信 {{ profile.unanswered_reviews }}件
+      <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 未返信 {{ profile.unanswered_reviews }}件
     </a>
     <a href="/meo" class="btn btn-ghost btn-sm">← 一覧へ</a>
   </div>
@@ -40,7 +40,7 @@
   <div class="stat-card {% if profile.photo_alert %}yellow-top{% else %}green-top{% endif %}">
     <div class="stat-label">写真枚数</div>
     <div class="stat-value {% if profile.photo_alert %}yellow{% else %}green{% endif %}">{{ profile.photos_count }}</div>
-    <div class="stat-meta">{% if profile.photo_alert %}⚠️ 不足{% else %}✓ 十分{% endif %}</div>
+    <div class="stat-meta">{% if profile.photo_alert %}<span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> 不足{% else %} 十分{% endif %}</div>
   </div>
   <div class="stat-card">
     <div class="stat-label">最終同期</div>
@@ -157,7 +157,7 @@
         <div style="font-size:12.5px;line-height:1.5;">{{ r.comment or '（コメントなし）' }}</div>
         {% if r.reply %}
         <div style="margin-top:5px;padding:6px 9px;background:rgba(99,102,241,.06);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;font-size:11.5px;color:var(--muted2);">
-          💬 {{ r.reply[:80] }}{% if r.reply | length > 80 %}…{% endif %}
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> {{ r.reply[:80] }}{% if r.reply | length > 80 %}…{% endif %}
         </div>
         {% endif %}
       </td>
@@ -188,14 +188,14 @@
 <!-- ── Reply Modal ── -->
 <div id="reply-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;">
   <div style="background:var(--s2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:560px;">
-    <div style="font-size:15px;font-weight:700;margin-bottom:4px;">💬 レビューへ返信</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> レビューへ返信</div>
     <div id="modal-reviewer" style="font-size:12px;color:var(--muted2);margin-bottom:16px;"></div>
     <input type="hidden" id="modal-review-id">
     <input type="hidden" id="modal-draft-id" value="">
     <textarea id="modal-reply" class="form-textarea" rows="5" placeholder="返信内容を入力…" style="margin-bottom:10px;"></textarea>
     <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="closeReplyModal()">キャンセル</button>
-      <button class="btn btn-ghost btn-sm" onclick="generateDraft()">✦ AI下書き</button>
+      <button class="btn btn-ghost btn-sm" onclick="generateDraft()"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AI下書き</button>
       <button class="btn btn-primary" onclick="sendReply()">送信</button>
     </div>
   </div>
@@ -238,7 +238,7 @@ async function generateDraft() {
       toast('生成失敗: ' + d.error, 'err');
     }
   } finally {
-    btn.textContent = '✦ AI下書き'; btn.disabled = false;
+    btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AI下書き'; btn.disabled = false;
   }
 }
 async function sendReply() {

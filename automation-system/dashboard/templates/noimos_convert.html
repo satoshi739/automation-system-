@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🔄 ブランド変換</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="refresh-cw"></i></span> ブランド変換</div>
     <div class="page-sub">元ネタ: <strong>{{ pattern.title }}</strong></div>
   </div>
   <div class="header-actions">
@@ -14,18 +14,18 @@
 
 <!-- 元ネタ構造サマリー -->
 <div class="card" style="margin-bottom:20px;background:rgba(99,102,241,.04);border-color:rgba(99,102,241,.2);">
-  <div class="card-header"><span class="card-title" style="color:var(--accent2);">📌 抽出済み構造</span></div>
+  <div class="card-header"><span class="card-title" style="color:var(--accent2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="pin"></i></span> 抽出済み構造</span></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
     <div>
       {% if pattern.hook %}
       <div style="margin-bottom:12px;">
-        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">🎣 Hook</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="fish"></i></span> Hook</div>
         <div style="font-size:12.5px;color:var(--text);line-height:1.6;">{{ pattern.hook }}</div>
       </div>
       {% endif %}
       {% if pattern.problem_framing %}
       <div style="margin-bottom:12px;">
-        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">⚡ Problem Framing</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Problem Framing</div>
         <div style="font-size:12.5px;color:var(--text);line-height:1.6;">{{ pattern.problem_framing }}</div>
       </div>
       {% endif %}
@@ -33,13 +33,13 @@
     <div>
       {% if pattern.emotional_arc %}
       <div style="margin-bottom:12px;">
-        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">🌊 Emotional Arc</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="waves"></i></span> Emotional Arc</div>
         <div style="font-size:12.5px;color:var(--text);line-height:1.6;">{{ pattern.emotional_arc }}</div>
       </div>
       {% endif %}
       {% if pattern.cta %}
       <div style="margin-bottom:12px;">
-        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">📣 CTA</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> CTA</div>
         <div style="font-size:12.5px;color:var(--text);">{{ pattern.cta }}</div>
       </div>
       {% endif %}
@@ -48,7 +48,7 @@
   {% if pattern.risk_flags %}
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
     {% for flag in pattern.risk_flags %}
-    <span style="font-size:10.5px;padding:3px 9px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red);">⚠ {{ flag }}</span>
+    <span style="font-size:10.5px;padding:3px 9px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red);"><span style="display:inline-flex;align-items:center;"><i data-lucide="alert-triangle"></i></span> {{ flag }}</span>
     {% endfor %}
   </div>
   {% endif %}
@@ -89,17 +89,17 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">🎣 Hook（ブランド向けに書き換え）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="fish"></i></span> Hook（ブランド向けに書き換え）</label>
           <textarea class="form-textarea" name="hook" rows="3" placeholder="元ネタの引きを、このブランドの言葉で再現する...">{{ pattern.hook or '' }}</textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">📝 本文 / ストーリー構成</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> 本文 / ストーリー構成</label>
           <textarea class="form-textarea" name="body" rows="5" placeholder="Problem → Solution → Proof → CTA の流れで組み立てる..."></textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">📣 CTA（ブランド向け）</label>
+          <label class="form-label"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> CTA（ブランド向け）</label>
           <input class="form-input" name="cta" value="{{ pattern.cta or '' }}" placeholder="保存してね / プロフへ / DM送って など">
         </div>
 

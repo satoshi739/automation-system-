@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">💡 {{ idea.title }}</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="lightbulb"></i></span> {{ idea.title }}</div>
     <div class="page-sub">
       {% set brand_info = brands.get(idea.brand, {}) %}
       <span style="color:{{ brand_info.color or 'var(--muted2)' }};">{{ brand_info.name_short or idea.brand }}</span>
@@ -16,7 +16,7 @@
   </div>
   <div class="header-actions">
     <a href="/ideas" class="btn btn-ghost btn-sm">← 一覧</a>
-    {% if pattern %}<a href="/noimos/{{ pattern.id }}" class="btn btn-ghost btn-sm">🧠 元ネタ</a>{% endif %}
+    {% if pattern %}<a href="/noimos/{{ pattern.id }}" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span> 元ネタ</a>{% endif %}
     {% if idea.status == 'draft' %}
     <form method="POST" action="/ideas/{{ idea.id }}/approve" style="display:inline;">
       <button type="submit" class="btn btn-green btn-sm">承認する</button>
@@ -33,19 +33,19 @@
       <div class="card-header"><span class="card-title">アイデア内容</span></div>
       {% if idea.hook %}
       <div style="margin-bottom:14px;">
-        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;">🎣 Hook</div>
+        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="fish"></i></span> Hook</div>
         <div style="font-size:13px;color:var(--text);line-height:1.65;background:rgba(99,102,241,.05);border:1px solid rgba(99,102,241,.15);border-radius:var(--radius-sm);padding:12px;">{{ idea.hook }}</div>
       </div>
       {% endif %}
       {% if idea.body %}
       <div style="margin-bottom:14px;">
-        <div style="font-size:10px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;">📝 本文</div>
+        <div style="font-size:10px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span> 本文</div>
         <div style="font-size:12.5px;color:var(--text);line-height:1.75;white-space:pre-wrap;">{{ idea.body }}</div>
       </div>
       {% endif %}
       {% if idea.cta %}
       <div style="margin-bottom:14px;">
-        <div style="font-size:10px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;">📣 CTA</div>
+        <div style="font-size:10px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="megaphone"></i></span> CTA</div>
         <div style="font-size:12.5px;color:var(--text);">{{ idea.cta }}</div>
       </div>
       {% endif %}
@@ -60,7 +60,7 @@
     <!-- 承認依頼 -->
     {% if idea.status == 'approved' and variants %}
     <div class="card">
-      <div class="card-header"><span class="card-title">📤 承認依頼を送る</span></div>
+      <div class="card-header"><span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="upload"></i></span> 承認依頼を送る</span></div>
       <form method="POST" action="/ideas/{{ idea.id }}/request_publish">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>

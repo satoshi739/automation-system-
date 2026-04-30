@@ -4,7 +4,7 @@
 
 <div class="page-header">
   <div>
-    <div class="page-title">🎯 {{ campaign.title }}</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="target"></i></span> {{ campaign.title }}</div>
     <div class="page-sub">
       {% set brand_info = brands.get(campaign.brand, {}) %}
       <span style="color:{{ brand_info.color or 'var(--muted2)' }};">{{ brand_info.name_short or campaign.brand or '—' }}</span>

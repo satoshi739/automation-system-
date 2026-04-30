@@ -35,7 +35,7 @@
 <div id="event-drawer" style="display:none;position:fixed;right:0;top:0;bottom:0;width:340px;background:var(--s1);border-left:1px solid var(--border);z-index:200;padding:24px;overflow-y:auto;transition:transform .25s;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
     <div style="font-size:15px;font-weight:700;" id="drawer-title">投稿詳細</div>
-    <button onclick="closeDrawer()" style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;color:var(--muted2);cursor:pointer;font-size:13px;">✕</button>
+    <button onclick="closeDrawer()" style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;color:var(--muted2);cursor:pointer;font-size:13px;"></button>
   </div>
   <div id="drawer-content"></div>
 </div>
@@ -73,7 +73,7 @@ function showDrawer(event) {
   document.getElementById('drawer-title').textContent = (props.platform_icon || '') + ' ' + (props.platform || '');
 
   const statusBadge = props.posted
-    ? '<span style="background:rgba(16,185,129,.1);color:var(--green2);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">✓ 投稿済</span>'
+    ? '<span style="background:rgba(16,185,129,.1);color:var(--green2);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;"> 投稿済</span>'
     : '<span style="background:rgba(245,158,11,.1);color:var(--yellow2);border:1px solid rgba(245,158,11,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">待機中</span>';
 
   document.getElementById('drawer-content').innerHTML = `
@@ -89,7 +89,7 @@ function showDrawer(event) {
       ファイル: ${props.file || ''}
     </div>
     ${!props.posted ? `<form method="POST" action="/queue/delete/${props.brand_id}/${props.platform}/${props.file}">
-      <button class="btn btn-danger btn-sm" onclick="return confirm('削除しますか？')" style="width:100%;justify-content:center;">✕ 削除する</button>
+      <button class="btn btn-danger btn-sm" onclick="return confirm('削除しますか？')" style="width:100%;justify-content:center;"> 削除する</button>
     </form>` : ''}
   `;
 
