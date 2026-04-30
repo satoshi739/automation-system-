@@ -710,6 +710,14 @@ if __name__ == "__main__":
     logger.info("スケジューラー起動")
     (Path(__file__).parent / "logs").mkdir(exist_ok=True)
 
+    # DB初期化・エージェントシード（冪等）
+    try:
+        import setup_from_config
+        setup_from_config.run()
+        logger.info("DB初期化・エージェントシード完了")
+    except Exception as _e:
+        logger.warning(f"DB初期化スキップ: {_e}")
+
     if args.test_once:
         logger.info("=== --test-once モード: 予約投稿チェックを1回実行 ===")
         check_scheduled_posts()
