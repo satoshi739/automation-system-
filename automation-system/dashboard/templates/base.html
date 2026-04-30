@@ -22,6 +22,7 @@
   <!-- Quill -->
   <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script src="https://unpkg.com/lucide@1.14.0/dist/umd/lucide.min.js"></script>
   <style>
     /* Flatpickr override */
     .flatpickr-calendar { background:var(--s2)!important; border:1px solid var(--border)!important; box-shadow:0 16px 40px rgba(0,0,0,.6)!important; border-radius:var(--radius)!important; }
@@ -194,7 +195,8 @@
       background: linear-gradient(180deg, var(--accent2), var(--purple2));
       box-shadow: 0 0 8px rgba(99,102,241,.6);
     }
-    .nav-icon { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; opacity: .9; }
+    .nav-icon { width: 20px; flex-shrink: 0; opacity: .85; display: flex; align-items: center; justify-content: center; }
+    .nav-icon svg { width: 14px; height: 14px; flex-shrink: 0; }
     .nav-badge {
       margin-left: auto; font-size: 10px; font-weight: 700;
       padding: 2px 7px; border-radius: 20px;
@@ -933,7 +935,7 @@
   <div style="display:flex;align-items:center;gap:8px;">
     <span id="mobile-clock" style="font-size:11px;color:var(--muted2);"></span>
     <a href="/decisions" style="position:relative;display:inline-flex;">
-      <span style="font-size:16px;">⚡</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="mobile-badge" style="display:none;position:absolute;top:-3px;right:-4px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);"></span>
     </a>
   </div>
@@ -1049,7 +1051,9 @@
 
   <!-- ── ロゴ ── -->
   <div class="sidebar-brand">
-    <div class="logo-mark" style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);font-size:17px;">⚡</div>
+    <div class="logo-mark" style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+</div>
     <div>
       <div class="logo-name" style="font-size:13px;letter-spacing:-.4px;">Brand OS</div>
       <div class="logo-sub" style="font-size:9.5px;letter-spacing:.8px;">AUTONOMOUS · UPJ GROUP</div>
@@ -1073,15 +1077,15 @@
   </div>
 
   <a href="/president" class="nav-item-cmd {{ 'active' if request.path=='/president' else '' }}">
-    <span class="nav-icon">👑</span>
-    <span style="flex:1;">社長ダッシュボード</span>
+    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+    <span style="flex:1;">経営ビュー</span>
   </a>
   <a href="/ceo" class="nav-item-cmd {{ 'active' if request.path=='/ceo' else '' }}">
-    <span class="nav-icon">🏢</span>
+    <span class="nav-icon"><i data-lucide="cpu"></i></span>
     <span style="flex:1;">AI CEO</span>
   </a>
   <a href="/decisions" class="nav-item {{ 'active' if '/decisions' in request.path else '' }}">
-    <span class="nav-icon">⚡</span>
+    <span class="nav-icon"><i data-lucide="alert-circle"></i></span>
     <span style="flex:1;">判断待ち</span>
     <span id="decision-badge" class="nav-badge" style="display:none">0</span>
   </a>
@@ -1128,20 +1132,20 @@
 
   <a href="/agents" class="nav-item {{ 'active' if request.path=='/agents' else '' }}"
      style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.09);margin:1px 8px;border-radius:10px;">
-    <span class="nav-icon" style="color:var(--green2);">◎</span>
+    <span class="nav-icon" style="color:var(--green2);"><i data-lucide="activity"></i></span>
     <span style="flex:1;">Agent ステータス</span>
     <span class="live-badge"><span class="live-badge-dot"></span>LIVE</span>
   </a>
   <a href="/agent-workspace" class="nav-item {{ 'active' if '/agent-workspace' in request.path else '' }}">
-    <span class="nav-icon">⚙</span>
+    <span class="nav-icon"><i data-lucide="settings-2"></i></span>
     <span style="flex:1;">Agent Workspace</span>
   </a>
   <a href="/story-autopilot" class="nav-item {{ 'active' if request.path.startswith('/story-autopilot') else '' }}">
-    <span class="nav-icon">🤖</span>
+    <span class="nav-icon"><i data-lucide="bot"></i></span>
     <span style="flex:1;">Story Autopilot</span>
   </a>
   <a href="/publishing" class="nav-item {{ 'active' if request.path.startswith('/publishing') else '' }}">
-    <span class="nav-icon">📤</span>
+    <span class="nav-icon"><i data-lucide="send"></i></span>
     <span style="flex:1;">承認キュー</span>
   </a>
 
@@ -1154,20 +1158,20 @@
   </div>
 
   <a href="/inbox" class="nav-item {{ 'active' if request.path=='/inbox' else '' }}">
-    <span class="nav-icon">📥</span> 素材インボックス
+    <span class="nav-icon"><i data-lucide="inbox"></i></span> 素材インボックス
   </a>
   <a href="/queue" class="nav-item {{ 'active' if request.path=='/queue' else '' }}">
-    <span class="nav-icon">▤</span> 投稿キュー
+    <span class="nav-icon"><i data-lucide="list"></i></span> 投稿キュー
   </a>
   <a href="/calendar" class="nav-item {{ 'active' if request.path=='/calendar' else '' }}">
-    <span class="nav-icon">◫</span> 投稿カレンダー
+    <span class="nav-icon"><i data-lucide="calendar"></i></span> 投稿カレンダー
   </a>
   <a href="/blog" class="nav-item {{ 'active' if request.path.startswith('/blog') else '' }}">
-    <span class="nav-icon">✒</span>
+    <span class="nav-icon"><i data-lucide="pen-line"></i></span>
     <span style="flex:1;">Blog Auto Growth</span>
   </a>
   <a href="/meo" class="nav-item {{ 'active' if request.path=='/meo' or request.path.startswith('/meo/') else '' }}">
-    <span class="nav-icon">📍</span>
+    <span class="nav-icon"><i data-lucide="map-pin"></i></span>
     <span style="flex:1;">MEO / 口コミ</span>
     <span id="meo-unanswered-badge" class="nav-badge" style="display:none;">0</span>
   </a>
@@ -1181,18 +1185,18 @@
   </div>
 
   <a href="/leads/kanban" class="nav-item {{ 'active' if 'kanban' in request.path else '' }}">
-    <span class="nav-icon">⊞</span> 営業 Kanban
+    <span class="nav-icon"><i data-lucide="kanban"></i></span> 営業 Kanban
   </a>
   <a href="/leads" class="nav-item {{ 'active' if request.path=='/leads' else '' }}">
-    <span class="nav-icon">◎</span> リード一覧
+    <span class="nav-icon"><i data-lucide="users"></i></span> リード一覧
   </a>
   <a href="/notifications" class="nav-item {{ 'active' if '/notifications' in request.path else '' }}">
-    <span class="nav-icon">🔔</span>
+    <span class="nav-icon"><i data-lucide="bell"></i></span>
     <span style="flex:1;">通知</span>
     <span class="nav-badge" id="notif-nav-badge" {% if not unread_notif_count %}style="display:none;"{% endif %}>{{ unread_notif_count }}</span>
   </a>
   <a href="/logs" class="nav-item {{ 'active' if request.path=='/logs' else '' }}">
-    <span class="nav-icon">≡</span> 実行ログ
+    <span class="nav-icon"><i data-lucide="file-text"></i></span> 実行ログ
   </a>
   {% for bid, b in nav_brands.items() %}
   <a href="/settings/{{ bid }}" class="nav-item {{ 'active' if ('settings/'+bid) in request.path else '' }}"
@@ -1202,7 +1206,7 @@
   </a>
   {% endfor %}
   <a href="#" onclick="toggleSettings(event)" class="nav-item {{ 'active' if 'settings' in request.path else '' }}">
-    <span class="nav-icon">⚙</span>
+    <span class="nav-icon"><i data-lucide="sliders"></i></span>
     <span style="flex:1;">設定</span>
     <span style="font-size:10px;color:var(--muted);" id="settings-arrow">▸</span>
   </a>
@@ -1352,14 +1356,14 @@ const NAV_BRANDS_DATA = {{ nav_brands | tojson }};
 let cmdIdx = -1, cmdFiltered = [];
 
 const CMD_LIST = [
-  { icon:'👑', label:'社長ダッシュボード',    desc:'会社全体を俯瞰・優先アクション',     url:'/president',          group:'経営' },
-  { icon:'🤖', label:'AI CEO ダッシュボード', desc:'全ブランド・エージェント制御',       url:'/ceo',                group:'経営' },
-  { icon:'🧠', label:'AI Chief of Staff',    desc:'ブランド横断サマリー・おすすめアクション', url:'/chief-of-staff', group:'経営' },
-  { icon:'☀️', label:'Daily Brief 履歴',     desc:'朝ブリーフ過去7日間',               url:'/daily-briefs',       group:'経営' },
-  { icon:'⚡', label:'異常検知',             desc:'KPIの急変動・アラート一覧',          url:'/anomaly-alerts',     group:'経営' },
-  { icon:'🔔', label:'システムアラート',     desc:'alerts.log 直近100件・死活監視ログ', url:'/system-alerts',      group:'経営' },
+  { icon:'◈', label:'経営ビュー',            desc:'会社全体を俯瞰・優先アクション',     url:'/president',          group:'経営' },
+  { icon:'◈', label:'AI CEO ダッシュボード', desc:'全ブランド・エージェント制御',       url:'/ceo',                group:'経営' },
+  { icon:'◎', label:'AI Chief of Staff',    desc:'ブランド横断サマリー・おすすめアクション', url:'/chief-of-staff', group:'経営' },
+  { icon:'◐', label:'Daily Brief 履歴',     desc:'朝ブリーフ過去7日間',               url:'/daily-briefs',       group:'経営' },
+  { icon:'△', label:'異常検知',             desc:'KPIの急変動・アラート一覧',          url:'/anomaly-alerts',     group:'経営' },
+  { icon:'◯', label:'システムアラート',     desc:'alerts.log 直近100件・死活監視ログ', url:'/system-alerts',      group:'経営' },
   { icon:'◈',  label:'Performance Snapshot', desc:'週次KPIサマリー・ブランド別比較',   url:'/performance-snapshot',group:'経営' },
-  { icon:'✒',  label:'Blog Auto Growth',     desc:'記事化候補一覧・下書き管理',         url:'/blog',               group:'ブログ' },
+  { icon:'/',  label:'Blog Auto Growth',     desc:'記事化候補一覧・下書き管理',         url:'/blog',               group:'ブログ' },
   { icon:'⚙',  label:'Agent Workspace',      desc:'AI エージェント実行・タスク管理',   url:'/agent-workspace',    group:'AI OS' },
   { icon:'⌂',  label:'ホーム',         desc:'ダッシュボードに戻る',     url:'/',              group:'ページ' },
   { icon:'✦',  label:'AI 生成',        desc:'コンテンツを生成する',     url:'/generate',      group:'ページ' },
@@ -1372,16 +1376,16 @@ const CMD_LIST = [
   { icon:'△',  label:'判断待ち',       desc:'承認待ちアイテム',         url:'/decisions',     group:'ページ' },
   { icon:'◉',  label:'パフォーマンス', desc:'SNS分析データ',            url:'/performance',   group:'ページ' },
   { icon:'◈',  label:'アナリティクス', desc:'ビジネス指標',             url:'/analytics',     group:'ページ' },
-  { icon:'🧠', label:'Asset Brain',   desc:'写真・動画・テンプレを資産管理', url:'/assets',       group:'ページ' },
-  { icon:'📥', label:'写真インボックス',desc:'メディアを取り込む',       url:'/inbox',         group:'ページ' },
+  { icon:'◎',  label:'Asset Brain',   desc:'写真・動画・テンプレを資産管理', url:'/assets',   group:'ページ' },
+  { icon:'↓',  label:'写真インボックス',desc:'メディアを取り込む',       url:'/inbox',         group:'ページ' },
   { icon:'≡',  label:'ログ',           desc:'実行ログを確認',           url:'/logs',          group:'ページ' },
-  { icon:'🧠', label:'NoiMos AI',        desc:'元ネタアーカイブ・構造抽出',      url:'/noimos',     group:'NoiMos' },
+  { icon:'◎',  label:'NoiMos AI',        desc:'元ネタアーカイブ・構造抽出',      url:'/noimos',     group:'NoiMos' },
   { icon:'＋', label:'元ネタ登録',      desc:'バズった投稿を登録する',           url:'/noimos/new', group:'NoiMos' },
-  { icon:'🎯', label:'Campaign Pipeline',desc:'企画〜承認〜公開まで管理',        url:'/campaigns',  group:'NoiMos' },
-  { icon:'💡', label:'コンテンツアイデア',desc:'ブランド変換済みアイデア一覧',   url:'/ideas',      group:'NoiMos' },
-  { icon:'📤', label:'承認キュー',      desc:'承認依頼一覧・承認・却下',         url:'/publishing', group:'NoiMos' },
-  { icon:'📍', label:'MEO Control Tower', desc:'Google Business Profile 拠点管理', url:'/meo',        group:'MEO' },
-  { icon:'💬', label:'Review Center',  desc:'未返信レビュー・AI返信管理', url:'/reviews',       group:'MEO' },
+  { icon:'◉',  label:'Campaign Pipeline',desc:'企画〜承認〜公開まで管理',        url:'/campaigns',  group:'NoiMos' },
+  { icon:'◇',  label:'コンテンツアイデア',desc:'ブランド変換済みアイデア一覧',   url:'/ideas',      group:'NoiMos' },
+  { icon:'↑',  label:'承認キュー',      desc:'承認依頼一覧・承認・却下',         url:'/publishing', group:'NoiMos' },
+  { icon:'·',  label:'MEO Control Tower', desc:'Google Business Profile 拠点管理', url:'/meo',        group:'MEO' },
+  { icon:'◯',  label:'Review Center',  desc:'未返信レビュー・AI返信管理', url:'/reviews',       group:'MEO' },
   { icon:'★',  label:'低評価レビュー', desc:'★1–2 のレビュー一覧',       url:'/reviews?tab=low_rating', group:'MEO' },
   { icon:'✦',  label:'AI下書き',       desc:'AI返信下書き承認',          url:'/reviews?tab=drafts',     group:'MEO' },
   ...Object.entries(NAV_BRANDS_DATA).map(([bid, b]) => ({
@@ -1479,6 +1483,7 @@ function updateMobileBadge(count) {
   const el = document.getElementById('mobile-badge');
   if (el) el.style.display = count > 0 ? 'block' : 'none';
 }
+lucide.createIcons();
 </script>
 {% block scripts %}{% endblock %}
 </body>
