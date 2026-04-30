@@ -306,8 +306,13 @@ def get_overview() -> dict:
 def _get_president_user_id() -> Optional[str]:
     with db.get_conn() as conn:
         row = conn.execute(
-            "SELECT id FROM users WHERE role_id='human_president' LIMIT 1"
+            "SELECT id FROM users WHERE role_id='owner' LIMIT 1"
         ).fetchone()
+        if not row:
+            # フォールバック: humanユーザーの最初の1件
+            row = conn.execute(
+                "SELECT id FROM users WHERE user_type='human' LIMIT 1"
+            ).fetchone()
     return row["id"] if row else None
 
 

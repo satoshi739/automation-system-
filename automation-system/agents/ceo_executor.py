@@ -213,11 +213,16 @@ def _handle_send_president_notification(args: dict) -> str:
     urgency = args.get("urgency", "medium")
 
     try:
+        import os
         from sns.line_api import LINEMessenger
         messenger = LINEMessenger()
-        prefix = {"high": "🚨【緊急】", "medium": "📋【報告】", "low": "ℹ️【情報】"}.get(urgency, "📋")
+        owner_id = os.environ.get("OWNER_LINE_USER_ID", "")
+        if not owner_id:
+            log.warning("OWNER_LINE_USER_ID未設定、LINE通知をスキップ")
+            return "LINE通知スキップ（OWNER_LINE_USER_ID未設定）"
+        prefix = {"high": "【緊急】", "medium": "【報告】", "low": "【情報】"}.get(urgency, "【報告】")
         full_msg = f"{prefix} AI CEO より\n\n{message}"
-        ok = messenger.push_to_admin(full_msg)
+        ok = messenger.push(owner_id, full_msg)
         if ok:
             return "President notification sent via LINE"
         return "LINE send attempted (check logs)"

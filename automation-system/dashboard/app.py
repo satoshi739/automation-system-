@@ -1275,8 +1275,8 @@ def api_generate_reel(brand_id):
             "reel_data": reel_data,
         })
     except Exception as e:
-        import traceback
-        return jsonify({"error": str(e), "trace": traceback.format_exc()}), 500
+        log.error(f"API error: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/queue/save_all/<brand_id>", methods=["POST"])
@@ -1809,8 +1809,8 @@ def api_generate_blog_post():
 
         return jsonify({"ok": True, "post": post, "wp": wp_result})
     except Exception as e:
-        import traceback
-        return jsonify({"error": str(e), "trace": traceback.format_exc()}), 500
+        log.error(f"API error: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/ai/weekly_calendar/<brand_id>", methods=["POST"])

@@ -1019,10 +1019,9 @@ def generate_blog_post_auto(brand: str, word_count: int = 1200) -> dict:
         max_tokens=4000,
         messages=[
             {"role": "user", "content": prompt},
-            {"role": "assistant", "content": "{"},
         ],
     )
-    raw = ("{" + msg.content[0].text).strip()
+    raw = msg.content[0].text.strip()
 
     result = None
     # まずそのままパース試行
