@@ -15,11 +15,24 @@
   .file-row:hover { border-color: var(--border2); }
   .file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
   .file-size { font-size: 11px; color: var(--muted); flex-shrink: 0; }
-  .empty-inbox {
-    text-align: center; padding: 40px 20px;
+  .drop-zone {
+    text-align: center; padding: 28px 16px;
     color: var(--muted); font-size: 13px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
   }
-  .empty-inbox .drop-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
+  .drop-zone.drag-over {
+    border-color: #6366f1;
+    background: rgba(99,102,241,.08);
+    color: var(--text);
+  }
+  .drop-zone .drop-icon { font-size: 36px; margin-bottom: 8px; opacity: .4; }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
   .path-box {
     font-family: 'SF Mono', Menlo, monospace; font-size: 11px;
     color: var(--muted); background: var(--s2); border: 1px solid var(--border);
@@ -27,6 +40,13 @@
     overflow-x: auto; white-space: nowrap;
   }
   .processed-meta { font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+  .upload-progress {
+    height: 3px; background: var(--border); border-radius: 2px;
+    margin-top: 8px; overflow: hidden; display: none;
+  }
+  .upload-progress-bar {
+    height: 100%; background: #6366f1; width: 0%; transition: width .3s;
+  }
 </style>
 
 <div class="page-header">
@@ -45,7 +65,7 @@
 
 {% if not inbox_data %}
 <div class="card">
-  <div class="empty-inbox">
+  <div class="drop-zone" style="border:none;">
     <div class="drop-icon">📭</div>
     ブランド設定がありません。<code>config/brands.yaml</code> を確認してください。
   </div>
@@ -54,14 +74,14 @@
 <div class="inbox-grid">
   {% for bid, data in inbox_data.items() %}
   {% set brand = brands.get(bid, {}) %}
-  <div class="card" style="margin-bottom:0;">
+  <div class="card" style="margin-bottom:0;" id="card-{{ bid }}">
     <div class="card-header">
       <div style="display:flex;align-items:center;gap:10px;">
         <span style="width:9px;height:9px;border-radius:50%;background:{{ brand.get('color','#6366f1') }};display:inline-block;box-shadow:0 0 6px {{ brand.get('color','#6366f1') }};"></span>
         <span class="card-title">{{ brand.get('name_short', bid) }}</span>
       </div>
       <div style="display:flex;gap:7px;align-items:center;">
-        <span class="badge {% if data.files|length > 0 %}badge-warn{% else %}badge-l1{% endif %}">
+        <span class="badge {% if data.files|length > 0 %}badge-warn{% else %}badge-l1{% endif %}" id="badge-{{ bid }}">
           {{ data.files|length }} ファイル
         </span>
         <button class="btn btn-sm btn-primary" onclick="processInbox('{{ bid }}', this)">
@@ -70,8 +90,7 @@
       </div>
     </div>
 
-    {% if data.files %}
-    <div class="file-list">
+    <div id="filelist-{{ bid }}" class="file-list">
       {% for f in data.files %}
       <div class="file-row">
         <span style="font-size:15px;">{{ '🎬' if f.is_video else '🖼' }}</span>
@@ -83,12 +102,23 @@
       </div>
       {% endfor %}
     </div>
-    {% else %}
-    <div class="empty-inbox" style="padding:24px 0 8px;">
+
+    <div class="drop-zone" id="drop-{{ bid }}"
+         ondragover="onDragOver(event,'{{ bid }}')"
+         ondragleave="onDragLeave(event,'{{ bid }}')"
+         ondrop="onDrop(event,'{{ bid }}')"
+         onclick="document.getElementById('file-input-{{ bid }}').click()">
+      <input type="file" id="file-input-{{ bid }}" multiple
+             accept=".jpg,.jpeg,.png,.webp,.heic,.mp4,.mov,.m4v"
+             onchange="uploadFiles('{{ bid }}', this.files)">
       <div class="drop-icon">📂</div>
-      <div>ファイルをドロップしてください</div>
+      <div>ここにファイルをドロップ</div>
+      <div style="font-size:11px;margin-top:4px;opacity:.6;">または クリックして選択</div>
     </div>
-    {% endif %}
+
+    <div class="upload-progress" id="progress-{{ bid }}">
+      <div class="upload-progress-bar" id="progress-bar-{{ bid }}"></div>
+    </div>
 
     <div class="path-box" title="Finderで開く場合はこのパスを使用">{{ data.path }}</div>
     <div class="processed-meta">処理済み: {{ data.processed_count }} ファイル</div>
@@ -98,6 +128,81 @@
 {% endif %}
 
 <script>
+function onDragOver(e, bid) {
+  e.preventDefault();
+  document.getElementById('drop-' + bid).classList.add('drag-over');
+}
+function onDragLeave(e, bid) {
+  document.getElementById('drop-' + bid).classList.remove('drag-over');
+}
+function onDrop(e, bid) {
+  e.preventDefault();
+  document.getElementById('drop-' + bid).classList.remove('drag-over');
+  const files = e.dataTransfer.files;
+  if (files.length > 0) uploadFiles(bid, files);
+}
+
+async function uploadFiles(bid, files) {
+  if (!files || files.length === 0) return;
+
+  const progressEl = document.getElementById('progress-' + bid);
+  const barEl = document.getElementById('progress-bar-' + bid);
+  progressEl.style.display = 'block';
+  barEl.style.width = '20%';
+
+  const form = new FormData();
+  for (const f of files) form.append('files', f);
+
+  try {
+    const res = await fetch('/api/inbox/upload/' + bid, { method: 'POST', body: form });
+    barEl.style.width = '80%';
+    const d = await res.json();
+    if (d.ok) {
+      barEl.style.width = '100%';
+      const names = d.saved.join(', ');
+      toast(`✅ ${d.count}件 保存 → AI処理中…`, 'ok');
+      d.saved.forEach(name => addFileRow(bid, name));
+      updateBadge(bid);
+      // 保存完了後に自動でAI処理を実行
+      const btn = document.querySelector(`#card-${bid} .btn-primary`);
+      if (btn) processInbox(bid, btn);
+    } else {
+      toast(`エラー: ${d.error}`, 'err');
+    }
+  } catch(e) {
+    toast(`通信エラー: ${e}`, 'err');
+  } finally {
+    setTimeout(() => {
+      progressEl.style.display = 'none';
+      barEl.style.width = '0%';
+    }, 800);
+    // file input をリセット
+    const inp = document.getElementById('file-input-' + bid);
+    if (inp) inp.value = '';
+  }
+}
+
+function addFileRow(bid, name) {
+  const list = document.getElementById('filelist-' + bid);
+  const isVideo = /\.(mp4|mov|m4v)$/i.test(name);
+  const row = document.createElement('div');
+  row.className = 'file-row';
+  row.innerHTML = `
+    <span style="font-size:15px;">${isVideo ? '🎬' : '🖼'}</span>
+    <span class="file-name" title="${name}">${name}</span>
+    <span class="badge ${isVideo ? 'badge-purple' : 'badge-l2'}">${isVideo ? 'VIDEO' : 'IMAGE'}</span>
+  `;
+  list.appendChild(row);
+}
+
+function updateBadge(bid) {
+  const badge = document.getElementById('badge-' + bid);
+  const list = document.getElementById('filelist-' + bid);
+  const count = list ? list.querySelectorAll('.file-row').length : 0;
+  badge.textContent = count + ' ファイル';
+  badge.className = 'badge ' + (count > 0 ? 'badge-warn' : 'badge-l1');
+}
+
 async function processInbox(brand, btn) {
   const orig = btn.textContent;
   btn.disabled = true;
