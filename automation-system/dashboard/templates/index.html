@@ -184,197 +184,34 @@
   <a href="/agents" class="os-banner-link">OS管理 →</a>
 </div>
 
-<!-- ══ ブランド別ステータスカード（ビルデザイン） ══ -->
-<style>
-  /* ── ビルカード ── */
-  .building-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px 10px 4px 4px;
-    background: linear-gradient(180deg, #03050e 0%, #060b18 55%, #080d1c 100%);
-    border: 1px solid rgba(255,255,255,.07);
-    transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s, border-color .28s;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    min-height: 270px;
-    text-decoration: none;
-    color: inherit;
-  }
-  .building-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    border-color: rgba(255,255,255,.15);
-  }
-  /* 星空背景 */
-  .building-card::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 40% 0;
-    background-image:
-      radial-gradient(1px 1px at 18% 22%, rgba(255,255,255,.55) 0%, transparent 100%),
-      radial-gradient(1px 1px at 75% 12%, rgba(255,255,255,.4)  0%, transparent 100%),
-      radial-gradient(1px 1px at 48%  7%, rgba(255,255,255,.6)  0%, transparent 100%),
-      radial-gradient(1px 1px at 33% 18%, rgba(255,255,255,.3)  0%, transparent 100%),
-      radial-gradient(1px 1px at 62% 28%, rgba(255,255,255,.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 88%  5%, rgba(255,255,255,.45) 0%, transparent 100%),
-      radial-gradient(1px 1px at  8% 35%, rgba(255,255,255,.25) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  /* 地面グロー */
-  .building-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 5%; right: 5%;
-    height: 48px;
-    background: radial-gradient(ellipse at center bottom, var(--bc, rgba(99,102,241,.35)) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* アンテナエリア */
-  .bld-sky {
-    height: 36px;
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  .bld-antenna {
-    width: 2px;
-    height: 22px;
-    border-radius: 2px;
-    position: relative;
-    flex-shrink: 0;
-  }
-  .bld-antenna-tip {
-    position: absolute;
-    top: -4px; left: 50%;
-    transform: translateX(-50%);
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    animation: ant-blink 3s ease-in-out infinite;
-  }
-  @keyframes ant-blink {
-    0%,85%,100% { opacity:1; box-shadow:0 0 7px 2px currentColor; }
-    90%          { opacity:.15; box-shadow:none; }
-    95%          { opacity:.8; box-shadow:0 0 4px 1px currentColor; }
-  }
-
-  /* ビル本体 */
-  .bld-body {
-    position: relative;
-    z-index: 2;
-    padding: 8px 16px 6px;
-  }
-  /* 窓グリッド */
-  .win-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 5px;
-  }
-  .win {
-    width: 100%;
-    height: 18px;
-    border-radius: 2px;
-  }
-  .win.lit {
-    animation: win-flicker var(--fd, 5s) ease-in-out infinite var(--fo, 0s);
-  }
-  .win.dark { opacity: .06; }
-  @keyframes win-flicker {
-    0%,88%,100% { opacity: .85; }
-    90%          { opacity: .22; }
-    93%          { opacity: .7;  }
-    96%          { opacity: .45; }
-  }
-
-  /* ロビー（ブランド情報） */
-  .bld-lobby {
-    position: relative;
-    z-index: 2;
-    padding: 10px 16px 14px;
-    border-top: 1px solid rgba(255,255,255,.06);
-    background: linear-gradient(0deg, rgba(0,0,0,.5) 0%, transparent 100%);
-  }
-  .bld-name-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 5px;
-  }
-  .bld-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    animation: dot-glow 2.2s ease-in-out infinite;
-  }
-  @keyframes dot-glow {
-    0%,100% { box-shadow: 0 0 5px 1px currentColor; }
-    50%      { box-shadow: 0 0 10px 3px currentColor; }
-  }
-  .bld-gen {
-    font-size: 11.5px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 9px;
-  }
-</style>
-
+<!-- ══ ブランド別ステータスカード ══ -->
 <div class="three-col" style="margin-bottom:24px;">
   {% for bid, b in nav_brands.items() %}
-  {% set seed = loop.index0 %}
+  <a href="/brands/{{ bid }}" class="card" style="display:flex;flex-direction:column;gap:14px;padding:20px;border-top:3px solid {{ b.color }};text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s;"
+     onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(0,0,0,.4)'"
+     onmouseout="this.style.transform='';this.style.boxShadow=''">
 
-  <a href="/brands/{{ bid }}" class="building-card" style="--bc:{{ b.color }}44;"
-     onmouseover="this.style.boxShadow='0 28px 80px rgba(0,0,0,.75), 0 0 50px {{ b.color }}22'"
-     onmouseout="this.style.boxShadow=''">
-
-    <!-- 空・アンテナ -->
-    <div class="bld-sky">
-      <div class="bld-antenna" style="background:linear-gradient(to bottom, {{ b.color }}, rgba(255,255,255,.08));">
-        <div class="bld-antenna-tip" style="background:{{ b.color }};color:{{ b.color }};"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:{{ b.color }};box-shadow:0 0 6px {{ b.color }};flex-shrink:0;"></span>
+        <div>
+          <div style="font-size:16px;font-weight:800;letter-spacing:-.3px;">{{ b.name_short }}</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:1px;">{{ b.name }}</div>
+        </div>
       </div>
+      <span style="font-size:11px;color:var(--muted);"><i data-lucide="chevron-right" style="width:14px;height:14px;"></i></span>
     </div>
 
-    <!-- ビル本体（窓グリッド） -->
-    <div class="bld-body">
-      <div class="win-grid">
-        {% for i in range(42) %}
-        {# ブランドごとにずれた点灯パターン（約70%点灯） #}
-        {% set is_lit = ((i * 7 + seed * 13 + i // 6 * 5) % 10) >= 3 %}
-        <div class="win {{ 'lit' if is_lit else 'dark' }}"
-          style="background:{{ b.color }};
-                 {% if is_lit %}
-                   box-shadow:0 0 4px {{ b.color }}, 0 0 8px {{ b.color }}66;
-                   --fd:{{ 4 + (i * 11 % 7) }}s;
-                   --fo:{{ ((i * 5 + seed * 3) % 9) * 0.3 }}s;
-                 {% endif %}">
-        </div>
-        {% endfor %}
-      </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;">
+      {% for p in ['instagram','threads','facebook','twitter','youtube','tiktok','line','wordpress'] %}
+      {% if b.channels.get(p) %}
+      <span style="font-size:12px;opacity:.65;" title="{{ p }}">{{ nav_platform_icons.get(p,'') }}</span>
+      {% endif %}
+      {% endfor %}
     </div>
 
-    <!-- ロビー（ブランド情報） -->
-    <div class="bld-lobby">
-      <div class="bld-name-row">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <div class="bld-dot" style="background:{{ b.color }};color:{{ b.color }};"></div>
-          <span style="font-size:16px;font-weight:800;letter-spacing:-.4px;">{{ b.name_short }}</span>
-        </div>
-        <span style="font-size:11px;color:var(--muted);">→</span>
-      </div>
-      <div style="font-size:10.5px;color:var(--muted);margin-bottom:7px;">{{ b.name }}</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:2px;">
-        {% for p in ['instagram','threads','facebook','twitter','youtube','tiktok','line','wordpress'] %}
-        {% if b.channels.get(p) %}
-        <span style="font-size:12px;opacity:.75;" title="{{ p }}">{{ nav_platform_icons.get(p,'') }}</span>
-        {% endif %}
-        {% endfor %}
-      </div>
-      <div class="bld-gen" style="color:{{ b.color }};"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> 一括生成する</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:{{ b.color }};">
+      <i data-lucide="sparkles" style="width:13px;height:13px;"></i> 一括生成する
     </div>
 
   </a>
