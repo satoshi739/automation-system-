@@ -2,6 +2,10 @@ automation-system/.env
 automation-system/credentials.json
 automation-system/data/
 automation-system/logs/
+automation-system/content_queue/
+automation-system/media/inbox/
+automation-system/media/processed/
+automation-system/.env.backup*
 **/__pycache__/
 *.pyc
 *.db
