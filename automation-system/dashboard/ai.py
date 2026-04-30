@@ -1017,20 +1017,37 @@ def generate_blog_post_auto(brand: str, word_count: int = 1200) -> dict:
     msg = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=4000,
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": "{"},
+        ],
     )
-    raw = msg.content[0].text.strip()
+    raw = ("{" + msg.content[0].text).strip()
 
-    m = re.search(r'\{[\s\S]*\}', raw)
-    if m:
+    result = None
+    # まずそのままパース試行
+    try:
+        result = json.loads(raw)
+    except Exception:
+        pass
+    # 失敗時: マークダウンコードブロックを除去して再試行
+    if not result:
+        m = re.search(r'```(?:json)?\s*(\{[\s\S]*?\})\s*```', raw)
+        if m:
+            try:
+                result = json.loads(m.group(1))
+            except Exception:
+                pass
+    # 失敗時: 最初の { から JSONDecoder でパース
+    if not result:
         try:
-            result = json.loads(m.group())
+            idx = raw.index("{")
+            result, _ = json.JSONDecoder().raw_decode(raw[idx:])
         except Exception:
-            result = None
-    else:
-        result = None
+            pass
 
     if not result:
+        logger.warning(f"ブログJSON解析失敗 [{brand}] raw={raw[:120]}")
         result = {
             "title": f"{brand} ブログ",
             "meta_description": "",
