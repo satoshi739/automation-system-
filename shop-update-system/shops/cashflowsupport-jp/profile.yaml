@@ -19,19 +19,19 @@ address:
   lines: 中央区銀座7丁目13番21号
   building: Ginza Rokushuビル2階
 
-# サイト上で番号が確認できた時点で埋める（空は未確認）
-phone: ""
+# 公式サイト（https://cashflowsupport.jp/）で確認済み（2026-05-01）
+phone: "050-6871-8255"
 
 hours:
-  mon: "要確認（公式サイト・お問い合わせ先）"
-  tue: "要確認（公式サイト・お問い合わせ先）"
-  wed: "要確認（公式サイト・お問い合わせ先）"
-  thu: "要確認（公式サイト・お問い合わせ先）"
-  fri: "要確認（公式サイト・お問い合わせ先）"
-  sat: "要確認（公式サイト・お問い合わせ先）"
-  sun: "要確認（公式サイト・お問い合わせ先）"
+  mon: "要確認（公式サイト参照）"
+  tue: "要確認（公式サイト参照）"
+  wed: "要確認（公式サイト参照）"
+  thu: "要確認（公式サイト参照）"
+  fri: "要確認（公式サイト参照）"
+  sat: "要確認（公式サイト参照）"
+  sun: "要確認（公式サイト参照）"
 
-holiday_note: 受付・休業は公式サイトの表記を正とする。電話番号も同様に要確認。
+holiday_note: 営業時間は公式サイトの最新表記を正とする。
 
 services:
   - ファクタリング（売掛債権の買取）
@@ -45,7 +45,8 @@ cta: まずは無料相談（フォーム）。お急ぎの方は公式サイト
 links:
   website: https://cashflowsupport.jp/
   map: ""
-  line: ""
+  line: "https://lin.ee/81y9znLi"
+  instagram: "https://www.instagram.com/cashflowsupport/"
   reserve: ""
   contact_form: https://cashflowsupport.jp/
 

@@ -15,6 +15,7 @@ Claude AI エンジン
 """
 
 import os
+import re
 import sys
 import json
 import logging
@@ -22,6 +23,52 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import anthropic
+
+
+def _extract_json(raw: str) -> dict | None:
+    """Claude応答からJSONを抽出する（複数戦略）。失敗時はNoneを返す。"""
+    # 戦略1: コードフェンス内のJSONを取得
+    if "```" in raw:
+        block = raw.split("```")[1]
+        if block.startswith("json"):
+            block = block[4:]
+        try:
+            return json.loads(block.strip())
+        except Exception:
+            pass
+
+    # 戦略2: 直接パース
+    try:
+        return json.loads(raw.strip())
+    except Exception:
+        pass
+
+    # 戦略3: {…} ブロックを抽出して再試行（改行エスケープ補正含む）
+    m = re.search(r"\{.*\}", raw, re.DOTALL)
+    if m:
+        candidate = m.group(0)
+        try:
+            return json.loads(candidate)
+        except Exception:
+            try:
+                return json.loads(re.sub(r'(?<!\\)\n', r'\\n', candidate))
+            except Exception:
+                pass
+
+    # 戦略4: 正規表現で caption / hashtags を直接抽出
+    # Claudeが日本語の「」を"と書くとJSONが壊れるが値は取り出せる
+    cap_m = re.search(r'"caption":\s*"(.*?)(?=",\s*\n?\s*"hashtags")', raw, re.DOTALL)
+    tag_m = re.search(r'"hashtags":\s*"(.*?)(?=",?\s*\n?\s*(?:"hook"|"?\s*\}))', raw, re.DOTALL)
+    if cap_m:
+        def _unescape(s: str) -> str:
+            return s.replace("\\n", "\n").replace("\\t", "\t")
+        return {
+            "caption": _unescape(cap_m.group(1)),
+            "hashtags": _unescape(tag_m.group(1)) if tag_m else "",
+            "hook": "",
+        }
+
+    return None
 
 # パフォーマンストラッキングモジュール（automation-system/sns/performance.py）
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -185,14 +232,9 @@ def generate_instagram_post(
     )
     raw = resp.content[0].text.strip()
 
-    # JSON抽出
-    try:
-        if "```" in raw:
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        data = json.loads(raw.strip())
-    except Exception:
+    # JSON抽出（複数戦略でフォールバック）
+    data = _extract_json(raw)
+    if data is None:
         data = {"caption": raw, "hashtags": "", "hook": ""}
 
     caption = data.get("caption", "")

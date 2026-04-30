@@ -371,6 +371,15 @@ def run():
     logger.info("===== 朝のオペレーター開始 =====")
     (Path(__file__).parent / "logs").mkdir(exist_ok=True)
 
+    # 0-pre. ログローテーション
+    try:
+        from log_rotation import run as rotate_logs
+        rotated = rotate_logs()
+        if rotated:
+            logger.info("ログローテーション: %d ファイル処理", rotated)
+    except Exception as e:
+        logger.warning("ログローテーション失敗（無視して継続）: %s", e)
+
     # 0. alerts.log 読み上げ
     alert_msg = _read_unread_alerts()
     if alert_msg:
