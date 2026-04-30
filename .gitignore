@@ -5,3 +5,10 @@ automation-system/logs/
 **/__pycache__/
 *.pyc
 *.db
+
+# Claude Code
+.claude/
+
+# Screenshots
+スクリーンショット*.png
+Screenshot*.png

@@ -96,7 +96,6 @@ def _alert_owner(message: str, dedup_key: str = "") -> None:
         logger.error("LINE push失敗: %s", exc)
 
     logger.warning("ALERT: %s", message)
-    # TODO: LINE push notification (token pending)
 
 
 def _touch_heartbeat() -> None:
