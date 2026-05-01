@@ -165,15 +165,11 @@ if write_env == "y":
                     lines[i] = f"{key}={val}\n"
                     existing_keys.add(key)
 
-    with open(env_path, "a" if lines else "w", encoding="utf-8") as f:
-        if not lines:
-            f.write("")
-        else:
-            # 既存ファイルを更新済みの lines で上書き
-            with open(env_path, "w", encoding="utf-8") as fw:
-                fw.writelines(lines)
-            f = open(env_path, "a", encoding="utf-8")
+    if lines:
+        with open(env_path, "w", encoding="utf-8") as fw:
+            fw.writelines(lines)
 
+    with open(env_path, "a", encoding="utf-8") as f:
         for key, val in [
             ("GBP_CLIENT_ID",     client_id),
             ("GBP_CLIENT_SECRET", client_secret),

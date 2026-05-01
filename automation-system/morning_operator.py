@@ -20,6 +20,20 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
+
+def _atomic_yaml_write(file_path: Path, data: dict) -> None:
+    """YAML をアトミックに書き込む（temp → rename で途中クラッシュによる破損防止）"""
+    tmp = file_path.with_suffix(".tmp")
+    try:
+        tmp.write_text(
+            yaml.dump(data, allow_unicode=True, default_flow_style=False, sort_keys=False),
+            encoding="utf-8",
+        )
+        tmp.replace(file_path)
+    except Exception:
+        tmp.unlink(missing_ok=True)
+        raise
+
 import database as db
 from sns.instagram import InstagramPoster
 from sns.line_api import LINEMessenger
@@ -179,10 +193,7 @@ def post_instagram_queue() -> int:
                         poster.post_image(image_url=data.get("image_url",""),
                                           caption=data.get("caption",""))
                     data["posted"] = True
-                    f.write_text(
-                        yaml.dump(data, allow_unicode=True, default_flow_style=False, sort_keys=False),
-                        encoding="utf-8",
-                    )
+                    _atomic_yaml_write(f, data)
                     posted_total += 1
                     logger.info(f"Instagram投稿完了(YAML): {f.name}")
                     break
@@ -266,10 +277,7 @@ def post_line_queue() -> int:
                     else:
                         messenger.broadcast(data.get("message",""))
                     data["posted"] = True
-                    f.write_text(
-                        yaml.dump(data, allow_unicode=True, default_flow_style=False, sort_keys=False),
-                        encoding="utf-8",
-                    )
+                    _atomic_yaml_write(f, data)
                     sent_total += 1
                     logger.info(f"LINE配信完了(YAML): {f.name}")
                     break

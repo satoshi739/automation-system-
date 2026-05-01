@@ -136,13 +136,26 @@ def _next_queued_post(subdir: str = "instagram") -> dict | None:
     return None
 
 
+def _atomic_yaml_write(file_path: Path, data: dict) -> None:
+    """YAML をアトミックに書き込む（temp → rename で途中クラッシュによる破損防止）"""
+    tmp = file_path.with_suffix(".tmp")
+    try:
+        tmp.write_text(
+            yaml.dump(data, allow_unicode=True, default_flow_style=False, sort_keys=False),
+            encoding="utf-8",
+        )
+        tmp.replace(file_path)
+    except Exception:
+        tmp.unlink(missing_ok=True)
+        raise
+
+
 def _mark_posted(file_path: Path):
     """投稿済みフラグを立てる"""
     with open(file_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     data["posted"] = True
-    with open(file_path, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    _atomic_yaml_write(file_path, data)
 
 
 def _mark_status(file_path: Path, status: str):
@@ -151,8 +164,7 @@ def _mark_status(file_path: Path, status: str):
         data = yaml.safe_load(f)
     data["posted"] = (status == "posted")
     data["status"] = status
-    with open(file_path, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    _atomic_yaml_write(file_path, data)
 
 
 def post_to_instagram():

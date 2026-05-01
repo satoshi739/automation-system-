@@ -1363,7 +1363,7 @@ setInterval(tick, 1000); tick();
 
 // ── Stats poll（30秒ごと・数値更新時フラッシュ） ──
 function refreshStats() {
-  fetch('/api/stats').then(r => r.json()).then(d => {
+  fetch('/api/stats').then(r => { if(!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
     document.querySelectorAll('[data-stat]').forEach(el => {
       const v = d[el.dataset.stat];
       if (v !== undefined) {
@@ -1392,38 +1392,36 @@ function refreshStats() {
         label.style.color = 'var(--muted)';
       }
     }
-    // ライブインジケーター更新
     const liveEl = document.getElementById('live-indicator');
     if (liveEl) {
       const t = new Date();
       liveEl.textContent = `${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')} 更新`;
     }
-    // モバイルバッジ
     updateMobileBadge && updateMobileBadge(d.decisions_open);
-  }).catch(() => {});
+  }).catch(e => console.debug('[poll] stats:', e));
 }
 setInterval(refreshStats, 30000); refreshStats();
 
 // MEO バッジを30秒ごとに更新
 function refreshMeoStats() {
-  fetch('/api/meo/stats').then(r => r.json()).then(d => {
+  fetch('/api/meo/stats').then(r => { if(!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
     const ub = document.getElementById('meo-unanswered-badge');
     const db = document.getElementById('meo-draft-badge');
     if (ub) { ub.textContent = d.unanswered; ub.style.display = d.unanswered > 0 ? 'inline' : 'none'; }
     if (db) { db.textContent = d.pending_drafts; db.style.display = d.pending_drafts > 0 ? 'inline' : 'none'; }
-  }).catch(() => {});
+  }).catch(e => console.debug('[poll] meo:', e));
 }
 setInterval(refreshMeoStats, 30000); refreshMeoStats();
 
 // 通知バッジを60秒ごとに更新
 function refreshNotifBadge() {
-  fetch('/api/notifications').then(r => r.json()).then(d => {
+  fetch('/api/notifications').then(r => { if(!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
     const nb = document.getElementById('notif-nav-badge');
     if (nb) {
       nb.textContent = d.unread;
       nb.style.display = d.unread > 0 ? 'inline' : 'none';
     }
-  }).catch(() => {});
+  }).catch(e => console.debug('[poll] notif:', e));
 }
 setInterval(refreshNotifBadge, 60000);
 
