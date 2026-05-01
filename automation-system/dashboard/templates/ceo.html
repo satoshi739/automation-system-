@@ -6,13 +6,13 @@
   /* ── CEO固有スタイル ── */
   .ceo-header-badge {
     display: inline-flex; align-items: center; gap: 7px;
-    background: linear-gradient(135deg, rgba(201,162,39,.15), rgba(201,162,39,.1));
-    border: 1px solid rgba(201,162,39,.35); border-radius: 20px; padding: 6px 14px;
+    background: var(--s2);
+    border: 1px solid rgba(201,162,39,.25); border-radius: 20px; padding: 6px 14px;
     font-size: 12px; color: var(--purple2); font-weight: 600;
   }
   .ceo-header-badge::before {
     content: ''; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--purple2); box-shadow: 0 0 8px var(--purple2); animation: glow 2s infinite;
+    background: var(--purple2);
   }
 
   /* タスクキュー */
@@ -24,8 +24,8 @@
   }
   .task-row:hover { border-color: var(--border2); background: var(--s2); }
   .task-priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .task-priority-dot.high { background: var(--red);     box-shadow: 0 0 6px var(--red); }
-  .task-priority-dot.mid  { background: var(--yellow2); box-shadow: 0 0 6px var(--yellow2); }
+  .task-priority-dot.high { background: var(--red); }
+  .task-priority-dot.mid  { background: var(--yellow2); }
   .task-priority-dot.low  { background: var(--muted); }
   .task-id    { font-size: 10px; color: var(--muted); width: 22px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
   .task-name  { flex: 1; font-size: 13px; font-weight: 500; min-width: 0; }
@@ -85,8 +85,8 @@
     width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 800;
-    background: linear-gradient(135deg, rgba(201,162,39,.25), rgba(201,162,39,.2));
-    border: 1px solid rgba(201,162,39,.3); color: var(--accent2);
+    background: rgba(201,162,39,.12);
+    border: 1px solid rgba(201,162,39,.2); color: var(--accent2);
   }
   .priority-focus      { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
   .priority-rationale  { font-size: 12px; color: var(--muted2); line-height: 1.55; }
@@ -95,8 +95,8 @@
   .to-president-item {
     display: flex; align-items: flex-start; gap: 13px;
     padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 9px;
-    background: linear-gradient(135deg, rgba(201,162,39,.08), rgba(10,16,36,.9));
-    border: 1px solid rgba(201,162,39,.25);
+    background: var(--s1);
+    border: 1px solid rgba(201,162,39,.2);
     transition: border-color .18s;
   }
   .to-president-item:hover { border-color: rgba(201,162,39,.45); }
@@ -129,8 +129,8 @@
   .agent-mini-icon { font-size: 15px; flex-shrink: 0; }
   .agent-mini-name { font-size: 12.5px; font-weight: 600; flex: 1; }
   .agent-mini-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .agent-mini-dot.ok   { background: var(--green2); box-shadow: 0 0 5px var(--green2); animation: glow 2.5s infinite; }
-  .agent-mini-dot.warn { background: var(--yellow2); box-shadow: 0 0 5px var(--yellow2); animation: glow 2.5s infinite; }
+  .agent-mini-dot.ok   { background: var(--green2); }
+  .agent-mini-dot.warn { background: var(--yellow2); }
   .agent-mini-dot.idle { background: var(--muted); }
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
