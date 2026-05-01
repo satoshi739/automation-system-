@@ -142,7 +142,7 @@
       </div>
       <div class="candidate-title">{{ p.title }}</div>
       {% if p.source_caption %}
-      <div class="candidate-caption">{{ p.source_caption[:120] }}{% if p.source_caption|length > 120 %}…{% endif %}</div>
+      <div class="candidate-caption">{{ (p.source_caption or '')[:120] }}{% if (p.source_caption or '')|length > 120 %}…{% endif %}</div>
       {% endif %}
     </div>
 

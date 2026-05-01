@@ -376,7 +376,7 @@
     <div class="cc-panel-body">
       {% set stage_labels = {'L1':'初回接触','L2':'ヒアリング','L3':'提案中','L4':'クロージング','L5':'契約済み'} %}
       {% set stage_colors = {'L1':'#c9a227','L2':'#e8c84a','L3':'#10b981','L4':'#34d399','L5':'#6ee7b7'} %}
-      {% set funnel_vals = [funnel.L1, funnel.L2, funnel.L3, funnel.L4, funnel.L5] %}
+      {% set funnel_vals = [funnel.get('L1', 0), funnel.get('L2', 0), funnel.get('L3', 0), funnel.get('L4', 0), funnel.get('L5', 0)] %}
       {% set max_val = [funnel_vals | max, 1] | max %}
       <div class="pipeline-stage" style="padding-top:0;">
         <div class="pipeline-label" style="font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:700;">ステージ</div>

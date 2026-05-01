@@ -1487,6 +1487,9 @@ function closeCmd(e) {
     document.getElementById('cmd-overlay').classList.remove('open');
   }
 }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 function filterCmd() {
   const q = document.getElementById('cmd-input').value.toLowerCase();
   cmdFiltered = q ? CMD_LIST.filter(c =>
@@ -1504,13 +1507,13 @@ function renderCmd() {
   const groups = {};
   cmdFiltered.forEach((c, i) => { (groups[c.group] = groups[c.group] || []).push({...c, _i: i}); });
   el.innerHTML = Object.entries(groups).map(([grp, items]) =>
-    `<div class="cmd-group-label">${grp}</div>` +
+    `<div class="cmd-group-label">${esc(grp)}</div>` +
     items.map(c => `
       <div class="cmd-item${c._i === cmdIdx ? ' selected' : ''}" onclick="execCmd(${c._i})" onmouseover="cmdIdx=${c._i};renderCmd()">
-        <div class="cmd-item-icon" style="${c.color ? `background:${c.color}22;border-color:${c.color}33;color:${c.color}` : ''}">${c.icon}</div>
+        <div class="cmd-item-icon" style="${c.color ? `background:${esc(c.color)}22;border-color:${esc(c.color)}33;color:${esc(c.color)}` : ''}">${esc(c.icon)}</div>
         <div class="cmd-item-text">
-          <div class="cmd-item-label">${c.label}</div>
-          <div class="cmd-item-desc">${c.desc}</div>
+          <div class="cmd-item-label">${esc(c.label)}</div>
+          <div class="cmd-item-desc">${esc(c.desc)}</div>
         </div>
         <span class="cmd-item-enter">↵</span>
       </div>`).join('')

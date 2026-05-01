@@ -1078,7 +1078,10 @@ def api_notif_mark_read():
     d    = request.get_json(force=True) or {}
     nid  = d.get("id")
     if nid:
-        db.mark_notification_read(int(nid))
+        try:
+            db.mark_notification_read(int(nid))
+        except (ValueError, TypeError):
+            pass
     else:
         db.mark_all_notifications_read()
     return jsonify({"ok": True, "unread": db.count_unread_notifications()})
@@ -1841,7 +1844,10 @@ def api_generate_blog_post():
     d = request.get_json() or {}
     topic       = d.get("topic", "")
     style       = d.get("style", "体験談・実践寄り")
-    word_count  = int(d.get("word_count", 1200))
+    try:
+        word_count = int(d.get("word_count", 1200))
+    except (ValueError, TypeError):
+        word_count = 1200
     save_to_wp  = d.get("save_to_wp", False)   # Trueで下書き保存
     publish     = d.get("publish", False)       # Trueで即公開
 
@@ -2084,7 +2090,10 @@ def assets():
     channel = request.args.get("channel", "")
     season  = request.args.get("season", "")
     status  = request.args.get("status", "active")
-    tag_id  = int(request.args.get("tag", 0))
+    try:
+        tag_id = int(request.args.get("tag", 0))
+    except (ValueError, TypeError):
+        tag_id = 0
     q       = request.args.get("q", "")
 
     asset_list = db.list_assets(
@@ -2242,7 +2251,11 @@ def meo_detail(profile_id):
     # 星ごとの集計
     rating_dist = {i: 0 for i in range(1, 6)}
     for r in reviews:
-        rating_dist[r.get("rating", 1)] = rating_dist.get(r.get("rating", 1), 0) + 1
+        try:
+            rating = max(1, min(5, int(r.get("rating", 1) or 1)))
+        except (ValueError, TypeError):
+            rating = 1
+        rating_dist[rating] = rating_dist[rating] + 1
     return render_template(
         "meo_detail.html",
         profile=profile, reviews=reviews, posts=posts,
@@ -2887,15 +2900,20 @@ def noimos_new():
         f          = request.form
         formats    = request.form.getlist("format_suitability")
         risk_flags = request.form.getlist("risk_flags")
+        def _safe_int(val, default=0):
+            try:
+                return int(val or default)
+            except (ValueError, TypeError):
+                return default
         pid = db.create_viral_pattern({
             "title":            f.get("title", "").strip(),
             "source_type":      f.get("source_type", ""),
             "source_url":       f.get("source_url", "").strip(),
             "source_caption":   f.get("source_caption", "").strip(),
-            "metrics_likes":    int(f.get("metrics_likes") or 0),
-            "metrics_comments": int(f.get("metrics_comments") or 0),
-            "metrics_saves":    int(f.get("metrics_saves") or 0),
-            "metrics_views":    int(f.get("metrics_views") or 0),
+            "metrics_likes":    _safe_int(f.get("metrics_likes")),
+            "metrics_comments": _safe_int(f.get("metrics_comments")),
+            "metrics_saves":    _safe_int(f.get("metrics_saves")),
+            "metrics_views":    _safe_int(f.get("metrics_views")),
             "hook":             f.get("hook", "").strip(),
             "problem_framing":  f.get("problem_framing", "").strip(),
             "emotional_arc":    f.get("emotional_arc", "").strip(),
@@ -3269,6 +3287,10 @@ def story_template_new():
     brands = load_brands()
     if request.method == "POST":
         days = request.form.getlist("active_days") or ["mon","tue","wed","thu","fri","sat","sun"]
+        try:
+            frame_count_new = int(request.form.get("frame_count", 3))
+        except (ValueError, TypeError):
+            frame_count_new = 3
         tmpl_repo.create({
             "brand":        request.form["brand"],
             "name":         request.form["name"],
@@ -3277,7 +3299,7 @@ def story_template_new():
             "run_mode":     request.form.get("run_mode", "semi_auto"),
             "active_days":  days,
             "run_time":     request.form.get("run_time", "09:00"),
-            "frame_count":  int(request.form.get("frame_count", 3)),
+            "frame_count":  frame_count_new,
             "topic_prompt": request.form.get("topic_prompt", ""),
             "asset_source": request.form.get("asset_source", "asset_brain"),
             "asset_tags":   [t.strip() for t in request.form.get("asset_tags","").split(",") if t.strip()],
@@ -3297,6 +3319,10 @@ def story_template_detail(tmpl_id):
         return "Template not found", 404
     if request.method == "POST":
         days = request.form.getlist("active_days") or tmpl["active_days"]
+        try:
+            frame_count_upd = int(request.form.get("frame_count", 3))
+        except (ValueError, TypeError):
+            frame_count_upd = 3
         tmpl_repo.update(tmpl_id, {
             "name":         request.form.get("name", tmpl["name"]),
             "description":  request.form.get("description", ""),
@@ -3304,7 +3330,7 @@ def story_template_detail(tmpl_id):
             "run_mode":     request.form.get("run_mode", "semi_auto"),
             "active_days":  days,
             "run_time":     request.form.get("run_time", "09:00"),
-            "frame_count":  int(request.form.get("frame_count", 3)),
+            "frame_count":  frame_count_upd,
             "topic_prompt": request.form.get("topic_prompt", ""),
             "asset_source": request.form.get("asset_source", "asset_brain"),
             "asset_tags":   [t.strip() for t in request.form.get("asset_tags","").split(",") if t.strip()],
@@ -3539,7 +3565,10 @@ def api_story_accounts(brand):
 @app.route("/api/story-autopilot/insights/<brand>")
 def api_story_insights(brand):
     _, _, _, insight_repo = _story_repos()
-    days = int(request.args.get("days", 28))
+    try:
+        days = int(request.args.get("days", 28))
+    except (ValueError, TypeError):
+        days = 28
     return jsonify(insight_repo.summary_by_brand(brand, days))
 
 

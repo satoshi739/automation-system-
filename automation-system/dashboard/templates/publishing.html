@@ -75,7 +75,7 @@
         {% if variant and variant.caption %}
         <div style="font-size:12.5px;color:var(--muted2);line-height:1.6;background:var(--s2);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px;border:1px solid var(--border);">
           <span style="font-size:10px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px;">{{ variant.format }} キャプション</span>
-          {{ variant.caption[:200] }}{% if variant.caption|length > 200 %}…{% endif %}
+          {{ (variant.caption or '')[:200] }}{% if (variant.caption or '')|length > 200 %}…{% endif %}
         </div>
         {% endif %}
 
