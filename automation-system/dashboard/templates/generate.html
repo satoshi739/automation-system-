@@ -139,21 +139,28 @@ async function generateIG() {
   const topic = document.getElementById('ig-topic').value.trim();
   if (!topic) { alert('トピックを入力してください'); return; }
   const btn = document.getElementById('ig-btn');
-  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
 
-  const resp = await fetch('/api/ai/generate_post', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      topic, brand: document.getElementById('ig-brand').value,
-      target: document.getElementById('ig-target').value,
-      tone:   document.getElementById('ig-tone').value,
-      extra:  document.getElementById('ig-extra').value,
-    })
-  });
-  btn.textContent = ' 生成する'; btn.disabled = false;
-
-  const d = await resp.json();
-  if (d.error) { alert('エラー: ' + d.error); return; }
+  let d;
+  try {
+    const resp = await fetch('/api/ai/generate_post', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        topic, brand: document.getElementById('ig-brand').value,
+        target: document.getElementById('ig-target').value,
+        tone:   document.getElementById('ig-tone').value,
+        extra:  document.getElementById('ig-extra').value,
+      })
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    d = await resp.json();
+  } catch(e) {
+    alert('エラー: ' + String(e).slice(0, 200));
+    btn.innerHTML = ' 生成する'; btn.disabled = false;
+    return;
+  }
+  btn.innerHTML = ' 生成する'; btn.disabled = false;
+  if (d.error) { alert('エラー: ' + String(d.error).slice(0, 200)); return; }
   _igData = d;
   document.getElementById('ig-hook').textContent    = d.hook || '';
   document.getElementById('ig-caption').textContent = d.caption || '';
@@ -165,19 +172,26 @@ async function generateLINE() {
   const topic = document.getElementById('line-topic').value.trim();
   if (!topic) { alert('トピックを入力してください'); return; }
   const btn = document.getElementById('line-btn');
-  btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 生成中...'; btn.disabled = true;
 
-  const resp = await fetch('/api/ai/generate_line', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      topic, brand: document.getElementById('line-brand').value,
-      purpose: document.getElementById('line-purpose').value,
-    })
-  });
-  btn.textContent = ' 生成する'; btn.disabled = false;
-
-  const d = await resp.json();
-  if (d.error) { alert('エラー: ' + d.error); return; }
+  let d;
+  try {
+    const resp = await fetch('/api/ai/generate_line', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        topic, brand: document.getElementById('line-brand').value,
+        purpose: document.getElementById('line-purpose').value,
+      })
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    d = await resp.json();
+  } catch(e) {
+    alert('エラー: ' + String(e).slice(0, 200));
+    btn.innerHTML = ' 生成する'; btn.disabled = false;
+    return;
+  }
+  btn.innerHTML = ' 生成する'; btn.disabled = false;
+  if (d.error) { alert('エラー: ' + String(d.error).slice(0, 200)); return; }
   _lineMsg = d.message;
   document.getElementById('line-message').textContent = d.message;
   document.getElementById('line-result').style.display = 'block';
@@ -199,7 +213,13 @@ function addToQueue(channel) {
 document.getElementById('queue-form').addEventListener('submit', async e => {
   e.preventDefault();
   const fd = new FormData(e.target);
-  await fetch('/queue/add', { method: 'POST', body: fd });
+  try {
+    const r = await fetch('/queue/add', { method: 'POST', body: fd });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  } catch(e) {
+    alert('キュー追加エラー: ' + String(e).slice(0, 200));
+    return;
+  }
   document.getElementById('queue-modal').style.display = 'none';
   alert(' キューに追加しました');
 });

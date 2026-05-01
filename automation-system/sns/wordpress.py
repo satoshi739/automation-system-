@@ -57,8 +57,10 @@ class WordPressPoster:
         )
         r.raise_for_status()
         post = r.json()
-        log.info(f"WordPress投稿{'公開' if status=='publish' else '下書き'}完了: {post['link']}")
-        return {"status":status,"id":post["id"],"url":post["link"]}
+        post_url = post.get("link", "")
+        post_id  = post.get("id")
+        log.info(f"WordPress投稿{'公開' if status=='publish' else '下書き'}完了: {post_url}")
+        return {"status":status,"id":post_id,"url":post_url}
 
     def _upload_image_from_url(self, image_url: str, title: str) -> int | None:
         """URLから画像をダウンロードしてWordPressにアップロード"""
@@ -72,7 +74,7 @@ class WordPressPoster:
             r = requests.post(f"{self.wp_url}/wp-json/wp/v2/media",
                               headers=headers, data=img_resp.content)
             r.raise_for_status()
-            return r.json()["id"]
+            return r.json().get("id")
         except Exception as e:
             log.warning(f"アイキャッチ画像アップロード失敗: {e}")
             return None
@@ -95,4 +97,4 @@ class WordPressPoster:
         )
         r.raise_for_status()
         post = r.json()
-        return {"status":"published","url":post["link"]}
+        return {"status":"published","url":post.get("link","")}

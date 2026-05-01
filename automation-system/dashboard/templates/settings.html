@@ -400,14 +400,16 @@ async function testConnection(type, brandId) {
   res.style.display = 'block';
   txt.innerHTML = '<span style="display:inline-flex;align-items:center;"><i data-lucide="hourglass"></i></span> 接続テスト中...';
 
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').slice(0,300);
   try {
     const r = await fetch(`/api/test_connection/${brandId}/${type}`, {method: 'POST'});
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const d = await r.json();
     if (d.ok) {
-      txt.innerHTML = ` <strong>${type}</strong> 接続成功！<br><span style="font-size:11px;color:var(--muted);">${d.detail||''}</span>`;
+      txt.innerHTML = ` <strong>${esc(type)}</strong> 接続成功！<br><span style="font-size:11px;color:var(--muted);">${esc(d.detail)}</span>`;
       txt.style.color = 'var(--green)';
     } else {
-      txt.innerHTML = ` <strong>${type}</strong> 接続失敗<br><span style="font-size:11px;color:var(--muted);">${d.error||''}</span>`;
+      txt.innerHTML = ` <strong>${esc(type)}</strong> 接続失敗<br><span style="font-size:11px;color:var(--muted);">${esc(d.error)}</span>`;
       txt.style.color = 'var(--red)';
     }
   } catch(e) {

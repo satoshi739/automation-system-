@@ -156,6 +156,7 @@ async function uploadFiles(bid, files) {
   try {
     const res = await fetch('/api/inbox/upload/' + bid, { method: 'POST', body: form });
     barEl.style.width = '80%';
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const d = await res.json();
     if (d.ok) {
       barEl.style.width = '100%';
@@ -213,6 +214,7 @@ async function processInbox(brand, btn) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ brand: brand, dry_run: false })
     });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const d = await res.json();
     if (d.ok) {
       toast(` ${brand}: ${d.processed} 件処理しました`, 'ok');

@@ -132,7 +132,8 @@ def login():
         pw_ok   = bool(expected_pw)   and hmac.compare_digest(pw_input,   expected_pw)
         if user_ok and pw_ok:
             session["logged_in"] = True
-            next_url = request.args.get("next") or url_for("index")
+            raw_next = request.args.get("next", "")
+            next_url = raw_next if raw_next.startswith("/") and not raw_next.startswith("//") else url_for("index")
             return redirect(next_url)
         error = "ユーザー名またはパスワードが違います"
     return render_template("login.html", error=error)
@@ -1047,7 +1048,7 @@ def logs_page():
 
 @app.route("/audit-logs")
 def audit_logs_page():
-    page     = int(request.args.get("page", 1))
+    page     = max(1, min(int(request.args.get("page", 1) or 1), 10000))
     per_page = 50
     offset   = (page - 1) * per_page
     resource = request.args.get("resource", "")
@@ -1503,8 +1504,9 @@ def api_test_connection(brand_id, conn_type):
         if not token:
             return jsonify({"ok": False, "error": "META_ACCESS_TOKENが設定されていません"})
         try:
-            import urllib.request
-            url = f"https://graph.facebook.com/v19.0/me?access_token={token}"
+            import urllib.request, urllib.parse
+            params = urllib.parse.urlencode({"access_token": token})
+            url = f"https://graph.facebook.com/v19.0/me?{params}"
             with urllib.request.urlopen(url, timeout=8) as r:
                 data = json.loads(r.read())
             return jsonify({"ok": True, "detail": f"ユーザー: {data.get('name', data.get('id', ''))}"})
@@ -2640,7 +2642,7 @@ def api_resolve_escalation(escalation_id):
 
 # ── Task approve（社長直接承認） ──────────────────────────────────────────────
 
-@app.route("/api/tasks/<task_id>/approve", methods=["POST"])
+@app.route("/api/tasks/<task_id>/approve/dashboard", methods=["POST"])
 def api_task_approve(task_id):
     try:
         import org_database as obd
@@ -2655,7 +2657,7 @@ def api_task_approve(task_id):
         )
     except Exception as e:
         log.warning(f"task_approve error: {e}")
-    return redirect(url_for("agent_workspace_page"))
+    return redirect(url_for("agent_workspace"))
 
 
 # ── Orchestrator API ──────────────────────────────────────────────────────────

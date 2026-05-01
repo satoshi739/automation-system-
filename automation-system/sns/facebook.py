@@ -13,6 +13,11 @@ class FacebookPoster:
         self.page_id    = os.environ.get(f"{prefix}_FB_PAGE_ID","")
         self.page_token = os.environ.get(f"{prefix}_FB_PAGE_TOKEN","")
         self.dry_run    = os.environ.get("DRY_RUN","false").lower() == "true"
+        if not self.page_token or not self.page_id:
+            log.warning("[%s] FB_PAGE_TOKEN または FB_PAGE_ID 未設定 — Facebook投稿を無効化", brand)
+            self.enabled = False
+        else:
+            self.enabled = True
 
     def _api(self, method, path, **kw):
         kw.setdefault("params",{})["access_token"] = self.page_token
@@ -21,20 +26,27 @@ class FacebookPoster:
         return r.json()
 
     def post_text(self, message: str) -> dict:
+        if not self.enabled:
+            log.warning("Facebook投稿をスキップ（未設定）")
+            return {"status":"skipped"}
         if self.dry_run:
             log.info(f"[DRY RUN] Facebook投稿: {message[:40]}...")
             return {"status":"dry_run"}
         r = self._api("POST", f"{self.page_id}/feed", data={"message": message})
-        log.info(f"Facebook投稿完了: {r['id']}")
-        return {"status":"posted","id":r["id"]}
+        post_id = r.get("id")
+        log.info(f"Facebook投稿完了: {post_id}")
+        return {"status":"posted","id":post_id}
 
     def post_image(self, image_url: str, message: str) -> dict:
+        if not self.enabled:
+            log.warning("Facebook画像投稿をスキップ（未設定）")
+            return {"status":"skipped"}
         if self.dry_run:
             log.info(f"[DRY RUN] Facebook画像投稿: {message[:40]}...")
             return {"status":"dry_run"}
         r = self._api("POST", f"{self.page_id}/photos",
                       data={"url": image_url, "caption": message})
-        return {"status":"posted","id":r["id"]}
+        return {"status":"posted","id":r.get("id")}
 
     def get_page_insights(self, days: int = 28) -> dict:
         """ページのインサイト（リーチ・エンゲージメント）"""

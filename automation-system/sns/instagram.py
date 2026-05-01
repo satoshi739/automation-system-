@@ -73,7 +73,9 @@ class InstagramPoster:
             f"{self.account_id}/media",
             data={"image_url": image_url, "caption": caption},
         )
-        container_id = container["id"]
+        container_id = container.get("id")
+        if not container_id:
+            raise RuntimeError(f"メディアコンテナIDが取得できませんでした: {container}")
 
         # Step 2: 準備完了まで待機（最大60秒）
         for _ in range(12):
@@ -91,7 +93,9 @@ class InstagramPoster:
             f"{self.account_id}/media_publish",
             data={"creation_id": container_id},
         )
-        media_id = result["id"]
+        media_id = result.get("id")
+        if not media_id:
+            raise RuntimeError(f"投稿IDが取得できませんでした: {result}")
         logger.info(f"Instagram投稿完了: media_id={media_id}")
         return {"status": "posted", "media_id": media_id}
 
@@ -117,7 +121,9 @@ class InstagramPoster:
 
         # Step 1: コンテナ作成
         container = self._api("POST", f"{self.account_id}/media", data=data)
-        container_id = container["id"]
+        container_id = container.get("id")
+        if not container_id:
+            raise RuntimeError(f"リールコンテナIDが取得できませんでした: {container}")
 
         # Step 2: 動画処理を待機（動画は画像より時間がかかる）
         logger.info("Instagram: リール動画処理中（最大5分）...")
@@ -138,7 +144,9 @@ class InstagramPoster:
             f"{self.account_id}/media_publish",
             data={"creation_id": container_id},
         )
-        media_id = result["id"]
+        media_id = result.get("id")
+        if not media_id:
+            raise RuntimeError(f"リール投稿IDが取得できませんでした: {result}")
         logger.info(f"Instagramリール投稿完了: media_id={media_id}")
         return {"status": "posted", "media_id": media_id}
 
@@ -179,12 +187,15 @@ class InstagramPoster:
                 data["image_url"] = slide["image_url"]
 
             container = self._api("POST", f"{self.account_id}/media", data=data)
-            child_ids.append(container["id"])
+            cid = container.get("id")
+            if not cid:
+                raise RuntimeError(f"スライド{i+1}のコンテナIDが取得できませんでした: {container}")
+            child_ids.append(cid)
 
             # 動画スライドは処理完了を待つ
             if "video_url" in slide:
                 for _ in range(60):
-                    status = self._api("GET", container["id"], params={"fields": "status_code"})
+                    status = self._api("GET", cid, params={"fields": "status_code"})
                     if status.get("status_code") == "FINISHED":
                         break
                     if status.get("status_code") == "ERROR":
@@ -202,7 +213,9 @@ class InstagramPoster:
                 "caption":    caption,
             },
         )
-        carousel_id = carousel["id"]
+        carousel_id = carousel.get("id")
+        if not carousel_id:
+            raise RuntimeError(f"カルーセルコンテナIDが取得できませんでした: {carousel}")
 
         # Step 3: 準備完了待機
         for _ in range(12):
@@ -219,7 +232,9 @@ class InstagramPoster:
             f"{self.account_id}/media_publish",
             data={"creation_id": carousel_id},
         )
-        media_id = result["id"]
+        media_id = result.get("id")
+        if not media_id:
+            raise RuntimeError(f"カルーセル投稿IDが取得できませんでした: {result}")
         logger.info(f"Instagramカルーセル投稿完了: media_id={media_id} ({len(slides)}枚)")
         return {"status": "posted", "media_id": media_id, "slide_count": len(slides)}
 
@@ -253,10 +268,13 @@ class InstagramPoster:
                         "story_format": "STICKER",
                     },
                 )
+                story_id = container.get("id")
+                if not story_id:
+                    raise RuntimeError(f"ストーリーズコンテナIDが取得できませんでした: {container}")
                 self._api(
                     "POST",
                     f"{self.account_id}/media_publish",
-                    data={"creation_id": container["id"]},
+                    data={"creation_id": story_id},
                 )
                 posted += 1
                 time.sleep(2)
