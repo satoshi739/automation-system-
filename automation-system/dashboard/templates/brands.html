@@ -2,10 +2,207 @@
 {% block title %}ブランド運営 — Brand OS{% endblock %}
 {% block content %}
 
+<style>
+/* ══════════════════════════════════════════
+   BRAND COMMAND CARDS — Executive Edition
+══════════════════════════════════════════ */
+
+.brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.brand-card {
+  position: relative;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform .22s cubic-bezier(.22,1,.36,1),
+              box-shadow .22s cubic-bezier(.22,1,.36,1),
+              border-color .22s;
+  cursor: pointer;
+}
+.brand-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(0,0,0,.6), 0 0 0 1px var(--bc, rgba(201,162,39,.3));
+  border-color: var(--bc, rgba(201,162,39,.35));
+}
+
+/* カラーバー（上部グロー） */
+.brand-card-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 40% at 50% -10%, var(--bc-alpha, rgba(201,162,39,.12)) 0%, transparent 70%);
+  border-radius: inherit;
+}
+
+/* アクセントライン（左） */
+.brand-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--bc, var(--accent));
+  border-radius: 0 3px 3px 0;
+  opacity: .8;
+  transition: opacity .2s, top .2s, bottom .2s;
+}
+.brand-card:hover::before {
+  top: 10%; bottom: 10%;
+  opacity: 1;
+}
+
+.brand-card-inner {
+  padding: 24px;
+}
+
+/* ── ヘッダー ── */
+.bc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  gap: 12px;
+}
+.bc-brand-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.bc-orb {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900; letter-spacing: -1px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--bc, var(--accent)), var(--bc2, var(--accent2)));
+  color: #000;
+  box-shadow: 0 6px 20px var(--bc-shadow, rgba(201,162,39,.35));
+}
+.bc-name-block { min-width: 0; }
+.bc-name {
+  font-size: 17px; font-weight: 800; letter-spacing: -.3px;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bc-fullname {
+  font-size: 11px; color: var(--muted2); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bc-badge {
+  flex-shrink: 0;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  letter-spacing: .5px;
+}
+.bc-badge-ok  { background: rgba(16,185,129,.12); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+.bc-badge-err { background: rgba(239,68,68,.12);  color: #ef4444; border: 1px solid rgba(239,68,68,.25); }
+
+/* ── KPIバー ── */
+.bc-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bc-kpi {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+  transition: border-color .15s;
+}
+.bc-kpi.alert { border-color: rgba(239,68,68,.3); }
+.bc-kpi-num {
+  font-size: 22px; font-weight: 800; line-height: 1;
+  letter-spacing: -1px;
+}
+.bc-kpi-label {
+  font-size: 9px; font-weight: 600; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--muted2); margin-top: 4px;
+}
+
+/* ── セカンダリ行 ── */
+.bc-sec-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bc-sec {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 8px 12px;
+  display: flex; align-items: center; gap: 9px;
+}
+.bc-sec.disabled { opacity: .35; border-style: dashed; }
+.bc-sec-icon { font-size: 14px; flex-shrink: 0; color: var(--muted2); }
+.bc-sec-val { font-size: 14px; font-weight: 700; line-height: 1; }
+.bc-sec-sub { font-size: 9.5px; color: var(--muted2); margin-top: 2px; }
+
+/* ── AIステータスバー ── */
+.bc-agent-bar {
+  border-radius: 10px;
+  padding: 8px 13px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+  background: rgba(16,185,129,.04);
+  border: 1px solid rgba(16,185,129,.12);
+}
+.bc-agent-left { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted2); }
+.bc-agent-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green2);
+}
+.bc-agent-dot.off { background: var(--border); animation: none !important; }
+.bc-agent-val { font-size: 12px; font-weight: 700; }
+
+/* ── チャンネルチップ ── */
+.bc-channels {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-bottom: 18px;
+}
+.bc-chip {
+  background: var(--s3);
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: 14px;
+  font-size: 10.5px; font-weight: 600;
+  color: var(--muted2);
+  letter-spacing: .3px;
+}
+
+/* ── CTA ── */
+.bc-cta {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px;
+  width: 100%; padding: 11px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--bc, var(--accent)), var(--bc2, var(--accent2)));
+  color: #000;
+  font-size: 13px; font-weight: 700; letter-spacing: .3px;
+  text-decoration: none;
+  transition: opacity .15s, transform .12s;
+  box-shadow: 0 4px 16px var(--bc-shadow, rgba(201,162,39,.25));
+}
+.bc-cta:hover { opacity: .88; transform: translateY(-1px); }
+.bc-cta:active { transform: translateY(0); }
+
+@media (max-width: 640px) {
+  .brands-grid { grid-template-columns: 1fr; }
+}
+</style>
+
 <div class="page-header">
   <div>
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">BRAND OPERATIONS</div>
-    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="tag"></i></span> ブランド運営</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:5px;">BRAND OPERATIONS</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="layers"></i></span> ブランド運営</div>
     <div class="page-sub">UPJ グループ 全ブランドの運転席</div>
   </div>
   <div class="header-actions">
@@ -13,99 +210,108 @@
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+<div class="brands-grid">
   {% for brand_id, brand in brands.items() %}
   {% set s = brand_stats[brand_id] %}
   {% set has_alert = s.story_pending > 0 or s.publishing_pending > 0 or (s.meo_unanswered is defined and s.meo_unanswered > 2) %}
+  {% set bc = brand.color or '#c9a227' %}
+  {% set initials = (brand.name_short or brand_id)[:2]|upper %}
 
-  <div class="card" style="border-top:3px solid {{ brand.color }};padding:20px;">
+  <div class="brand-card"
+       style="--bc:{{ bc }};
+              --bc2:{{ brand.color2 or bc }};
+              --bc-alpha:{{ bc }}1f;
+              --bc-shadow:{{ bc }}55;"
+       onclick="location.href='/brands/{{ brand_id }}'">
+    <div class="brand-card-glow"></div>
+    <div class="brand-card-inner">
 
-    <!-- ヘッダー -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
-      <div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-          <span style="width:8px;height:8px;border-radius:50%;background:{{ brand.color }};box-shadow:0 0 6px {{ brand.color }};flex-shrink:0;"></span>
-          <span style="font-size:17px;font-weight:800;">{{ brand.name_short }}</span>
+      <!-- ヘッダー -->
+      <div class="bc-header">
+        <div class="bc-brand-info">
+          <div class="bc-orb">{{ initials }}</div>
+          <div class="bc-name-block">
+            <div class="bc-name">{{ brand.name_short or brand_id }}</div>
+            <div class="bc-fullname">{{ brand.name or '' }}</div>
+          </div>
         </div>
-        <div style="font-size:11.5px;color:var(--muted);margin-left:16px;">{{ brand.name }}</div>
-      </div>
-      {% if has_alert %}
-      <span style="font-size:10px;font-weight:700;background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:2px 8px;border-radius:20px;">要対応</span>
-      {% else %}
-      <span style="font-size:10px;font-weight:700;background:rgba(16,185,129,.12);color:var(--green2);border:1px solid rgba(16,185,129,.25);padding:2px 8px;border-radius:20px;">正常</span>
-      {% endif %}
-    </div>
-
-    <!-- ミニステータスグリッド -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
-
-      <!-- 投稿キュー -->
-      <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:8px 10px;text-align:center;">
-        <div style="font-size:18px;font-weight:800;color:{{ 'var(--yellow2)' if s.queue_pending > 0 else 'var(--green2)' }};">{{ s.queue_pending }}</div>
-        <div style="font-size:9.5px;color:var(--muted);margin-top:2px;">投稿待ち</div>
+        {% if has_alert %}
+        <span class="bc-badge bc-badge-err">要対応</span>
+        {% else %}
+        <span class="bc-badge bc-badge-ok">正常稼働</span>
+        {% endif %}
       </div>
 
-      <!-- ストーリー -->
-      <div style="background:var(--s2);border:1px solid {{ 'rgba(239,68,68,.3)' if s.story_pending > 0 else 'var(--border)' }};border-radius:9px;padding:8px 10px;text-align:center;">
-        <div style="font-size:18px;font-weight:800;color:{{ 'var(--red)' if s.story_pending > 0 else 'var(--muted)' }};">{{ s.story_pending }}</div>
-        <div style="font-size:9.5px;color:var(--muted);margin-top:2px;">Story待ち</div>
-      </div>
-
-      <!-- コンテンツ承認 -->
-      <div style="background:var(--s2);border:1px solid {{ 'rgba(239,68,68,.3)' if s.publishing_pending > 0 else 'var(--border)' }};border-radius:9px;padding:8px 10px;text-align:center;">
-        <div style="font-size:18px;font-weight:800;color:{{ 'var(--red)' if s.publishing_pending > 0 else 'var(--muted)' }};">{{ s.publishing_pending }}</div>
-        <div style="font-size:9.5px;color:var(--muted);margin-top:2px;">承認待ち</div>
-      </div>
-    </div>
-
-    <!-- MEOスコア + ブログ -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;">
-      {% if s.meo_score is not none and s.meo_score %}
-      <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span></span>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:{{ 'var(--green2)' if s.meo_score >= 70 else 'var(--yellow2)' if s.meo_score >= 40 else 'var(--red)' }};">{{ s.meo_score }}</div>
-          <div style="font-size:9px;color:var(--muted);">MEOスコア</div>
+      <!-- KPI -->
+      <div class="bc-kpi-row">
+        <div class="bc-kpi {{ 'alert' if s.story_pending > 0 else '' }}">
+          <div class="bc-kpi-num" style="color:{{ 'var(--yellow2)' if s.queue_pending > 0 else 'var(--green2)' }};">{{ s.queue_pending }}</div>
+          <div class="bc-kpi-label">投稿待ち</div>
+        </div>
+        <div class="bc-kpi {{ 'alert' if s.story_pending > 0 else '' }}">
+          <div class="bc-kpi-num" style="color:{{ 'var(--red)' if s.story_pending > 0 else 'var(--muted)' }};">{{ s.story_pending }}</div>
+          <div class="bc-kpi-label">Story待ち</div>
+        </div>
+        <div class="bc-kpi {{ 'alert' if s.publishing_pending > 0 else '' }}">
+          <div class="bc-kpi-num" style="color:{{ 'var(--red)' if s.publishing_pending > 0 else 'var(--muted)' }};">{{ s.publishing_pending }}</div>
+          <div class="bc-kpi-label">承認待ち</div>
         </div>
       </div>
-      {% else %}
-      <div style="background:var(--s2);border:1px dashed var(--border);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:8px;opacity:.4;">
-        <span style="font-size:13px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="map-pin"></i></span></span>
-        <div style="font-size:11px;color:var(--muted);">MEO未連携</div>
-      </div>
-      {% endif %}
 
-      <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="pen"></i></span></span>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--blue);">{{ s.blog_drafts }}</div>
-          <div style="font-size:9px;color:var(--muted);">ブログ下書き</div>
+      <!-- セカンダリ -->
+      <div class="bc-sec-row">
+        {% if s.meo_score is not none and s.meo_score %}
+        <div class="bc-sec">
+          <span class="bc-sec-icon"><i data-lucide="map-pin"></i></span>
+          <div>
+            <div class="bc-sec-val" style="color:{{ 'var(--green2)' if s.meo_score >= 70 else 'var(--yellow2)' if s.meo_score >= 40 else 'var(--red)' }};">{{ s.meo_score }}</div>
+            <div class="bc-sec-sub">MEOスコア</div>
+          </div>
+        </div>
+        {% else %}
+        <div class="bc-sec disabled">
+          <span class="bc-sec-icon"><i data-lucide="map-pin"></i></span>
+          <div class="bc-sec-sub">MEO未連携</div>
+        </div>
+        {% endif %}
+
+        <div class="bc-sec">
+          <span class="bc-sec-icon"><i data-lucide="file-text"></i></span>
+          <div>
+            <div class="bc-sec-val" style="color:var(--accent);">{{ s.blog_drafts }}</div>
+            <div class="bc-sec-sub">ブログ下書き</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- AI Agent -->
-    <div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.12);border-radius:9px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:7px;">
-        <div style="width:6px;height:6px;border-radius:50%;background:{{ 'var(--green2)' if s.agents_online > 0 else 'var(--border)' }};{{ 'animation:livePulse 2s infinite;' if s.agents_online > 0 else '' }}"></div>
-        <span style="font-size:11.5px;color:var(--muted2);">AI Agent</span>
+      <!-- AIエージェント -->
+      <div class="bc-agent-bar">
+        <div class="bc-agent-left">
+          <div class="bc-agent-dot {{ '' if s.agents_online > 0 else 'off' }}"
+               style="{{ 'animation:livePulse 2s infinite;' if s.agents_online > 0 else '' }}"></div>
+          AI Agent
+        </div>
+        <span class="bc-agent-val" style="color:{{ 'var(--green2)' if s.agents_online > 0 else 'var(--muted)' }};">
+          {{ s.agents_online }}/{{ s.agents_total }} 稼働
+        </span>
       </div>
-      <span style="font-size:11.5px;font-weight:700;color:{{ 'var(--green2)' if s.agents_online > 0 else 'var(--muted)' }};">{{ s.agents_online }}/{{ s.agents_total }} 稼働</span>
-    </div>
 
-    <!-- チャンネルタグ -->
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
-      {% for p, enabled in brand.channels.items() %}
-      {% if enabled %}
-      <span style="background:var(--s3);border:1px solid var(--border);padding:3px 8px;border-radius:14px;font-size:10.5px;color:var(--muted2);">{{ platform_icons.get(p,'') }} {{ p }}</span>
-      {% endif %}
-      {% endfor %}
-    </div>
+      <!-- チャンネル -->
+      <div class="bc-channels">
+        {% for p, enabled in brand.channels.items() %}
+        {% if enabled %}
+        <span class="bc-chip">{{ platform_icons.get(p,'') }} {{ p }}</span>
+        {% endif %}
+        {% endfor %}
+      </div>
 
-    <!-- CTA -->
-    <a href="/brands/{{ brand_id }}" class="btn btn-ghost" style="width:100%;justify-content:center;text-align:center;font-size:13px;">
-      運転席を開く →
-    </a>
+      <!-- CTA -->
+      <a href="/brands/{{ brand_id }}" class="bc-cta" onclick="event.stopPropagation();">
+        <span style="display:inline-flex;align-items:center;"><i data-lucide="arrow-right"></i></span>
+        運転席を開く
+      </a>
+
+    </div>
   </div>
   {% endfor %}
 </div>
