@@ -53,7 +53,7 @@ _MONITOR_INTERVAL    = 300   # 5分ごとにチェック
 
 
 def _server_alert(message: str) -> None:
-    """alerts.log への書き込み + Mac通知（server_check 発信）。"""
+    """alerts.log への書き込み + Mac通知 + LINEプッシュ（server_check 発信）。"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         with open(ALERTS_LOG, "a", encoding="utf-8") as fh:
@@ -69,6 +69,19 @@ def _server_alert(message: str) -> None:
         )
     except Exception as exc:
         logger.error("Mac通知失敗: %s", exc)
+    try:
+        import requests as _req
+        token = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
+        user_id = os.environ.get("OWNER_LINE_USER_ID", "")
+        if token and user_id:
+            _req.post(
+                "https://api.line.me/v2/bot/message/push",
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                json={"to": user_id, "messages": [{"type": "text", "text": f"[システムアラート]\n{message}"}]},
+                timeout=5,
+            )
+    except Exception as exc:
+        logger.error("LINE アラート送信失敗: %s", exc)
     logger.warning("ALERT: %s", message)
 
 

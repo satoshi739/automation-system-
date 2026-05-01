@@ -580,7 +580,12 @@ def setup_schedule():
     logger.info("フォローアップチェック: 2時間ごと")
 
     # Googleドライブ同期（1時間ごと: ナノバナナプロで書き出した素材を自動取得）
-    schedule.every(1).hours.do(lambda: sync_from_drive())
+    def _safe_sync_from_drive():
+        try:
+            sync_from_drive()
+        except Exception as exc:
+            logger.error("Google Drive同期エラー（schedulerは継続）: %s", exc)
+    schedule.every(1).hours.do(_safe_sync_from_drive)
     logger.info("Google Drive同期: 1時間ごと")
 
     # 朝のオペレーター（毎朝5:00 JST = 20:00 UTC前日）
