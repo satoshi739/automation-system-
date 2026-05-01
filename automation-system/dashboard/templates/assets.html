@@ -559,13 +559,14 @@ function renderModal(a) {
     : a.copyright_status === 'creative_commons' ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="unlock"></i></span> CC'
     : '<span style="display:inline-flex;align-items:center;"><i data-lucide="help-circle"></i></span> 不明';
 
+  // [label, value, isHtml] — isHtml=true の値はすでにサニタイズ済みHTMLなのでesc()しない
   const meta = [
-    ['タイプ',    typeIcon(a.asset_type) + ' ' + a.asset_type],
-    ['ブランド',  (BRANDS_CFG[a.brand] || {}).name_short || a.brand],
-    ['チャネル',  (a.channel_use || []).map(c => (PLATFORM_ICONS[c]||'·') + ' ' + c).join('  ') || '—'],
+    ['タイプ',    typeIcon(a.asset_type) + ' ' + esc(a.asset_type), true],
+    ['ブランド',  esc((BRANDS_CFG[a.brand] || {}).name_short || a.brand), true],
+    ['チャネル',  (a.channel_use || []).map(c => esc((PLATFORM_ICONS[c]||'·') + ' ' + c)).join('  ') || '—', true],
     ['シーズン',  a.season || 'all'],
     ['ターゲット', (a.target_audience || []).join('、') || '—'],
-    ['著作権',    cs],
+    ['著作権',    cs, true],
     ['顔出し許可', a.face_permission ? ' あり' : '—'],
     ['再利用可',  a.reusable ? ' はい' : '—'],
     ['ステータス', a.status],
@@ -573,8 +574,8 @@ function renderModal(a) {
     ['説明',      a.description || '—'],
     ['パフォーマンス', a.performance_note || '—'],
   ];
-  document.getElementById('modal-meta').innerHTML = meta.map(([k,v]) =>
-    `<div class="meta-item"><div class="meta-label">${esc(k)}</div><div class="meta-value">${esc(v)}</div></div>`
+  document.getElementById('modal-meta').innerHTML = meta.map(([k,v,isHtml]) =>
+    `<div class="meta-item"><div class="meta-label">${esc(k)}</div><div class="meta-value">${isHtml ? v : esc(v)}</div></div>`
   ).join('');
 
   // Tags
@@ -593,7 +594,7 @@ function renderModal(a) {
   } else {
     usagesEl.innerHTML = a.usages.map(u => `
       <div class="usage-row">
-        <span class="usage-channel">${(PLATFORM_ICONS[esc(u.channel)]||'·')} ${esc(u.channel)}</span>
+        <span class="usage-channel">${(PLATFORM_ICONS[u.channel]||'·')} ${esc(u.channel)}</span>
         <span class="usage-note">${esc(u.result_note || u.used_in || '—')}</span>
         <span class="usage-date">${esc((u.used_at||'').slice(0,10))}</span>
       </div>

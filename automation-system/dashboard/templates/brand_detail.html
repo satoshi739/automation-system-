@@ -648,21 +648,28 @@ async function saveAllToQueue() {
     else generatedContent[currentPlatform].text = edited;
   }
 
-  const r = await fetch(`/api/queue/save_all/${BRAND_ID_CURRENT}`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({content: generatedContent})
-  });
-  const result = await r.json();
+  try {
+    const r = await fetch(`/api/queue/save_all/${BRAND_ID_CURRENT}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({content: generatedContent})
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const result = await r.json();
 
-  if (result.ok) {
-    const saved = result.saved || [];
-    const icons = {'instagram':'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>','threads':'<span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span>','facebook':'<span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span>','twitter':'𝕏','line':'<span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span>','wordpress':'<span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span>'};
-    document.getElementById('saved-summary').textContent =
-      saved.map(p => (icons[p]||'') + ' ' + (PLATFORM_META[p]?.label||p)).join('  ·  ') + ' をキューに追加しました';
-    showStep('done');
-    if (typeof toast !== 'undefined') toast(` ${saved.length}プラットフォームに追加完了`, 'ok');
-  } else {
-    if (typeof toast !== 'undefined') toast('保存失敗: ' + (result.error||''), 'err');
+    if (result.ok) {
+      const saved = result.saved || [];
+      const icons = {'instagram':'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>','threads':'<span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span>','facebook':'<span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span>','twitter':'𝕏','line':'<span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span>','wordpress':'<span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span>'};
+      document.getElementById('saved-summary').textContent =
+        saved.map(p => (icons[p]||'') + ' ' + (PLATFORM_META[p]?.label||p)).join('  ·  ') + ' をキューに追加しました';
+      showStep('done');
+      if (typeof toast !== 'undefined') toast(` ${saved.length}プラットフォームに追加完了`, 'ok');
+    } else {
+      if (typeof toast !== 'undefined') toast('保存失敗: ' + (result.error||''), 'err');
+      btn.textContent = ' 全プラットフォームをキューに追加'; btn.disabled = false;
+    }
+  } catch(e) {
+    console.error('saveAllToQueue failed:', e);
+    if (typeof toast !== 'undefined') toast('通信エラー: ' + e.message, 'err');
     btn.textContent = ' 全プラットフォームをキューに追加'; btn.disabled = false;
   }
 }
