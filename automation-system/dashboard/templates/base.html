@@ -1172,11 +1172,11 @@
 
   <!-- ── ピン留め（常時表示） ── -->
   <div class="nav-pinned">
-    <a href="/" class="nav-item-cmd {{ 'active' if request.path=='/' else '' }}">
+    <a href="/" class="nav-item {{ 'active' if request.path=='/' else '' }}">
       <span class="nav-icon"><i data-lucide="home"></i></span>
       <span style="flex:1;">ホーム</span>
     </a>
-    <a href="/decisions" class="nav-item-cmd {{ 'active' if '/decisions' in request.path else '' }}" style="background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.16);">
+    <a href="/decisions" class="nav-item {{ 'active' if '/decisions' in request.path else '' }}">
       <span class="nav-icon" style="color:var(--red);"><i data-lucide="alert-circle"></i></span>
       <span style="flex:1;">判断待ち</span>
       <span id="decision-badge" class="nav-badge" style="display:none">0</span>
@@ -1197,20 +1197,6 @@
         <span class="brand-pill-name">{{ b.name_short }}</span>
         <span class="brand-pill-tag">{{ b.country if b.country else 'JP' }}</span>
       </a>
-      {% if bid in request.path %}
-      <div class="platform-sub" style="margin-left:4px;">
-        {% for p in ['instagram','threads','facebook','twitter','youtube','tiktok','line','wordpress'] %}
-        {% if b.channels.get(p) %}
-        <a href="/brands/{{ bid }}?platform={{ p }}" class="{{ 'active' if request.args.get('platform')==p else '' }}">
-          <span style="font-size:11px;">{{ nav_platform_icons.get(p,'·') }}</span> {{ p }}
-        </a>
-        {% endif %}
-        {% endfor %}
-        <a href="/brands/{{ bid }}?platform=analytics" class="{{ 'active' if request.args.get('platform')=='analytics' else '' }}">
-          <span style="font-size:11px;display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> Analytics
-        </a>
-      </div>
-      {% endif %}
       {% endfor %}
     </div>
   </div>
@@ -1248,15 +1234,9 @@
     <svg class="nav-coll-chevron open" id="chev-ai" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
   <div class="nav-coll-body" id="nav-body-ai">
-    <a href="/agents" class="nav-item {{ 'active' if request.path=='/agents' else '' }}"
-       style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.09);margin:1px 8px;border-radius:10px;">
-      <span class="nav-icon" style="color:var(--green2);"><i data-lucide="activity"></i></span>
+    <a href="/agents" class="nav-item {{ 'active' if request.path=='/agents' else '' }}">
+      <span class="nav-icon"><i data-lucide="activity"></i></span>
       <span style="flex:1;">Agent ステータス</span>
-      <span class="live-badge"><span class="live-badge-dot"></span>LIVE</span>
-    </a>
-    <a href="/agent-workspace" class="nav-item {{ 'active' if '/agent-workspace' in request.path else '' }}">
-      <span class="nav-icon"><i data-lucide="settings-2"></i></span>
-      <span style="flex:1;">Agent Workspace</span>
     </a>
     <a href="/story-autopilot" class="nav-item {{ 'active' if request.path.startswith('/story-autopilot') else '' }}">
       <span class="nav-icon"><i data-lucide="bot"></i></span>
@@ -1276,11 +1256,11 @@
     <svg class="nav-coll-chevron open" id="chev-sales" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
   <div class="nav-coll-body" id="nav-body-sales">
-    <a href="/president" class="nav-item-cmd {{ 'active' if request.path=='/president' else '' }}">
+    <a href="/president" class="nav-item {{ 'active' if request.path=='/president' else '' }}">
       <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
       <span style="flex:1;">経営ビュー</span>
     </a>
-    <a href="/ceo" class="nav-item-cmd {{ 'active' if request.path=='/ceo' else '' }}">
+    <a href="/ceo" class="nav-item {{ 'active' if request.path=='/ceo' else '' }}">
       <span class="nav-icon"><i data-lucide="cpu"></i></span>
       <span style="flex:1;">AI CEO</span>
     </a>

@@ -749,176 +749,77 @@ document.getElementById('bulk-modal').addEventListener('click', function(e) {
   {% endif %}
 </div>
 
-<!-- ── プラットフォームビルカード ── -->
+<!-- ── プラットフォームカード ── -->
 <style>
   .plt-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
   }
-  .plt-building {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px 10px 4px 4px;
-    background: linear-gradient(180deg, #03050e 0%, #060b18 50%, #080e1e 100%);
-    border: 1px solid rgba(255,255,255,.07);
-    transition: transform .26s cubic-bezier(.22,1,.36,1), box-shadow .26s, border-color .26s;
-    cursor: pointer;
+  .plt-card {
     display: flex;
     flex-direction: column;
-    min-height: 220px;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
     text-decoration: none;
+    transition: border-color .15s, background .15s;
   }
-  .plt-building:hover {
-    transform: translateY(-6px) scale(1.005);
-    border-color: rgba(255,255,255,.14);
+  .plt-card:hover {
+    border-color: var(--accent);
+    background: var(--hover);
   }
-  /* 星空 */
-  .plt-building::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 45% 0;
-    background-image:
-      radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 72% 10%, rgba(255,255,255,.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 44%  6%, rgba(255,255,255,.6) 0%, transparent 100%),
-      radial-gradient(1px 1px at 88% 18%, rgba(255,255,255,.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 58% 25%, rgba(255,255,255,.35)0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  /* 地面グロー */
-  .plt-building::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 8%; right: 8%;
-    height: 40px;
-    background: radial-gradient(ellipse at center bottom, var(--pc, rgba(201,162,39,.3)) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
-  }
-  .plt-sky {
-    height: 28px;
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  .plt-antenna {
-    width: 2px; height: 18px;
-    border-radius: 2px;
-    position: relative;
-  }
-  .plt-antenna-tip {
-    position: absolute;
-    top: -3px; left: 50%;
-    transform: translateX(-50%);
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    animation: plt-ant 2.8s ease-in-out infinite;
-  }
-  @keyframes plt-ant {
-    0%,85%,100% { opacity:1; box-shadow:0 0 6px 2px currentColor; }
-    90%          { opacity:.1; box-shadow:none; }
-    95%          { opacity:.7; box-shadow:0 0 3px 1px currentColor; }
-  }
-  .plt-body {
-    position: relative;
-    z-index: 2;
-    padding: 6px 14px 4px;
-  }
-  .plt-win-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 4px;
-  }
-  .plt-win {
-    width: 100%;
-    height: 14px;
-    border-radius: 2px;
-  }
-  .plt-win.lit {
-    animation: plt-flicker var(--fd,5s) ease-in-out infinite var(--fo,0s);
-  }
-  .plt-win.dark { opacity:.06; }
-  @keyframes plt-flicker {
-    0%,89%,100% { opacity:.88; }
-    91%          { opacity:.2; }
-    94%          { opacity:.7; }
-    97%          { opacity:.4; }
-  }
-  .plt-lobby {
-    position: relative;
-    z-index: 2;
-    padding: 9px 14px 12px;
-    border-top: 1px solid rgba(255,255,255,.06);
-    background: linear-gradient(0deg, rgba(0,0,0,.5) 0%, transparent 100%);
-    margin-top: auto;
-  }
-  .plt-lobby-header {
+  .plt-card-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 5px;
+  }
+  .plt-card-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .plt-card-preview {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    flex: 1;
+  }
+  .plt-card-footer {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
   }
 </style>
 
 <div class="plt-grid">
   {% for p, info in platforms.items() %}
-  {% set pidx = loop.index0 %}
-  <a href="/brands/{{ brand_id }}?platform={{ p }}" class="plt-building"
-     style="--pc:{{ brand.color }}44;"
-     onmouseover="this.style.boxShadow='0 20px 60px rgba(0,0,0,.7), 0 0 40px {{ brand.color }}1a'"
-     onmouseout="this.style.boxShadow=''">
-
-    <!-- 空・アンテナ -->
-    <div class="plt-sky">
-      <div class="plt-antenna" style="background:linear-gradient(to bottom, {{ brand.color }}, rgba(255,255,255,.06));">
-        <div class="plt-antenna-tip" style="background:{{ brand.color }};color:{{ brand.color }};animation-delay:{{ pidx * 0.4 }}s;"></div>
+  <a href="/brands/{{ brand_id }}?platform={{ p }}" class="plt-card">
+    <div class="plt-card-top">
+      <div class="plt-card-name">
+        <span>{{ info.icon }}</span>
+        <span>{{ p }}</span>
       </div>
-    </div>
-
-    <!-- 窓グリッド（8列×4行=32窓） -->
-    <div class="plt-body">
-      <div class="plt-win-grid">
-        {% for i in range(32) %}
-        {% set is_lit = ((i * 7 + pidx * 11 + i // 8 * 5) % 10) >= 3 %}
-        <div class="plt-win {{ 'lit' if is_lit else 'dark' }}"
-          style="background:{{ brand.color }};
-                 {% if is_lit %}
-                   box-shadow:0 0 4px {{ brand.color }}, 0 0 8px {{ brand.color }}55;
-                   --fd:{{ 4 + (i * 13 % 6) }}s;
-                   --fo:{{ ((i * 7 + pidx * 4) % 9) * 0.3 }}s;
-                 {% endif %}">
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- ロビー -->
-    <div class="plt-lobby">
-      <div class="plt-lobby-header">
-        <span style="font-size:13px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:7px;">
-          <span>{{ info.icon }}</span>
-          <span style="text-transform:uppercase;font-size:11.5px;letter-spacing:.8px;">{{ p }}</span>
-        </span>
-        {% if info.pending_count > 0 %}
-        <span class="badge badge-warn">{{ info.pending_count }}件待機</span>
-        {% else %}
-        <span class="badge badge-ok"> 空</span>
-        {% endif %}
-      </div>
-      {% if info.posts %}
-      <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:7px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
-        {{ (info.posts[0].caption or info.posts[0].text or info.posts[0].title or info.posts[0].message or '')[:60] }}…
-      </div>
+      {% if info.pending_count > 0 %}
+      <span class="badge badge-warn">{{ info.pending_count }}件</span>
       {% else %}
-      <div style="font-size:11px;color:var(--muted);margin-bottom:7px;">投稿なし</div>
+      <span class="badge badge-ok">空</span>
       {% endif %}
-      <span class="btn btn-ghost btn-sm">管理する →</span>
     </div>
-
+    <div class="plt-card-preview">
+      {{ (info.posts[0].caption or info.posts[0].text or info.posts[0].title or info.posts[0].message or '')[:80] if info.posts else '投稿なし' }}
+    </div>
+    <div class="plt-card-footer">管理する →</div>
   </a>
   {% endfor %}
 </div>
