@@ -888,6 +888,32 @@
     }
 
     /* ══════════════════════════════════════════
+       COLLAPSIBLE NAV SECTIONS
+    ══════════════════════════════════════════ */
+    .nav-coll-header {
+      display: flex; align-items: center; gap: 7px;
+      padding: 14px 14px 5px 16px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .nav-coll-header:hover .nav-section-text { color: var(--muted2); }
+    .nav-coll-chevron {
+      color: var(--muted); flex-shrink: 0;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+      margin-left: 2px;
+    }
+    .nav-coll-chevron.open { transform: rotate(90deg); }
+    .nav-coll-body {
+      overflow: hidden;
+      transition: height .28s cubic-bezier(.22,1,.36,1);
+    }
+    /* pinned items at top */
+    .nav-pinned {
+      padding: 8px 8px 0;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+
+    /* ══════════════════════════════════════════
        STAT NUMBER TRANSITION
     ══════════════════════════════════════════ */
     [data-stat] {
@@ -1144,156 +1170,157 @@
     </span>
   </div>
 
-  <!-- ════════════════════════════
-       1. 司令室
-  ════════════════════════════ -->
-  <div class="nav-section">
-    <div class="nav-section-text">司令室</div>
-    <div class="nav-section-line"></div>
+  <!-- ── ピン留め（常時表示） ── -->
+  <div class="nav-pinned">
+    <a href="/" class="nav-item-cmd {{ 'active' if request.path=='/' else '' }}">
+      <span class="nav-icon"><i data-lucide="home"></i></span>
+      <span style="flex:1;">ホーム</span>
+    </a>
+    <a href="/decisions" class="nav-item-cmd {{ 'active' if '/decisions' in request.path else '' }}" style="background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.16);">
+      <span class="nav-icon" style="color:var(--red);"><i data-lucide="alert-circle"></i></span>
+      <span style="flex:1;">判断待ち</span>
+      <span id="decision-badge" class="nav-badge" style="display:none">0</span>
+    </a>
   </div>
 
-  <a href="/president" class="nav-item-cmd {{ 'active' if request.path=='/president' else '' }}">
-    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
-    <span style="flex:1;">経営ビュー</span>
-  </a>
-  <a href="/ceo" class="nav-item-cmd {{ 'active' if request.path=='/ceo' else '' }}">
-    <span class="nav-icon"><i data-lucide="cpu"></i></span>
-    <span style="flex:1;">AI CEO</span>
-  </a>
-  <a href="/decisions" class="nav-item {{ 'active' if '/decisions' in request.path else '' }}">
-    <span class="nav-icon"><i data-lucide="alert-circle"></i></span>
-    <span style="flex:1;">判断待ち</span>
-    <span id="decision-badge" class="nav-badge" style="display:none">0</span>
-  </a>
-
-  <!-- ════════════════════════════
-       2. ブランド
-  ════════════════════════════ -->
-  <div class="nav-section" style="margin-top:6px;">
+  <!-- ════════ ブランド ════════ -->
+  <div class="nav-coll-header" onclick="toggleNavSection('brands')">
     <div class="nav-section-text">ブランド</div>
     <div class="nav-section-line"></div>
+    <svg class="nav-coll-chevron open" id="chev-brands" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
-
-  <div class="brand-pills">
-    {% for bid, b in nav_brands.items() %}
-    <a href="/brands/{{ bid }}" class="brand-pill {{ 'active' if bid in request.path else '' }}">
-      <span class="brand-pill-dot" style="background:{{ b.color }};box-shadow:0 0 6px {{ b.color }};"></span>
-      <span class="brand-pill-name">{{ b.name_short }}</span>
-      <span class="brand-pill-tag">{{ b.country if b.country else 'JP' }}</span>
-    </a>
-    {% if bid in request.path %}
-    <div class="platform-sub" style="margin-left:4px;">
-      {% for p in ['instagram','threads','facebook','twitter','youtube','tiktok','line','wordpress'] %}
-      {% if b.channels.get(p) %}
-      <a href="/brands/{{ bid }}?platform={{ p }}" class="{{ 'active' if request.args.get('platform')==p else '' }}">
-        <span style="font-size:11px;">{{ nav_platform_icons.get(p,'·') }}</span> {{ p }}
+  <div class="nav-coll-body" id="nav-body-brands">
+    <div class="brand-pills">
+      {% for bid, b in nav_brands.items() %}
+      <a href="/brands/{{ bid }}" class="brand-pill {{ 'active' if bid in request.path else '' }}">
+        <span class="brand-pill-dot" style="background:{{ b.color }};box-shadow:0 0 6px {{ b.color }};"></span>
+        <span class="brand-pill-name">{{ b.name_short }}</span>
+        <span class="brand-pill-tag">{{ b.country if b.country else 'JP' }}</span>
       </a>
+      {% if bid in request.path %}
+      <div class="platform-sub" style="margin-left:4px;">
+        {% for p in ['instagram','threads','facebook','twitter','youtube','tiktok','line','wordpress'] %}
+        {% if b.channels.get(p) %}
+        <a href="/brands/{{ bid }}?platform={{ p }}" class="{{ 'active' if request.args.get('platform')==p else '' }}">
+          <span style="font-size:11px;">{{ nav_platform_icons.get(p,'·') }}</span> {{ p }}
+        </a>
+        {% endif %}
+        {% endfor %}
+        <a href="/brands/{{ bid }}?platform=analytics" class="{{ 'active' if request.args.get('platform')=='analytics' else '' }}">
+          <span style="font-size:11px;display:inline-flex;align-items:center;"><i data-lucide="bar-chart-2"></i></span> Analytics
+        </a>
+      </div>
       {% endif %}
       {% endfor %}
-      <a href="/brands/{{ bid }}?platform=analytics" class="{{ 'active' if request.args.get('platform')=='analytics' else '' }}">
-        <span style="font-size:11px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span></span> Analytics
-      </a>
     </div>
-    {% endif %}
-    {% endfor %}
   </div>
 
-  <!-- ════════════════════════════
-       3. AI エージェント
-  ════════════════════════════ -->
-  <div class="nav-section" style="margin-top:6px;">
-    <div class="nav-section-text">AI エージェント</div>
-    <div class="nav-section-line"></div>
-  </div>
-
-  <a href="/agents" class="nav-item {{ 'active' if request.path=='/agents' else '' }}"
-     style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.09);margin:1px 8px;border-radius:10px;">
-    <span class="nav-icon" style="color:var(--green2);"><i data-lucide="activity"></i></span>
-    <span style="flex:1;">Agent ステータス</span>
-    <span class="live-badge"><span class="live-badge-dot"></span>LIVE</span>
-  </a>
-  <a href="/agent-workspace" class="nav-item {{ 'active' if '/agent-workspace' in request.path else '' }}">
-    <span class="nav-icon"><i data-lucide="settings-2"></i></span>
-    <span style="flex:1;">Agent Workspace</span>
-  </a>
-  <a href="/story-autopilot" class="nav-item {{ 'active' if request.path.startswith('/story-autopilot') else '' }}">
-    <span class="nav-icon"><i data-lucide="bot"></i></span>
-    <span style="flex:1;">Story Autopilot</span>
-  </a>
-  <a href="/publishing" class="nav-item {{ 'active' if request.path.startswith('/publishing') else '' }}">
-    <span class="nav-icon"><i data-lucide="send"></i></span>
-    <span style="flex:1;">承認キュー</span>
-  </a>
-
-  <!-- ════════════════════════════
-       4. コンテンツ
-  ════════════════════════════ -->
-  <div class="nav-section" style="margin-top:6px;">
+  <!-- ════════ コンテンツ ════════ -->
+  <div class="nav-coll-header" onclick="toggleNavSection('content')">
     <div class="nav-section-text">コンテンツ</div>
     <div class="nav-section-line"></div>
+    <svg class="nav-coll-chevron open" id="chev-content" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
-
-  <a href="/inbox" class="nav-item {{ 'active' if request.path=='/inbox' else '' }}">
-    <span class="nav-icon"><i data-lucide="inbox"></i></span> 素材インボックス
-  </a>
-  <a href="/queue" class="nav-item {{ 'active' if request.path=='/queue' else '' }}">
-    <span class="nav-icon"><i data-lucide="list"></i></span> 投稿キュー
-  </a>
-  <a href="/calendar" class="nav-item {{ 'active' if request.path=='/calendar' else '' }}">
-    <span class="nav-icon"><i data-lucide="calendar"></i></span> 投稿カレンダー
-  </a>
-  <a href="/blog" class="nav-item {{ 'active' if request.path.startswith('/blog') else '' }}">
-    <span class="nav-icon"><i data-lucide="pen-line"></i></span>
-    <span style="flex:1;">Blog Auto Growth</span>
-  </a>
-  <a href="/meo" class="nav-item {{ 'active' if request.path=='/meo' or request.path.startswith('/meo/') else '' }}">
-    <span class="nav-icon"><i data-lucide="map-pin"></i></span>
-    <span style="flex:1;">MEO / 口コミ</span>
-    <span id="meo-unanswered-badge" class="nav-badge" style="display:none;">0</span>
-  </a>
-
-  <!-- ════════════════════════════
-       5. 営業・管理
-  ════════════════════════════ -->
-  <div class="nav-section" style="margin-top:6px;">
-    <div class="nav-section-text">営業・管理</div>
-    <div class="nav-section-line"></div>
-  </div>
-
-  <a href="/leads/kanban" class="nav-item {{ 'active' if 'kanban' in request.path else '' }}">
-    <span class="nav-icon"><i data-lucide="kanban"></i></span> 営業 Kanban
-  </a>
-  <a href="/leads" class="nav-item {{ 'active' if request.path=='/leads' else '' }}">
-    <span class="nav-icon"><i data-lucide="users"></i></span> リード一覧
-  </a>
-  <a href="/notifications" class="nav-item {{ 'active' if '/notifications' in request.path else '' }}">
-    <span class="nav-icon"><i data-lucide="bell"></i></span>
-    <span style="flex:1;">通知</span>
-    <span class="nav-badge" id="notif-nav-badge" {% if not unread_notif_count %}style="display:none;"{% endif %}>{{ unread_notif_count }}</span>
-  </a>
-  <a href="/logs" class="nav-item {{ 'active' if request.path=='/logs' else '' }}">
-    <span class="nav-icon"><i data-lucide="file-text"></i></span> 実行ログ
-  </a>
-  {% for bid, b in nav_brands.items() %}
-  <a href="/settings/{{ bid }}" class="nav-item {{ 'active' if ('settings/'+bid) in request.path else '' }}"
-     style="display:{% if 'settings' in request.path %}block{% else %}none{% endif %};" id="settings-link-{{ bid }}">
-    <span class="nav-icon" style="color:{{ b.color }};font-size:8px;">●</span>
-    <span style="flex:1;">{{ b.name_short }} 設定</span>
-  </a>
-  {% endfor %}
-  <a href="#" onclick="toggleSettings(event)" class="nav-item {{ 'active' if 'settings' in request.path else '' }}">
-    <span class="nav-icon"><i data-lucide="sliders"></i></span>
-    <span style="flex:1;">設定</span>
-    <span style="font-size:10px;color:var(--muted);" id="settings-arrow">▸</span>
-  </a>
-  <div id="settings-sub" style="display:{% if 'settings' in request.path %}block{% else %}none{% endif %};">
-    {% for bid, b in nav_brands.items() %}
-    <a href="/settings/{{ bid }}" class="nav-item {{ 'active' if ('settings/'+bid) in request.path else '' }}"
-       style="margin-left:12px;font-size:11px;">
-      <span class="nav-icon" style="color:{{ b.color }};font-size:8px;">●</span>
-      <span style="flex:1;">{{ b.name_short }}</span>
+  <div class="nav-coll-body" id="nav-body-content">
+    <a href="/queue" class="nav-item {{ 'active' if request.path=='/queue' else '' }}">
+      <span class="nav-icon"><i data-lucide="list"></i></span> 投稿キュー
     </a>
-    {% endfor %}
+    <a href="/calendar" class="nav-item {{ 'active' if request.path=='/calendar' else '' }}">
+      <span class="nav-icon"><i data-lucide="calendar"></i></span> 投稿カレンダー
+    </a>
+    <a href="/publishing" class="nav-item {{ 'active' if request.path.startswith('/publishing') else '' }}">
+      <span class="nav-icon"><i data-lucide="send"></i></span>
+      <span style="flex:1;">承認キュー</span>
+    </a>
+    <a href="/blog" class="nav-item {{ 'active' if request.path.startswith('/blog') else '' }}">
+      <span class="nav-icon"><i data-lucide="pen-line"></i></span>
+      <span style="flex:1;">Blog Auto Growth</span>
+    </a>
+    <a href="/inbox" class="nav-item {{ 'active' if request.path=='/inbox' else '' }}">
+      <span class="nav-icon"><i data-lucide="inbox"></i></span> 素材インボックス
+    </a>
+  </div>
+
+  <!-- ════════ AI 自動化 ════════ -->
+  <div class="nav-coll-header" onclick="toggleNavSection('ai')">
+    <div class="nav-section-text">AI 自動化</div>
+    <div class="nav-section-line"></div>
+    <svg class="nav-coll-chevron open" id="chev-ai" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="nav-coll-body" id="nav-body-ai">
+    <a href="/agents" class="nav-item {{ 'active' if request.path=='/agents' else '' }}"
+       style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.09);margin:1px 8px;border-radius:10px;">
+      <span class="nav-icon" style="color:var(--green2);"><i data-lucide="activity"></i></span>
+      <span style="flex:1;">Agent ステータス</span>
+      <span class="live-badge"><span class="live-badge-dot"></span>LIVE</span>
+    </a>
+    <a href="/agent-workspace" class="nav-item {{ 'active' if '/agent-workspace' in request.path else '' }}">
+      <span class="nav-icon"><i data-lucide="settings-2"></i></span>
+      <span style="flex:1;">Agent Workspace</span>
+    </a>
+    <a href="/story-autopilot" class="nav-item {{ 'active' if request.path.startswith('/story-autopilot') else '' }}">
+      <span class="nav-icon"><i data-lucide="bot"></i></span>
+      <span style="flex:1;">Story Autopilot</span>
+    </a>
+    <a href="/meo" class="nav-item {{ 'active' if request.path=='/meo' or request.path.startswith('/meo/') else '' }}">
+      <span class="nav-icon"><i data-lucide="map-pin"></i></span>
+      <span style="flex:1;">MEO / 口コミ</span>
+      <span id="meo-unanswered-badge" class="nav-badge" style="display:none;">0</span>
+    </a>
+  </div>
+
+  <!-- ════════ 営業・売上 ════════ -->
+  <div class="nav-coll-header" onclick="toggleNavSection('sales')">
+    <div class="nav-section-text">営業・売上</div>
+    <div class="nav-section-line"></div>
+    <svg class="nav-coll-chevron open" id="chev-sales" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="nav-coll-body" id="nav-body-sales">
+    <a href="/president" class="nav-item-cmd {{ 'active' if request.path=='/president' else '' }}">
+      <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+      <span style="flex:1;">経営ビュー</span>
+    </a>
+    <a href="/ceo" class="nav-item-cmd {{ 'active' if request.path=='/ceo' else '' }}">
+      <span class="nav-icon"><i data-lucide="cpu"></i></span>
+      <span style="flex:1;">AI CEO</span>
+    </a>
+    <a href="/leads/kanban" class="nav-item {{ 'active' if 'kanban' in request.path else '' }}">
+      <span class="nav-icon"><i data-lucide="kanban"></i></span> 営業 Kanban
+    </a>
+    <a href="/leads" class="nav-item {{ 'active' if request.path=='/leads' else '' }}">
+      <span class="nav-icon"><i data-lucide="users"></i></span> リード一覧
+    </a>
+  </div>
+
+  <!-- ════════ 管理 ════════ -->
+  <div class="nav-coll-header" onclick="toggleNavSection('admin')">
+    <div class="nav-section-text">管理</div>
+    <div class="nav-section-line"></div>
+    <svg class="nav-coll-chevron" id="chev-admin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="nav-coll-body" id="nav-body-admin" style="height:0;">
+    <a href="/notifications" class="nav-item {{ 'active' if '/notifications' in request.path else '' }}">
+      <span class="nav-icon"><i data-lucide="bell"></i></span>
+      <span style="flex:1;">通知</span>
+      <span class="nav-badge" id="notif-nav-badge" {% if not unread_notif_count %}style="display:none;"{% endif %}>{{ unread_notif_count }}</span>
+    </a>
+    <a href="/logs" class="nav-item {{ 'active' if request.path=='/logs' else '' }}">
+      <span class="nav-icon"><i data-lucide="file-text"></i></span> 実行ログ
+    </a>
+    <a href="#" onclick="toggleSettings(event)" class="nav-item {{ 'active' if 'settings' in request.path else '' }}">
+      <span class="nav-icon"><i data-lucide="sliders"></i></span>
+      <span style="flex:1;">設定</span>
+      <span style="font-size:10px;color:var(--muted);" id="settings-arrow">▸</span>
+    </a>
+    <div id="settings-sub" style="display:{% if 'settings' in request.path %}block{% else %}none{% endif %};">
+      {% for bid, b in nav_brands.items() %}
+      <a href="/settings/{{ bid }}" class="nav-item {{ 'active' if ('settings/'+bid) in request.path else '' }}"
+         style="margin-left:12px;font-size:11px;">
+        <span class="nav-icon" style="color:{{ b.color }};font-size:8px;">●</span>
+        <span style="flex:1;">{{ b.name_short }}</span>
+      </a>
+      {% endfor %}
+    </div>
   </div>
 
   <!-- Footer -->
@@ -1523,6 +1550,61 @@ document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmd(); }
   if (e.key === 'Escape' && document.getElementById('cmd-overlay').classList.contains('open')) closeCmd();
 });
+
+// ── 折りたたみナビ ──
+const NAV_SECTIONS = ['brands','content','ai','sales','admin'];
+
+function toggleNavSection(id) {
+  const body = document.getElementById('nav-body-' + id);
+  const chevron = document.getElementById('chev-' + id);
+  if (!body || !chevron) return;
+  const isOpen = chevron.classList.contains('open');
+  if (isOpen) {
+    body.style.height = body.scrollHeight + 'px';
+    requestAnimationFrame(() => { body.style.height = '0'; });
+    chevron.classList.remove('open');
+    localStorage.setItem('nav_' + id, 'closed');
+  } else {
+    body.style.height = '0';
+    requestAnimationFrame(() => { body.style.height = body.scrollHeight + 'px'; });
+    setTimeout(() => { if (chevron.classList.contains('open')) body.style.height = 'auto'; }, 300);
+    chevron.classList.add('open');
+    localStorage.setItem('nav_' + id, 'open');
+  }
+}
+
+function initCollapsibleNav() {
+  const currentPath = window.location.pathname;
+  NAV_SECTIONS.forEach(id => {
+    const body = document.getElementById('nav-body-' + id);
+    const chevron = document.getElementById('chev-' + id);
+    if (!body || !chevron) return;
+    const links = body.querySelectorAll('a[href]');
+    const isActive = Array.from(links).some(a => {
+      const h = a.getAttribute('href');
+      return h && h !== '#' && (currentPath === h || currentPath.startsWith(h + '/'));
+    });
+    const stored = localStorage.getItem('nav_' + id);
+    // admin closed by default unless active or explicitly opened
+    const defaultOpen = id !== 'admin';
+    const shouldOpen = isActive || (stored === 'open') || (stored === null && defaultOpen);
+    if (shouldOpen) {
+      chevron.classList.add('open');
+      body.style.height = 'auto';
+    } else {
+      chevron.classList.remove('open');
+      body.style.height = '0';
+    }
+  });
+  // Set mobile page title from active nav item
+  const activeNavItem = document.querySelector('.sidebar .nav-item.active, .sidebar .nav-item-cmd.active');
+  if (activeNavItem) {
+    const span = activeNavItem.querySelector('span[style*="flex"]') || activeNavItem.querySelector('span:not(.nav-icon):not(.nav-badge):not(.live-badge)');
+    const titleEl = document.getElementById('mobile-page-title');
+    if (titleEl && span) titleEl.textContent = span.textContent.trim() || 'Brand OS';
+  }
+}
+document.addEventListener('DOMContentLoaded', initCollapsibleNav);
 
 // ── モバイルサイドバー ──
 function toggleSidebar() {
