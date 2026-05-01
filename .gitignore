@@ -5,6 +5,7 @@ automation-system/logs/
 automation-system/content_queue/
 automation-system/media/inbox/
 automation-system/media/processed/
+media/
 automation-system/.env.backup*
 **/__pycache__/
 *.pyc
