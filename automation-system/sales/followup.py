@@ -20,14 +20,14 @@ SCENARIOS_PATH = Path(__file__).parent.parent / "config" / "line_scenarios.yaml"
 def _load_followup_messages() -> dict:
     with open(SCENARIOS_PATH, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
-    return cfg.get("followup_messages", {})
+    return (cfg or {}).get("followup_messages", {})
 
 
 def _load_schedule() -> dict:
     schedule_path = Path(__file__).parent.parent / "config" / "schedule.yaml"
     with open(schedule_path, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
-    return cfg.get("followup", {})
+    return (cfg or {}).get("followup", {})
 
 
 def run_followup_check():
@@ -100,7 +100,7 @@ def run_followup_check():
             with open(lead_file, "w", encoding="utf-8") as f:
                 yaml.dump(lead, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
             sent_count += 1
-            logger.info(f"フォローアップ送信: {lead['lead_id']} → {msg_key}")
+            logger.info(f"フォローアップ送信: {lead.get('lead_id', lead_file.stem)} → {msg_key}")
 
     logger.info(f"フォローアップチェック完了: {sent_count}件送信")
     return sent_count

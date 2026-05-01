@@ -482,6 +482,8 @@ def lead_detail(lead_id):
         if not path.exists():
             return "Not found", 404
         lead = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not lead:
+            return "Not found", 404
         db.upsert_lead(lead)  # 遅延移行
     return render_template("lead_detail.html", lead=lead, lead_id=lead_id, ai=ai_available())
 
@@ -996,7 +998,7 @@ def resolve_decision_file(filename):
     path = DECISION_DIR / filename
     if path.exists():
         try:
-            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
             data.update(resolved=True,
                         resolved_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         resolved_note=request.form.get("note",""))
@@ -1048,7 +1050,10 @@ def logs_page():
 
 @app.route("/audit-logs")
 def audit_logs_page():
-    page     = max(1, min(int(request.args.get("page", 1) or 1), 10000))
+    try:
+        page = max(1, min(int(request.args.get("page", 1) or 1), 10000))
+    except (ValueError, TypeError):
+        page = 1
     per_page = 50
     offset   = (page - 1) * per_page
     resource = request.args.get("resource", "")
@@ -1167,7 +1172,7 @@ def api_lead_stage():
     path = LEADS_DIR / f"{lead_id}.yaml"
     if path.exists():
         try:
-            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
             data["stage"] = new_stage
             data["last_contact"] = datetime.now().strftime("%Y-%m-%d")
             save_yaml(LEADS_DIR, f"{lead_id}.yaml", data)
@@ -1216,8 +1221,12 @@ def api_generate_line():
 def queue_delete(brand_id, platform, filename):
     """キューアイテムを削除（DB + YAML）"""
     import re
-    # パストラバーサル対策
-    if not re.match(r'^[\w\-. ]+$', filename):
+    # パストラバーサル対策（brand_id・platform・filename いずれも検証する）
+    if not re.match(r'^[\w\-]+$', brand_id):
+        return "Invalid brand_id", 400
+    if not re.match(r'^[\w\-]+$', platform):
+        return "Invalid platform", 400
+    if not re.match(r'^[\w\-.]+$', filename):
         return "Invalid filename", 400
     # DBから削除
     with db.get_conn() as conn:
@@ -1352,16 +1361,16 @@ def api_save_all_to_queue(brand_id):
     platform_map = {
         "instagram": lambda c: {
             "media_type": "image",
-            "caption":    f"{c['caption']}\n\n{c['hashtags']}",
+            "caption":    f"{c.get('caption','')}\n\n{c.get('hashtags','')}".strip(),
             "image_url":  c.get("image_url", ""),
         },
-        "threads": lambda c: {"text": c["text"]},
-        "facebook": lambda c: {"text": c["text"]},
-        "twitter":  lambda c: {"text": c["text"]},
-        "line":     lambda c: {"message": c["message"]},
+        "threads":  lambda c: {"text": c.get("text", "")},
+        "facebook": lambda c: {"text": c.get("text", "")},
+        "twitter":  lambda c: {"text": c.get("text", "")},
+        "line":     lambda c: {"message": c.get("message", "")},
         "wordpress": lambda c: {
-            "title":   c["title"],
-            "content": c["content"],
+            "title":   c.get("title", ""),
+            "content": c.get("content", ""),
             "status":  "draft",
         },
     }
