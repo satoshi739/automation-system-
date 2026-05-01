@@ -13,6 +13,9 @@ automation-system/.env.backup*
 # Claude Code
 .claude/
 
+# Shop text output (generated files)
+shop-update-system/output/
+
 # Screenshots
 スクリーンショット*.png
 Screenshot*.png
