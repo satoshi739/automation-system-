@@ -1,387 +1,167 @@
 {% extends "base.html" %}
-{% block title %}AI OS — Agents{% endblock %}
+{% block title %}AI Agents — Brand OS{% endblock %}
 {% block content %}
 
 <style>
-  /* ── 組織図レイアウト ── */
-  .os-header {
-    text-align: center;
-    padding: 32px 0 40px;
-    position: relative;
-  }
-  .os-title {
-    font-size: 11px; font-weight: 700; letter-spacing: 3px;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
-  }
-  .os-name {
-    font-size: 28px; font-weight: 900; letter-spacing: -1px;
-    background: linear-gradient(135deg, var(--accent2), var(--purple2), var(--cyan));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-
-  /* ── 階層カード共通 ── */
-  .tier-label {
-    font-size: 9.5px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--muted);
-    text-align: center; margin-bottom: 12px;
-    display: flex; align-items: center; gap: 12px; justify-content: center;
-  }
-  .tier-label::before, .tier-label::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-  }
-
-  /* コネクター線 */
-  .connector {
-    width: 2px; height: 32px; margin: 0 auto;
-    background: linear-gradient(180deg, var(--accent) 0%, var(--purple) 100%);
-    opacity: .4; position: relative;
-  }
-  .connector::after {
-    content: '▼'; position: absolute; bottom: -10px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 8px; color: var(--accent); opacity: .6;
-  }
-
-  /* ── President カード ── */
-  .president-card {
-    max-width: 380px; margin: 0 auto 0;
-    background: linear-gradient(135deg, rgba(99,102,241,.1) 0%, rgba(139,92,246,.08) 100%);
-    border: 1px solid rgba(99,102,241,.3);
-    border-radius: 18px; padding: 22px 28px;
-    display: flex; align-items: center; gap: 18px;
-    box-shadow: 0 0 40px rgba(99,102,241,.12), 0 8px 32px rgba(0,0,0,.3);
-    position: relative; overflow: hidden;
-  }
-  .president-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99,102,241,.8), rgba(139,92,246,.8), transparent);
-  }
-  .president-avatar {
-    width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--accent), var(--purple));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 4px 20px rgba(99,102,241,.4), inset 0 1px 0 rgba(255,255,255,.2);
-  }
-  .president-role {
-    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--accent2); margin-bottom: 4px;
-  }
-  .president-name {
-    font-size: 20px; font-weight: 800; letter-spacing: -.5px;
-  }
-  .president-desc {
-    font-size: 11.5px; color: var(--muted2); margin-top: 4px; line-height: 1.5;
-  }
-  .president-badge {
-    margin-left: auto; flex-shrink: 0;
-    background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.3);
-    border-radius: 20px; padding: 5px 12px;
-    font-size: 10.5px; font-weight: 700; color: var(--accent2);
-  }
-
-  /* ── CEO カード ── */
-  .ceo-card {
-    max-width: 480px; margin: 0 auto;
-    background: linear-gradient(135deg, rgba(16,185,129,.08) 0%, rgba(6,182,212,.06) 100%);
-    border: 1px solid rgba(16,185,129,.25);
-    border-radius: 18px; padding: 22px 28px;
-    display: flex; align-items: center; gap: 18px;
-    box-shadow: 0 0 40px rgba(16,185,129,.1), 0 8px 32px rgba(0,0,0,.3);
-    position: relative; overflow: hidden;
-  }
-  .ceo-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(16,185,129,.8), rgba(6,182,212,.6), transparent);
-  }
-  .ceo-avatar {
-    width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--green), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 4px 20px rgba(16,185,129,.4), inset 0 1px 0 rgba(255,255,255,.2);
-  }
-  .ceo-role {
-    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--green2); margin-bottom: 4px;
-  }
-  .ceo-name {
-    font-size: 18px; font-weight: 800; letter-spacing: -.4px;
-  }
-  .ceo-desc {
-    font-size: 11.5px; color: var(--muted2); margin-top: 4px; line-height: 1.5;
-  }
-  .ceo-online {
-    margin-left: auto; flex-shrink: 0; text-align: center;
-  }
-  .ceo-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--green2); margin: 0 auto 4px;
-    box-shadow: 0 0 10px var(--green2);
-    animation: ceo-pulse 2s infinite;
-  }
-  @keyframes ceo-pulse {
-    0%,100% { box-shadow: 0 0 8px var(--green2); }
-    50%      { box-shadow: 0 0 20px var(--green2), 0 0 40px rgba(52,211,153,.3); }
-  }
-  .ceo-online-label {
-    font-size: 9.5px; font-weight: 700; color: var(--green2); letter-spacing: .5px;
-  }
-
-  /* ── Agents グリッド ── */
   .agents-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
   }
   .agent-card {
     background: var(--s1);
     border: 1px solid var(--border);
-    border-radius: 16px; padding: 18px 20px;
-    transition: border-color .2s, transform .2s, box-shadow .2s;
-    position: relative; overflow: hidden;
+    border-left: 3px solid var(--ac, var(--accent));
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: border-color .15s;
   }
-  .agent-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--border2);
-    box-shadow: 0 12px 36px rgba(0,0,0,.35);
-  }
-  .agent-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: var(--ac, var(--accent));
-    opacity: .7;
-  }
-  .agent-card::after {
-    content: '';
-    position: absolute; top: 0; right: 0;
-    width: 80px; height: 80px;
-    background: radial-gradient(circle at top right, var(--ac, var(--accent)) 0%, transparent 70%);
-    opacity: .06; pointer-events: none;
-  }
+  .agent-card:hover { border-color: var(--border2); }
   .agent-header {
-    display: flex; align-items: flex-start; gap: 13px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
   }
   .agent-icon {
-    width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    background: var(--ac-bg, rgba(99,102,241,.1));
-    border: 1px solid var(--ac-border, rgba(99,102,241,.2));
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    background: var(--s2); border: 1px solid var(--border);
   }
   .agent-role {
     font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 3px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
   }
-  .agent-name {
-    font-size: 14px; font-weight: 700; letter-spacing: -.2px;
+  .agent-name { font-size: 14px; font-weight: 700; }
+  .agent-status {
+    margin-left: auto; display: flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 600;
   }
+  .agent-status-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .status-active  { color: var(--green2); }
+  .status-active .agent-status-dot  { background: var(--green2); }
+  .status-idle    { color: var(--yellow2); }
+  .status-idle .agent-status-dot    { background: var(--yellow2); }
+  .status-error   { color: var(--red); }
+  .status-error .agent-status-dot   { background: var(--red); }
+
   .agent-desc {
-    font-size: 11.5px; color: var(--muted2); line-height: 1.65; margin-bottom: 13px;
+    font-size: 11.5px; color: var(--muted2); line-height: 1.6; margin-bottom: 10px;
   }
-  .agent-meta {
-    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  .agent-footer {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-size: 10.5px; color: var(--muted);
   }
-  .agent-brand-pill {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 9px; border-radius: 12px; font-size: 10.5px; font-weight: 600;
-    background: rgba(255,255,255,.04); border: 1px solid var(--border);
-  }
-  .agent-brand-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-  }
-  .agent-run-info {
-    font-size: 10.5px; color: var(--muted); margin-left: auto;
-  }
+  .agent-brand-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
   .agent-tools {
-    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px;
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;
   }
   .agent-tool {
     font-size: 10px; padding: 2px 7px; border-radius: 6px;
-    background: rgba(255,255,255,.04); border: 1px solid var(--border);
-    color: var(--muted2); font-family: 'SF Mono', monospace;
+    background: var(--s2); border: 1px solid var(--border);
+    color: var(--muted2);
   }
-  .agent-status {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 10px; font-weight: 600;
-  }
-  .agent-status-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-  }
-  .status-active .agent-status-dot {
-    background: var(--green2); box-shadow: 0 0 5px var(--green2);
-    animation: livePulse 2s infinite;
-  }
-  .status-idle .agent-status-dot { background: var(--yellow2); }
-  .status-error .agent-status-dot { background: var(--red); }
-  @keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-  /* last_result preview */
   .agent-last-result {
-    margin-top: 9px; padding: 8px 10px;
-    background: rgba(0,0,0,.25); border-radius: 8px; border: 1px solid var(--border);
+    margin-top: 8px; padding: 7px 10px;
+    background: var(--s2); border-radius: 7px; border: 1px solid var(--border);
     font-size: 10.5px; color: var(--muted2); line-height: 1.5;
-    max-height: 48px; overflow: hidden;
-    position: relative;
+    max-height: 44px; overflow: hidden;
   }
-  .agent-last-result::after {
-    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-    height: 16px;
-    background: linear-gradient(transparent, rgba(7,12,26,.95));
+
+  /* 組織サマリー */
+  .org-bar {
+    display: flex; align-items: center; gap: 0;
+    background: var(--s1); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: 20px;
   }
+  .org-bar-item {
+    flex: 1; padding: 12px 16px; text-align: center;
+    border-right: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .org-bar-item:last-child { border-right: none; }
+  .org-bar-label { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+  .org-bar-val { font-size: 16px; font-weight: 800; }
 </style>
 
-<!-- ページヘッダー -->
 <div class="page-header">
   <div>
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">AI ORGANIZATION</div>
-    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> AI組織</div>
-    <div class="page-sub">人間 → AI CEO → AI Agents の3層構造で全ブランドを自律運営します</div>
+    <div class="page-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span> AI Agents</div>
+    <div class="page-sub">{{ agents|length }} エージェント稼働中</div>
   </div>
   <div class="header-actions">
-    <a href="/agent-workspace" class="btn btn-ghost btn-sm"><span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span> Agent Workspace</a>
-    <a href="/president" class="btn btn-ghost btn-sm">社長ビュー →</a>
+    <a href="/agent-workspace" class="btn btn-ghost btn-sm">Workspace</a>
+    <a href="/president" class="btn btn-ghost btn-sm">経営ビュー</a>
   </div>
 </div>
 
-<!-- 稼働サマリー -->
-<div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:28px;">
-  <div class="stat-card green-top">
-    <div class="stat-label">総エージェント数</div>
-    <div class="stat-value green">{{ agents|length }}</div>
-    <div class="stat-meta">稼働中</div>
+<!-- サマリーバー -->
+<div class="org-bar">
+  <div class="org-bar-item">
+    <div class="org-bar-label">総数</div>
+    <div class="org-bar-val" style="color:var(--text);">{{ agents|length }}</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Online</div>
-    <div class="stat-value blue">{{ agents|selectattr('db_status','equalto','active')|list|length }}</div>
-    <div class="stat-meta">アクティブ</div>
+  <div class="org-bar-item">
+    <div class="org-bar-label">Online</div>
+    <div class="org-bar-val" style="color:var(--green2);">{{ agents|selectattr('db_status','equalto','active')|list|length }}</div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">累計実行</div>
-    <div class="stat-value purple">{{ agents|map(attribute='run_count')|sum }}</div>
-    <div class="stat-meta">全Agent合計</div>
+  <div class="org-bar-item">
+    <div class="org-bar-label">累計実行</div>
+    <div class="org-bar-val" style="color:var(--accent2);">{{ agents|map(attribute='run_count')|sum }}</div>
   </div>
-  <div class="stat-card {{ 'red-top' if agents|selectattr('db_status','equalto','error')|list|length > 0 else '' }}">
-    <div class="stat-label">エラー</div>
-    <div class="stat-value {{ 'red' if agents|selectattr('db_status','equalto','error')|list|length > 0 else 'green' }}">
+  <div class="org-bar-item">
+    <div class="org-bar-label">エラー</div>
+    <div class="org-bar-val" style="color:{% if agents|selectattr('db_status','equalto','error')|list|length > 0 %}var(--red){% else %}var(--muted){% endif %};">
       {{ agents|selectattr('db_status','equalto','error')|list|length }}
     </div>
-    <div class="stat-meta">{{ '要確認' if agents|selectattr('db_status','equalto','error')|list|length > 0 else '正常' }}</div>
   </div>
 </div>
 
-<!-- OS ヘッダー -->
-<div class="os-header">
-  <div class="os-title">Autonomous Brand OS</div>
-  <div class="os-name">{{ os_cfg.organization.name if os_cfg.organization else 'UPJ Autonomous Brand OS' }}</div>
-  <div style="font-size:12px;color:var(--muted2);margin-top:8px;">
-    人間が最終意思決定を持ち、AI CEOが全ブランドを統括、専門Agentsが各領域を自律実行する
-  </div>
-</div>
-
-<!-- Tier 1: President -->
-<div class="tier-label">Human Layer — President</div>
-<div class="president-card">
-  <div class="president-avatar"><span style="display:inline-flex;align-items:center;"><i data-lucide="user"></i></span></div>
-  <div style="flex:1;min-width:0;">
-    <div class="president-role">President / Founder / Owner</div>
-    <div class="president-name">{{ president.name or 'Satoshi' }}</div>
-    <div class="president-desc">{{ president.authority or '最終意思決定・方針設定・AI CEO への指示' }}</div>
-  </div>
-  <div class="president-badge">最高権限</div>
-</div>
-
-<div class="connector"></div>
-
-<!-- Tier 2: AI CEO -->
-<div class="tier-label">AI Layer — CEO</div>
-<div class="ceo-card">
-  <div class="ceo-avatar"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
-  <div style="flex:1;min-width:0;">
-    <div class="ceo-role">{{ ai_ceo.role or 'AI CEO' }}</div>
-    <div class="ceo-name">{{ ai_ceo.name or 'CEO Agent' }}</div>
-    <div class="ceo-desc">{{ ai_ceo.description or '' }}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;">
-      {% for r in (ai_ceo.responsibilities or []) %}
-      <span style="font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);color:var(--green2);">{{ r }}</span>
-      {% endfor %}
-    </div>
-  </div>
-  <div class="ceo-online">
-    <div class="ceo-dot"></div>
-    <div class="ceo-online-label">ONLINE</div>
-  </div>
-</div>
-
-<div class="connector"></div>
-
-<!-- Tier 3: Agents -->
-<div class="tier-label">AI Agents Layer</div>
+<!-- エージェントカード -->
 {% if not agents %}
-<div style="text-align:center;padding:48px 20px;background:var(--s1);border:1px dashed var(--border);border-radius:16px;margin-bottom:24px;">
-  <div style="font-size:48px;margin-bottom:14px;opacity:.4;"><span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span></div>
-  <div style="font-size:16px;font-weight:700;margin-bottom:6px;">AIエージェントが未設定です</div>
-  <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6;">
-    <code>config/os_config.yaml</code> にエージェント設定を追加してください。
-  </div>
-  <div style="display:flex;gap:10px;justify-content:center;">
-    <a href="/agent-workspace" class="btn btn-accent btn-sm">Agent Workspace を開く</a>
-    <a href="/settings" class="btn btn-ghost btn-sm">設定へ</a>
-  </div>
+<div style="text-align:center;padding:48px 20px;background:var(--s1);border:1px dashed var(--border);border-radius:12px;">
+  <div style="font-size:13px;color:var(--muted);">エージェントが未設定です</div>
+  <a href="/agent-workspace" class="btn btn-accent btn-sm" style="margin-top:14px;">Agent Workspace を開く</a>
 </div>
 {% endif %}
+
 <div class="agents-grid">
   {% for ag in agents %}
-  {% set icon_map = {
-    'コンテンツ生成': '<span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span>',
-    '営業': '◎',
-    '分析': '<span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span>',
-    '運用': '<span style="display:inline-flex;align-items:center;"><i data-lucide="settings"></i></span>',
-    '記事生成': '<span style="display:inline-flex;align-items:center;"><i data-lucide="pen-line"></i></span>',
-  } %}
-  {% set icon = '<span style="display:inline-flex;align-items:center;"><i data-lucide="bot"></i></span>' %}
-  {% for k, v in icon_map.items() %}{% if k in ag.role %}{% set icon = v %}{% endif %}{% endfor %}
-
-  <div class="agent-card" style="--ac:{{ ag.brand_color }};--ac-bg:{{ ag.brand_color }}18;--ac-border:{{ ag.brand_color }}35;">
+  {% set status = ag.db_status or 'active' %}
+  <div class="agent-card" style="--ac:{{ ag.brand_color }};">
     <div class="agent-header">
-      <div class="agent-icon">{{ icon }}</div>
+      <div class="agent-icon">
+        {% if 'コンテンツ' in ag.role %}<i data-lucide="sparkles"></i>
+        {% elif '営業' in ag.role %}<i data-lucide="briefcase"></i>
+        {% elif '分析' in ag.role %}<i data-lucide="bar-chart-2"></i>
+        {% elif '記事' in ag.role %}<i data-lucide="pen-line"></i>
+        {% elif '運用' in ag.role %}<i data-lucide="settings"></i>
+        {% else %}<i data-lucide="bot"></i>{% endif %}
+      </div>
       <div style="flex:1;min-width:0;">
         <div class="agent-role">{{ ag.role }}</div>
         <div class="agent-name">{{ ag.name }}</div>
       </div>
-      <div class="agent-status status-{{ ag.db_status or 'active' }}">
+      <div class="agent-status status-{{ status }}">
         <div class="agent-status-dot"></div>
-        <span style="color:{% if ag.db_status=='active' %}var(--green2){% elif ag.db_status=='error' %}var(--red){% else %}var(--yellow2){% endif %};">
-          {{ ag.db_status or 'active' }}
-        </span>
+        {{ status }}
       </div>
     </div>
 
     <div class="agent-desc">{{ ag.description or '' }}</div>
 
-    <div class="agent-meta">
-      <div class="agent-brand-pill">
-        <div class="agent-brand-dot" style="background:{{ ag.brand_color }};box-shadow:0 0 5px {{ ag.brand_color }};"></div>
-        {{ ag.brand_short }}
-      </div>
-      <div class="agent-run-info">
-        {% if ag.last_run %}
-          最終: {{ ag.last_run[:16] }}
-        {% else %}
-          未実行
-        {% endif %}
-        &nbsp;·&nbsp;{{ ag.run_count or 0 }}回
-      </div>
+    <div class="agent-footer">
+      <span class="agent-brand-dot" style="background:{{ ag.brand_color }};"></span>
+      <span>{{ ag.brand_short }}</span>
+      <span style="margin-left:auto;">
+        {% if ag.last_run %}{{ ag.last_run[:16] }}{% else %}未実行{% endif %}
+        · {{ ag.run_count or 0 }}回
+      </span>
     </div>
 
     {% if ag.tools %}
     <div class="agent-tools">
-      {% for t in ag.tools %}
+      {% for t in ag.tools[:6] %}
       <span class="agent-tool">{{ t }}</span>
       {% endfor %}
+      {% if ag.tools|length > 6 %}<span class="agent-tool">+{{ ag.tools|length - 6 }}</span>{% endif %}
     </div>
     {% endif %}
 
@@ -390,24 +170,6 @@
     {% endif %}
   </div>
   {% endfor %}
-</div>
-
-<!-- 統計フッター -->
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;">
-  <div class="card" style="text-align:center;padding:20px;">
-    <div style="font-size:28px;font-weight:800;color:var(--green2);">{{ agents|length }}</div>
-    <div style="font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Active Agents</div>
-  </div>
-  <div class="card" style="text-align:center;padding:20px;">
-    <div style="font-size:28px;font-weight:800;color:var(--accent2);">{{ agents|map(attribute='run_count')|sum }}</div>
-    <div style="font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Total Runs</div>
-  </div>
-  <div class="card" style="text-align:center;padding:20px;">
-    <div style="font-size:28px;font-weight:800;color:var(--yellow2);">
-      {{ agents|selectattr('db_status','equalto','active')|list|length }}
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Online Now</div>
-  </div>
 </div>
 
 {% endblock %}
