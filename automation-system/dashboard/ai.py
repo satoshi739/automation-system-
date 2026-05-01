@@ -26,9 +26,8 @@ import anthropic
 
 
 def _resp_text(resp) -> str:
-    """Anthropic APIレスポンスからテキストを安全に取得する"""
     if resp.content and len(resp.content) > 0:
-        return _resp_text(resp)
+        return resp.content[0].text.strip()
     return ""
 
 
