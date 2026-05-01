@@ -289,12 +289,15 @@ def get_channel_data() -> dict:
 
 @app.route("/president")
 def president_dashboard():
-    from dashboard.real_service import (
-        get_morning_brief, get_priority_actions, get_pending_approvals,
-        get_danger_alerts, get_brand_status, get_agent_status,
-        get_recent_runs, get_unreplied, get_media_shortage,
-        get_post_shortage, get_blog_candidates,
-    )
+    try:
+        from dashboard.real_service import (
+            get_morning_brief, get_priority_actions, get_pending_approvals,
+            get_danger_alerts, get_brand_status, get_agent_status,
+            get_recent_runs, get_unreplied, get_media_shortage,
+            get_post_shortage, get_blog_candidates,
+        )
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     return render_template("president.html",
         brief=get_morning_brief(),
         priority_actions=get_priority_actions(),
@@ -312,15 +315,18 @@ def president_dashboard():
 
 @app.route("/ceo")
 def ceo_dashboard():
-    from dashboard.real_service import (
-        get_morning_brief, get_brand_status, get_agent_status,
-        get_task_queue, get_bottlenecks, get_escalations,
-        get_ceo_priorities, get_ceo_to_president, get_pending_approvals,
-    )
-    from dashboard.real_service import (
-        get_ai_recommendations, get_anomaly_alerts, get_strategy_notes,
-        get_performance_snapshot,
-    )
+    try:
+        from dashboard.real_service import (
+            get_morning_brief, get_brand_status, get_agent_status,
+            get_task_queue, get_bottlenecks, get_escalations,
+            get_ceo_priorities, get_ceo_to_president, get_pending_approvals,
+        )
+        from dashboard.real_service import (
+            get_ai_recommendations, get_anomaly_alerts, get_strategy_notes,
+            get_performance_snapshot,
+        )
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     return render_template("ceo.html",
         brief=get_morning_brief(),
         brand_status=get_brand_status(),
@@ -342,14 +348,20 @@ def ceo_dashboard():
 
 @app.route("/blog")
 def blog_candidates():
-    from dashboard.real_service import get_blog_projects
+    try:
+        from dashboard.real_service import get_blog_projects
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     projects = get_blog_projects()
     return render_template("blog_candidates.html", projects=projects)
 
 
 @app.route("/blog/<int:draft_id>")
 def blog_draft_detail(draft_id):
-    from dashboard.real_service import get_blog_draft_detail
+    try:
+        from dashboard.real_service import get_blog_draft_detail
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     draft = get_blog_draft_detail(draft_id)
     return render_template("blog_draft_detail.html", draft=draft)
 
@@ -358,10 +370,13 @@ def blog_draft_detail(draft_id):
 
 @app.route("/chief-of-staff")
 def chief_of_staff():
-    from dashboard.real_service import (
-        get_ai_recommendations, get_anomaly_alerts, get_strategy_notes,
-        get_performance_snapshot, get_daily_briefs_history,
-    )
+    try:
+        from dashboard.real_service import (
+            get_ai_recommendations, get_anomaly_alerts, get_strategy_notes,
+            get_performance_snapshot, get_daily_briefs_history,
+        )
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     return render_template("chief_of_staff.html",
         recommendations=get_ai_recommendations(),
         anomaly_alerts=get_anomaly_alerts(),
@@ -373,14 +388,20 @@ def chief_of_staff():
 
 @app.route("/daily-briefs")
 def daily_briefs():
-    from dashboard.real_service import get_daily_briefs_history
+    try:
+        from dashboard.real_service import get_daily_briefs_history
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     briefs = get_daily_briefs_history()
     return render_template("daily_briefs.html", briefs=briefs)
 
 
 @app.route("/anomaly-alerts")
 def anomaly_alerts():
-    from dashboard.real_service import get_anomaly_alerts
+    try:
+        from dashboard.real_service import get_anomaly_alerts
+    except ImportError:
+        return "real_service unavailable (MOCK_MODE?)", 503
     alerts = get_anomaly_alerts()
     return render_template("anomaly_alerts.html", alerts=alerts)
 
@@ -1357,7 +1378,7 @@ def api_save_all_to_queue(brand_id):
 
     d        = request.get_json() or {}
     content  = d.get("content", {})
-    ts       = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    ts       = datetime.now().strftime("%Y-%m-%d_%H%M%S_%f")
     saved    = []
     enabled  = brand.get("channels", {})
 
@@ -1387,9 +1408,10 @@ def api_save_all_to_queue(brand_id):
         try:
             entry = builder(platform_content)
             entry.update({"brand": brand_id, "channel": platform, "posted": False, "source": "ai_bulk"})
-            entry["filename"] = f"{ts}_ai_bulk.yaml"
+            fname = f"{ts}_{platform}_ai_bulk.yaml"
+            entry["filename"] = fname
             db.enqueue(entry)
-            save_yaml(QUEUE_ROOT / brand_id / platform, f"{ts}_ai_bulk.yaml", entry)
+            save_yaml(QUEUE_ROOT / brand_id / platform, fname, entry)
             saved.append(platform)
         except Exception as e:
             pass  # スキップして続行

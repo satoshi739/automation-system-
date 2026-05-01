@@ -55,7 +55,7 @@
       {%- elif 'WARNING' in line or 'WARNING' in line %}log-warn
       {%- elif 'INFO' in line %}log-info
       {%- elif 'OK' in line or 'ok' in line or '' in line or '完了' in line %}log-ok
-      {%- endif %}">{{ line }}</div>
+      {%- endif %}">{{ line | e }}</div>
     {% endfor %}
   {% else %}
   <div class="log-empty">ログがまだありません</div>
@@ -71,7 +71,7 @@
   <div class="log-box" id="logScheduler">
     {% if scheduler_log %}
       {% for line in scheduler_log %}
-      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
+      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line | e }}</div>
       {% endfor %}
     {% else %}
     <div class="log-empty">ログがまだありません — スケジューラーが起動すると記録されます</div>
@@ -87,7 +87,7 @@
   <div class="log-box" id="logMorning">
     {% if morning_log %}
       {% for line in morning_log %}
-      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
+      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '完了' in line or 'ok' in line.lower() %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line | e }}</div>
       {% endfor %}
     {% else %}
     <div class="log-empty">ログがまだありません — 毎朝 9:00 に実行されます</div>
@@ -103,7 +103,7 @@
   <div class="log-box" id="logServer">
     {% if server_log %}
       {% for line in server_log %}
-      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '200' in line %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line }}</div>
+      <div class="log-line {% if 'ERROR' in line or 'Error' in line %}log-err{% elif 'WARNING' in line %}log-warn{% elif '' in line or '200' in line %}log-ok{% elif 'INFO' in line %}log-info{% endif %}">{{ line | e }}</div>
       {% endfor %}
     {% else %}
     <div class="log-empty">ログがまだありません — LINE メッセージを受信すると記録されます</div>

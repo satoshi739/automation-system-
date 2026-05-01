@@ -89,7 +89,7 @@
         </td>
         <td>
           {% if l.detail %}
-          <span class="log-detail" title="{{ l.detail }}">{{ l.detail | tojson if l.detail is mapping else l.detail }}</span>
+          <span class="log-detail" title="{{ l.detail }}">{{ l.detail | tojson if l.detail is mapping else l.detail | e }}</span>
           {% else %}
           <span style="color:var(--muted);">—</span>
           {% endif %}
