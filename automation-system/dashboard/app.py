@@ -2815,6 +2815,20 @@ def _hb_alert(message: str) -> None:
         )
     except Exception:
         pass
+    # Railway本番でも通知が届くようLINEプッシュを送る
+    try:
+        import requests as _req
+        token = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
+        user_id = os.environ.get("OWNER_LINE_USER_ID", "")
+        if token and user_id:
+            _req.post(
+                "https://api.line.me/v2/bot/message/push",
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                json={"to": user_id, "messages": [{"type": "text", "text": f"[システムアラート]\n{message}"}]},
+                timeout=5,
+            )
+    except Exception as exc:
+        log.error("LINE アラート送信失敗: %s", exc)
     log.warning("ALERT: %s", message)
 
 
