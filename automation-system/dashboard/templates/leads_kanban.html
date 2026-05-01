@@ -88,24 +88,24 @@ async function drop(e, newStage) {
   card.classList.remove('dragging');
 
   // API呼び出し
-  const resp = await fetch('/api/leads/stage', {
+  fetch('/api/leads/stage', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ lead_id: draggingId, stage: newStage })
-  });
-
-  if (resp.ok) {
-    const toast = document.getElementById('move-toast');
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 2000);
-    // カード数を更新
-    document.querySelectorAll('.kanban-col').forEach(col => {
-      const cards = col.querySelectorAll('.kanban-card').length;
-      col.querySelector('.kanban-count').textContent = cards;
-    });
-  } else {
-    alert('更新に失敗しました');
-  }
+  }).then(resp => {
+    if (resp.ok) {
+      const toast = document.getElementById('move-toast');
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 2000);
+      // カード数を更新
+      document.querySelectorAll('.kanban-col').forEach(col => {
+        const cards = col.querySelectorAll('.kanban-card').length;
+        col.querySelector('.kanban-count').textContent = cards;
+      });
+    } else {
+      alert('更新に失敗しました');
+    }
+  }).catch(err => console.error('stage update failed', err));
   draggingId = null;
 }
 

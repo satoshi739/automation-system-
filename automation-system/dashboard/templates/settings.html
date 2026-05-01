@@ -54,7 +54,7 @@
 </div>
 
 <!-- ═══ Instagram / Meta ═══ -->
-{% if brand.channels.instagram or brand.channels.threads or brand.channels.facebook %}
+{% if brand.channels and (brand.channels.get('instagram') or brand.channels.get('threads') or brand.channels.get('facebook')) %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #e1306c;">
   <div class="card-header">
     <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span> Instagram / <span style="display:inline-flex;align-items:center;"><i data-lucide="link"></i></span> Threads / <span style="display:inline-flex;align-items:center;"><i data-lucide="book"></i></span> Facebook（Meta）</span>
@@ -84,14 +84,14 @@
       <input type="text" name="{{ prefix }}_INSTAGRAM_ACCOUNT_ID" class="form-input"
              value="{{ env.get(prefix+'_INSTAGRAM_ACCOUNT_ID','') }}" placeholder="17841400000000000">
     </div>
-    {% if brand.channels.threads %}
+    {% if brand.channels and brand.channels.get('threads') %}
     <div class="form-group">
       <label class="form-label">{{ prefix }}_THREADS_USER_ID</label>
       <input type="text" name="{{ prefix }}_THREADS_USER_ID" class="form-input"
              value="{{ env.get(prefix+'_THREADS_USER_ID','') }}" placeholder="Threads ユーザーID">
     </div>
     {% endif %}
-    {% if brand.channels.facebook %}
+    {% if brand.channels and brand.channels.get('facebook') %}
     <div class="form-group">
       <label class="form-label">{{ prefix }}_FB_PAGE_ID</label>
       <input type="text" name="{{ prefix }}_FB_PAGE_ID" class="form-input"
@@ -109,7 +109,7 @@
 {% endif %}
 
 <!-- ═══ Twitter / X ═══ -->
-{% if brand.channels.twitter %}
+{% if brand.channels and brand.channels.get('twitter') %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #1da1f2;">
   <div class="card-header">
     <span class="card-title">𝕏 Twitter / X</span>
@@ -150,7 +150,7 @@
 {% endif %}
 
 <!-- ═══ LINE ═══ -->
-{% if brand.channels.line %}
+{% if brand.channels and brand.channels.get('line') %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #06c755;">
   <div class="card-header">
     <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="smartphone"></i></span> LINE Messaging API</span>
@@ -188,7 +188,7 @@
 {% endif %}
 
 <!-- ═══ WordPress ═══ -->
-{% if brand.channels.wordpress %}
+{% if brand.channels and brand.channels.get('wordpress') %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #21759b;">
   <div class="card-header">
     <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="globe"></i></span> WordPress REST API</span>
@@ -225,7 +225,7 @@
 {% endif %}
 
 <!-- ═══ YouTube ═══ -->
-{% if brand.channels.youtube %}
+{% if brand.channels and brand.channels.get('youtube') %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #ff0000;">
   <div class="card-header">
     <span class="card-title">▶️ YouTube Data API</span>
@@ -252,7 +252,7 @@
 {% endif %}
 
 <!-- ═══ TikTok ═══ -->
-{% if brand.channels.tiktok %}
+{% if brand.channels and brand.channels.get('tiktok') %}
 <div class="card" style="margin-bottom:16px;border-top:3px solid #010101;">
   <div class="card-header">
     <span class="card-title"><span style="display:inline-flex;align-items:center;"><i data-lucide="music"></i></span> TikTok Content Posting API</span>

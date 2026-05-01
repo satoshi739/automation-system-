@@ -157,7 +157,7 @@
         <div style="font-size:12.5px;line-height:1.5;">{{ r.comment or '（コメントなし）' }}</div>
         {% if r.reply %}
         <div style="margin-top:5px;padding:6px 9px;background:rgba(99,102,241,.06);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;font-size:11.5px;color:var(--muted2);">
-          <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> {{ r.reply[:80] }}{% if r.reply | length > 80 %}…{% endif %}
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> {{ (r.reply or '')[:80] }}{% if (r.reply or '') | length > 80 %}…{% endif %}
         </div>
         {% endif %}
       </td>

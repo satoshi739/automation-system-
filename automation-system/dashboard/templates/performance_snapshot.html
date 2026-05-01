@@ -128,7 +128,7 @@
     <span style="width:8px;height:8px;border-radius:50%;background:{{ post.brand_color }};box-shadow:0 0 5px {{ post.brand_color }};flex-shrink:0;"></span>
     <span style="font-size:11px;color:{{ post.brand_color }};font-weight:700;width:40px;flex-shrink:0;">{{ post.brand }}</span>
     <span style="font-size:10.5px;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted2);flex-shrink:0;">{{ post.platform }}</span>
-    <span style="flex:1;color:var(--text);">{{ post.caption }}</span>
+    <span style="flex:1;color:var(--text);">{{ post.caption or '' }}</span>
     <span style="color:var(--red);font-size:12px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="heart"></i></span> {{ post.likes }}</span>
     <span style="color:var(--muted2);font-size:12px;">reach {{ post.reach | int }}</span>
     <span style="color:var(--green2);font-size:12px;font-weight:700;">{{ post.eng_rate }}%</span>

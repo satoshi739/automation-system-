@@ -622,7 +622,7 @@ function addTag() {
       tagsEl.appendChild(span);
       toast('タグ追加: ' + name, 'ok');
     }
-  });
+  }).catch(err => console.error('[assets] addTag:', err));
 }
 
 function removeTag(tagId, name, el) {
@@ -630,7 +630,7 @@ function removeTag(tagId, name, el) {
   fetch(`/assets/${currentAssetId}/tags/${tagId}`, {method:'DELETE'})
     .then(r => r.json()).then(d => {
       if (d.ok) { el.remove(); toast('タグ削除: ' + name, 'ok'); }
-    });
+    }).catch(err => console.error('[assets] removeTag:', err));
 }
 
 function archiveAsset() {
@@ -641,7 +641,7 @@ function archiveAsset() {
     body: JSON.stringify({status: 'archived'})
   }).then(r => r.json()).then(d => {
     if (d.ok) { closeModal(); location.reload(); }
-  });
+  }).catch(err => console.error('[assets] archiveAsset:', err));
 }
 
 function openUsageForm() {
@@ -653,7 +653,7 @@ function openUsageForm() {
     body: JSON.stringify({channel: ch, result_note: note})
   }).then(r => r.json()).then(d => {
     if (d.ok) { toast('使用記録しました', 'ok'); openDetail(currentAssetId); }
-  });
+  }).catch(err => console.error('[assets] openUsageForm:', err));
 }
 
 // ── Add Modal ──
@@ -683,7 +683,7 @@ function submitAdd() {
   }).then(r => r.json()).then(d => {
     if (d.ok) { toast('登録しました: ' + d.asset_id, 'ok'); closeAddModal(); location.reload(); }
     else { toast(d.error || 'エラー', 'err'); }
-  });
+  }).catch(err => console.error('[assets] submitAdd:', err));
 }
 
 // ── Load recommended sections ──
@@ -707,7 +707,7 @@ document.querySelectorAll('[id^="rec-"]').forEach(el => {
       el.querySelectorAll('.rec-card[data-asset-id]').forEach(card => {
         card.addEventListener('click', function() { openDetail(this.dataset.assetId); });
       });
-    });
+    }).catch(err => console.error('[assets] rec load:', err));
 });
 {% endif %}
 

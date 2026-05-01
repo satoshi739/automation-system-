@@ -961,7 +961,7 @@ def publish_wp_draft(brand_id, post_id):
         from sns.wordpress import WordPressPoster
         WordPressPoster(brand_id).publish_post(post_id)
     except Exception as e:
-        pass
+        flash(f"公開に失敗しました: {e}", "error")
     return redirect(url_for("brand_detail", brand_id=brand_id))
 
 
@@ -3000,7 +3000,10 @@ def noimos_convert(pid):
     if request.method == "POST":
         f              = request.form
         target_formats = request.form.getlist("target_formats")
-        campaign_id    = int(f.get("campaign_id") or 0) or None
+        try:
+            campaign_id = int(f.get("campaign_id") or 0) or None
+        except (ValueError, TypeError):
+            campaign_id = None
         iid = db.create_content_idea({
             "pattern_id":     pid,
             "campaign_id":    campaign_id,
@@ -3074,6 +3077,10 @@ def idea_detail(iid):
 @app.route("/ideas/<int:iid>/variants", methods=["POST"])
 def idea_add_variant(iid):
     f = request.form
+    try:
+        duration_sec = int(f.get("duration_sec") or 0) or None
+    except (ValueError, TypeError):
+        duration_sec = None
     db.create_content_variant({
         "idea_id":      iid,
         "format":       f.get("format", "feed"),
@@ -3081,7 +3088,7 @@ def idea_add_variant(iid):
         "hashtags":     f.get("hashtags", "").strip(),
         "image_prompt": f.get("image_prompt", "").strip(),
         "video_prompt": f.get("video_prompt", "").strip(),
-        "duration_sec": int(f.get("duration_sec") or 0) or None,
+        "duration_sec": duration_sec,
         "notes":        f.get("notes", "").strip(),
     })
     return redirect(url_for("idea_detail", iid=iid))

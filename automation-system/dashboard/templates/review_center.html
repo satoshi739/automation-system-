@@ -132,7 +132,7 @@
         <!-- Existing reply -->
         {% if r.reply %}
         <div style="padding:8px 11px;background:rgba(16,185,129,.05);border-left:2px solid var(--green);border-radius:0 7px 7px 0;font-size:12px;color:var(--muted2);line-height:1.55;">
-          <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 返信済み: {{ r.reply[:120] }}{% if r.reply | length > 120 %}…{% endif %}
+          <span style="display:inline-flex;align-items:center;"><i data-lucide="message-circle"></i></span> 返信済み: {{ (r.reply or '')[:120] }}{% if (r.reply or '') | length > 120 %}…{% endif %}
         </div>
         {% endif %}
 
