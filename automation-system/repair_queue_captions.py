@@ -55,6 +55,8 @@ def _parse_caption(raw: str) -> dict | None:
 def repair_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     data = yaml.safe_load(text)
+    if not isinstance(data, dict):
+        return False
 
     caption_raw = data.get("caption", "")
     if not (isinstance(caption_raw, str) and caption_raw.strip().startswith("{")):

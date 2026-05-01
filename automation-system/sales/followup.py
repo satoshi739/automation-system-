@@ -53,13 +53,20 @@ def run_followup_check():
         with open(lead_file, encoding="utf-8") as f:
             lead = yaml.safe_load(f)
 
+        if not isinstance(lead, dict):
+            continue
+
         # 契約済み・失注・LINE IDなし はスキップ
         if lead.get("outcome") in ("contracted", "lost"):
             continue
         if not lead.get("line_user_id"):
             continue
 
-        created = datetime.strptime(lead["created_at"], "%Y-%m-%d")
+        try:
+            created = datetime.strptime(str(lead.get("created_at", "")), "%Y-%m-%d")
+        except (ValueError, TypeError):
+            logger.warning(f"created_at パース失敗: {lead_file.name}")
+            continue
         elapsed_h = (now - created).total_seconds() / 3600
         followup_sent = lead.get("followup_sent", [])
 

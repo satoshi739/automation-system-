@@ -117,6 +117,10 @@ def update_lead_stage(lead_id: str, new_stage: str, note: str = "") -> bool:
     with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
+    if not isinstance(data, dict):
+        logger.warning(f"リードファイルが不正: {path}")
+        return False
+
     data["stage"] = new_stage
     data["last_contact"] = datetime.now().strftime("%Y-%m-%d")
     if note:

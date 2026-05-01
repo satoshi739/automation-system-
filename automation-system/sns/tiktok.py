@@ -55,6 +55,9 @@ class TikTokPoster:
             }
         )
         init.raise_for_status()
-        publish_id = init.json()["data"]["publish_id"]
+        resp_data = init.json()
+        publish_id = resp_data.get("data", {}).get("publish_id")
+        if not publish_id:
+            raise RuntimeError(f"TikTok publish_id が取得できませんでした: {resp_data}")
         log.info(f"TikTok投稿完了: publish_id={publish_id}")
         return {"status":"posted","publish_id":publish_id}

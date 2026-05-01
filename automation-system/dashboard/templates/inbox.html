@@ -186,11 +186,12 @@ async function uploadFiles(bid, files) {
 function addFileRow(bid, name) {
   const list = document.getElementById('filelist-' + bid);
   const isVideo = /\.(mp4|mov|m4v)$/i.test(name);
+  const safeName = String(name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const row = document.createElement('div');
   row.className = 'file-row';
   row.innerHTML = `
     <span style="font-size:15px;">${isVideo ? '<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>' : '<span style="display:inline-flex;align-items:center;"><i data-lucide="image"></i></span>'}</span>
-    <span class="file-name" title="${name}">${name}</span>
+    <span class="file-name" title="${safeName}">${safeName}</span>
     <span class="badge ${isVideo ? 'badge-purple' : 'badge-l2'}">${isVideo ? 'VIDEO' : 'IMAGE'}</span>
   `;
   list.appendChild(row);

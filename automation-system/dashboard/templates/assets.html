@@ -525,6 +525,11 @@ function applyFilter() {
   location.href = '/assets?' + p.toString();
 }
 
+// ── HTML escape helper ──
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // ── Type icon helper ──
 function typeIcon(t) {
   return {photo:'<span style="display:inline-flex;align-items:center;"><i data-lucide="camera"></i></span>', video:'<span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span>', template:'<span style="display:inline-flex;align-items:center;"><i data-lucide="archive"></i></span>', script:'<span style="display:inline-flex;align-items:center;"><i data-lucide="file-text"></i></span>'}[t] || '<span style="display:inline-flex;align-items:center;"><i data-lucide="file"></i></span>';
@@ -534,9 +539,10 @@ function typeIcon(t) {
 function openDetail(assetId) {
   currentAssetId = assetId;
   document.getElementById('asset-modal-overlay').classList.add('open');
-  fetch('/assets/' + assetId)
-    .then(r => r.json())
-    .then(a => renderModal(a));
+  fetch('/assets/' + encodeURIComponent(assetId))
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(a => renderModal(a))
+    .catch(e => console.error('[assets] openDetail:', e));
 }
 
 function closeModal() {
@@ -568,14 +574,17 @@ function renderModal(a) {
     ['パフォーマンス', a.performance_note || '—'],
   ];
   document.getElementById('modal-meta').innerHTML = meta.map(([k,v]) =>
-    `<div class="meta-item"><div class="meta-label">${k}</div><div class="meta-value">${v}</div></div>`
+    `<div class="meta-item"><div class="meta-label">${esc(k)}</div><div class="meta-value">${esc(v)}</div></div>`
   ).join('');
 
   // Tags
   const tagsEl = document.getElementById('modal-tags');
   tagsEl.innerHTML = (a.tags || []).map(t =>
-    `<span class="asset-tag" style="cursor:pointer;" title="クリックで削除" onclick="removeTag(${t.tag_id},'${t.name}',this)">${t.name} </span>`
+    `<span class="asset-tag" style="cursor:pointer;" title="クリックで削除" data-tag-id="${esc(t.tag_id)}" data-tag-name="${esc(t.name)}">${esc(t.name)} </span>`
   ).join('') || '<span style="color:var(--muted);font-size:12px;">タグなし</span>';
+  tagsEl.querySelectorAll('.asset-tag[data-tag-id]').forEach(el => {
+    el.addEventListener('click', function() { removeTag(this.dataset.tagId, this.dataset.tagName, this); });
+  });
 
   // Usages
   const usagesEl = document.getElementById('modal-usages');
@@ -584,9 +593,9 @@ function renderModal(a) {
   } else {
     usagesEl.innerHTML = a.usages.map(u => `
       <div class="usage-row">
-        <span class="usage-channel">${(PLATFORM_ICONS[u.channel]||'·')} ${u.channel || '—'}</span>
-        <span class="usage-note">${u.result_note || u.used_in || '—'}</span>
-        <span class="usage-date">${(u.used_at||'').slice(0,10)}</span>
+        <span class="usage-channel">${(PLATFORM_ICONS[esc(u.channel)]||'·')} ${esc(u.channel)}</span>
+        <span class="usage-note">${esc(u.result_note || u.used_in || '—')}</span>
+        <span class="usage-date">${esc((u.used_at||'').slice(0,10))}</span>
       </div>
     `).join('');
   }
@@ -605,7 +614,9 @@ function addTag() {
       const span = document.createElement('span');
       span.className = 'asset-tag';
       span.style.cursor = 'pointer';
-      span.setAttribute('onclick', `removeTag(${d.tag_id},'${name}',this)`);
+      span.dataset.tagId = d.tag_id;
+      span.dataset.tagName = name;
+      span.addEventListener('click', function() { removeTag(this.dataset.tagId, this.dataset.tagName, this); });
       span.textContent = name + ' ';
       tagsEl.appendChild(span);
       toast('タグ追加: ' + name, 'ok');
@@ -686,12 +697,15 @@ document.querySelectorAll('[id^="rec-"]').forEach(el => {
         return;
       }
       el.innerHTML = assets.slice(0,4).map(a => `
-        <div class="rec-card" onclick="openDetail('${a.asset_id}')">
+        <div class="rec-card" data-asset-id="${esc(a.asset_id)}">
           <div class="rec-thumb">${typeIcon(a.asset_type)}</div>
-          <div class="rec-title">${(a.title||a.asset_id).slice(0,30)}</div>
-          <div class="rec-type">${a.asset_type}</div>
+          <div class="rec-title">${esc((a.title||a.asset_id).slice(0,30))}</div>
+          <div class="rec-type">${esc(a.asset_type)}</div>
         </div>
       `).join('');
+      el.querySelectorAll('.rec-card[data-asset-id]').forEach(card => {
+        card.addEventListener('click', function() { openDetail(this.dataset.assetId); });
+      });
     });
 });
 {% endif %}

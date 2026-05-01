@@ -330,8 +330,9 @@ async function runTick() {
   btn.disabled = true; btn.textContent = '実行中…';
   try {
     const r = await fetch('/api/orchestrator/tick', { method: 'POST' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const d = await r.json();
-    toast(`Tick完了 — enqueued:${d.enqueued} assigned:${d.assigned} blocked:${d.blocked}`, 'ok');
+    toast(`Tick完了 — enqueued:${d.enqueued??0} assigned:${d.assigned??0} blocked:${d.blocked??0}`, 'ok');
     setTimeout(() => location.reload(), 1200);
   } catch(e) { toast('Tick失敗: ' + e, 'err'); }
   btn.disabled = false; btn.textContent = '<span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span> Tick';

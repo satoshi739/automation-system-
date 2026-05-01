@@ -76,19 +76,20 @@ function showDrawer(event) {
     ? '<span style="background:rgba(16,185,129,.1);color:var(--green2);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;"> 投稿済</span>'
     : '<span style="background:rgba(245,158,11,.1);color:var(--yellow2);border:1px solid rgba(245,158,11,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">待機中</span>';
 
+  const safeFile = encodeURIComponent(props.file || '');
   document.getElementById('drawer-content').innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
       <span style="width:8px;height:8px;border-radius:50%;background:${event.backgroundColor};"></span>
-      <span style="font-size:13px;font-weight:600;">${props.brand_name || ''}</span>
+      <span style="font-size:13px;font-weight:600;">${escHtml(props.brand_name)}</span>
       ${statusBadge}
     </div>
     <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;margin-bottom:14px;">
       ${escHtml(props.content || '（内容なし）')}
     </div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">
-      ファイル: ${props.file || ''}
+      ファイル: ${escHtml(props.file)}
     </div>
-    ${!props.posted ? `<form method="POST" action="/queue/delete/${props.brand_id}/${props.platform}/${props.file}">
+    ${!props.posted ? `<form method="POST" action="/queue/delete/${encodeURIComponent(props.brand_id||'')}/${encodeURIComponent(props.platform||'')}/${safeFile}">
       <button class="btn btn-danger btn-sm" onclick="return confirm('削除しますか？')" style="width:100%;justify-content:center;"> 削除する</button>
     </form>` : ''}
   `;

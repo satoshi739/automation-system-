@@ -417,6 +417,7 @@ async function startBulkGenerate() {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({topic, extra, tone: currentTone})
     });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
     generatedContent = await r.json();
     if (generatedContent.error) throw new Error(generatedContent.error);
 

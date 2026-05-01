@@ -2413,8 +2413,8 @@ def webhook():
         if event_type == "follow":
             welcome = scenarios.get("welcome_message", "ご登録ありがとうございます！")
             messenger.push(user_id, welcome)
-        elif event_type == "message" and event["message"]["type"] == "text":
-            text = event["message"]["text"]
+        elif event_type == "message" and event.get("message", {}).get("type") == "text":
+            text = event.get("message", {}).get("text", "")
             reply_token = event.get("replyToken", "")
             existing = load_lead_by_line_id(user_id)
             if not existing:
@@ -2423,7 +2423,7 @@ def webhook():
             reply = None
             for item in scenarios.get("keyword_replies", []):
                 if any(kw in text for kw in item.get("keywords", [])):
-                    reply = item["reply"]
+                    reply = item.get("reply", "")
                     break
             if reply:
                 messenger.reply(reply_token, reply)
