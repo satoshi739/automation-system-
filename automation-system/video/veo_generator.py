@@ -35,6 +35,7 @@ class VeoGenerator:
     def __init__(self):
         self.api_key = os.environ.get("GOOGLE_AI_STUDIO_API_KEY", "")
         self.use_veo = bool(self.api_key)
+        self.seconds_generated = 0
         if not self.use_veo:
             log.info("GOOGLE_AI_STUDIO_API_KEY未設定 → Ken Burnsフォールバックを使用")
 
@@ -107,8 +108,13 @@ class VeoGenerator:
         video_bytes = client.files.download(file=video.video)
         out_path.write_bytes(video_bytes)
 
+        self.seconds_generated += min(duration, 8)
         log.info(f"✓ Veo動画生成完了: {out_path}")
         return out_path
+
+    @property
+    def total_cost(self) -> float:
+        return self.seconds_generated * 0.15
 
     # ──────────────────────────────────────────────
     # Ken Burns フォールバック（完全無料）
@@ -135,7 +141,7 @@ class VeoGenerator:
 
         # zoompan: 徐々にズームイン
         vf = (
-            f"scale={REEL_W * 2}:{REEL_H * 2},"
+            f"scale={REEL_W}:{REEL_H},"
             f"zoompan=z='min(zoom+0.0008,1.3)':"
             f"d={total_frames}:"
             f"x='iw/2-(iw/zoom/2)':"
@@ -150,7 +156,8 @@ class VeoGenerator:
             "-t", str(duration),
             "-i", str(slide_path),
             "-vf", vf,
-            "-c:v", "libx264",
+            "-c:v", "libx264", "-preset", "ultrafast",
+            "-threads", "4",
             "-r", str(fps),
             "-pix_fmt", "yuv420p",
             str(out_path),

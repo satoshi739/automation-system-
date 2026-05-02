@@ -100,7 +100,7 @@ class VideoComposer:
                 "-i", str(telop_png),
                 "-filter_complex", f"[0:v][1:v]overlay=(W-w)/2:H-h-80[v]",
                 "-map", "[v]",
-                "-c:v", "libx264",
+                "-c:v", "libx264", "-preset", "ultrafast",
                 "-pix_fmt", "yuv420p",
                 "-t", str(duration),
                 str(clip_with_telop),
@@ -112,7 +112,7 @@ class VideoComposer:
             _ffmpeg(
                 "-i", str(clip),
                 "-t", str(duration),
-                "-c:v", "libx264",
+                "-c:v", "libx264", "-preset", "ultrafast",
                 "-pix_fmt", "yuv420p",
                 str(trimmed),
             )
@@ -191,7 +191,7 @@ class VideoComposer:
             "-f", "concat",
             "-safe", "0",
             "-i", str(list_file),
-            "-c:v", "libx264",
+            "-c:v", "libx264", "-preset", "ultrafast",
             "-c:a", "aac",
             "-pix_fmt", "yuv420p",
             str(output),

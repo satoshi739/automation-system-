@@ -1,0 +1,53 @@
+# UPJ動画パイプライン用 チャネル設定
+# 最終更新: 2026-05-02
+# ⚠️ TBD項目はアカウント開設後に更新すること
+
+channels:
+  upj:
+    name: upj
+    status: pending  # 開設待ち
+    instagram_handle: "TBD"
+    instagram_account_id: "TBD"
+    profile_link_url: "TBD"  # Linktree等の準備後に設定
+    narration_style: third_person
+    visual_style_modifier: ", corporate professional aesthetic, navy blue and white color scheme"
+    opening_hook_template: "知らないと損する{topic}"
+    cta_template: "詳細はプロフィールのリンクから →"
+    hashtags:
+      - "#SaaS"
+      - "#業務効率化"
+      - "#DX"
+      - "#中小企業"
+      - "#自動化"
+      - "#利益スキャナー"
+    color_accent: "#1a3a5c"
+    recommended_post_time: "08:00"
+    timezone: "Asia/Tokyo"
+
+  satoshi:
+    name: satoshi
+    status: active
+    instagram_handle: "@satoshi51314"
+    instagram_url: "https://www.instagram.com/satoshi51314/"
+    instagram_account_id: "TBD"  # Graph API連携時に取得
+    profile_link_url: "TBD"  # Linktree等の準備後に設定
+    narration_style: first_person
+    visual_style_modifier: ", authentic personal vlog aesthetic, warm tones, behind the scenes feel"
+    opening_hook_template: "実際に試した結果、{topic}"
+    cta_template: "気になる人はDMで「スキャナー」と送ってください"
+    hashtags:
+      - "#副業"
+      - "#物販"
+      - "#せどり"
+      - "#起業"
+      - "#経営者の日常"
+      - "#利益スキャナー"
+    color_accent: "#d97706"
+    recommended_post_time: "20:00"
+    timezone: "Asia/Tokyo"
+
+# パイプライン挙動
+pipeline:
+  default_channels:
+    - satoshi  # UPJ未開設のため、デフォルトはSatoshiのみ
+  skip_pending_channels: true  # status:pendingのチャネルは自動スキップ
