@@ -25,10 +25,18 @@ class GA4Client:
         from google.analytics.data_v1beta import BetaAnalyticsDataClient
         from google.oauth2 import service_account
         from pathlib import Path
-        creds = service_account.Credentials.from_service_account_file(
-            str(Path(__file__).parent.parent / "credentials.json"),
-            scopes=["https://www.googleapis.com/auth/analytics.readonly"]
-        )
+        import json, base64
+        creds_path = Path(__file__).parent.parent / "credentials.json"
+        b64 = os.environ.get("GOOGLE_CREDENTIALS_BASE64", "")
+        if b64 and not creds_path.exists():
+            creds_info = json.loads(base64.b64decode(b64))
+            creds = service_account.Credentials.from_service_account_info(
+                creds_info, scopes=["https://www.googleapis.com/auth/analytics.readonly"]
+            )
+        else:
+            creds = service_account.Credentials.from_service_account_file(
+                str(creds_path), scopes=["https://www.googleapis.com/auth/analytics.readonly"]
+            )
         return BetaAnalyticsDataClient(credentials=creds)
 
     def get_overview(self, days: int = 28) -> dict:
@@ -131,10 +139,18 @@ class SearchConsoleClient:
         from googleapiclient.discovery import build
         from google.oauth2 import service_account
         from pathlib import Path
-        creds = service_account.Credentials.from_service_account_file(
-            str(Path(__file__).parent.parent / "credentials.json"),
-            scopes=["https://www.googleapis.com/auth/webmasters.readonly"]
-        )
+        import json, base64
+        creds_path = Path(__file__).parent.parent / "credentials.json"
+        b64 = os.environ.get("GOOGLE_CREDENTIALS_BASE64", "")
+        if b64 and not creds_path.exists():
+            creds_info = json.loads(base64.b64decode(b64))
+            creds = service_account.Credentials.from_service_account_info(
+                creds_info, scopes=["https://www.googleapis.com/auth/webmasters.readonly"]
+            )
+        else:
+            creds = service_account.Credentials.from_service_account_file(
+                str(creds_path), scopes=["https://www.googleapis.com/auth/webmasters.readonly"]
+            )
         return build("searchconsole","v1",credentials=creds)
 
     def get_overview(self, days: int = 28) -> dict:
@@ -193,3 +209,75 @@ class SearchConsoleClient:
         except Exception as e:
             log.error(f"Search Console top queries エラー: {e}")
             return []
+
+
+# ─── Instagram インサイト ─────────────────────────────────────
+
+BRAND_META_ENV: dict[str, str] = {
+    "upjapan":       "UPJAPAN",
+    "dsc-marketing": "DSC_MARKETING",
+    "cashflowsupport": "CASHFLOWSUPPORT",
+    "bangkok-peach": "BANGKOK_PEACH",
+    "satoshi":       "SATOSHI",
+    "satoshi-blog":  "SATOSHI_BLOG",
+}
+
+
+class InstagramInsights:
+    BASE = "https://graph.facebook.com/v19.0"
+
+    def __init__(self, brand: str):
+        prefix = BRAND_META_ENV.get(brand, brand.upper().replace("-", "_"))
+        self.token      = os.environ.get(f"{prefix}_META_ACCESS_TOKEN", "")
+        self.account_id = os.environ.get(f"{prefix}_INSTAGRAM_ACCOUNT_ID", "")
+        self.enabled    = bool(self.token and self.account_id)
+
+    def _get(self, path: str, params: dict = None) -> dict:
+        import requests
+        p = {"access_token": self.token, **(params or {})}
+        r = requests.get(f"{self.BASE}/{path}", params=p, timeout=15)
+        r.raise_for_status()
+        return r.json()
+
+    def get_account_stats(self) -> dict:
+        """フォロワー数・投稿数・エンゲージメントを返す"""
+        if not self.enabled:
+            return {"status": "unset"}
+        try:
+            d = self._get(self.account_id, {"fields": "followers_count,media_count,name,username"})
+            return {
+                "status":          "ok",
+                "followers":       d.get("followers_count", 0),
+                "media_count":     d.get("media_count", 0),
+                "username":        d.get("username", ""),
+            }
+        except Exception as e:
+            err = str(e)
+            if "190" in err or "token" in err.lower():
+                return {"status": "token_expired"}
+            return {"status": "error", "error_msg": err[:80]}
+
+    def get_recent_insights(self, limit: int = 10) -> dict:
+        """直近N件の投稿のいいね・コメント・リーチ合計を返す"""
+        if not self.enabled:
+            return {"status": "unset", "total_likes": 0, "total_comments": 0, "avg_reach": 0, "posts": []}
+        try:
+            media = self._get(
+                f"{self.account_id}/media",
+                {"fields": "id,like_count,comments_count,timestamp,media_type", "limit": limit}
+            )
+            items = media.get("data", [])
+            total_likes    = sum(i.get("like_count", 0) for i in items)
+            total_comments = sum(i.get("comments_count", 0) for i in items)
+            return {
+                "status":         "ok",
+                "total_likes":    total_likes,
+                "total_comments": total_comments,
+                "post_count":     len(items),
+                "avg_likes":      round(total_likes / max(len(items), 1), 1),
+            }
+        except Exception as e:
+            err = str(e)
+            if "190" in err or "token" in err.lower():
+                return {"status": "token_expired", "total_likes": 0, "total_comments": 0, "avg_reach": 0}
+            return {"status": "error", "error_msg": err[:80], "total_likes": 0, "total_comments": 0}

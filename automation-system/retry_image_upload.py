@@ -21,7 +21,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 ROOT         = Path(__file__).parent
 QUEUE_DIR    = ROOT / "content_queue" / "instagram"

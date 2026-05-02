@@ -21,6 +21,7 @@ BRAND_ENV_PREFIX: dict[str, str] = {
     "bangkok-peach":  "BANGKOK_PEACH",
     "cashflowsupport": "CASHFLOWSUPPORT",
     "dsc-marketing":  "DSC_MARKETING",
+    "satoshi":        "SATOSHI",
     "satoshi-blog":   "SATOSHI_BLOG",
     "upjapan":        "UPJAPAN",
 }

@@ -789,10 +789,42 @@ def analytics():
                 "series":  bt.get("series", {"dates": [], "sessions": []}),
             }
 
+    # Stripeデータ
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(BASE_DIR))
+        from finance.stripe_client import get_summary as stripe_summary
+        stripe_data = stripe_summary()
+    except Exception as e:
+        stripe_data = {"mrr": {"status": "error"}, "churn": {"status": "error"}, "series": {"dates": [], "values": []}, "total_revenue_30d": 0}
+
+    # SNSアナリティクス（Instagram インサイト + エンゲージメントログ）
+    sns_data = {}
+    BRAND_IDS = list(BRAND_ENV_PREFIXES.keys())
+    for bid in BRAND_IDS:
+        entry = {}
+        # Instagramインサイト（META_ACCESS_TOKEN が必要）
+        try:
+            from sns.analytics import InstagramInsights
+            ig = InstagramInsights(bid)
+            entry["ig_account"] = ig.get_account_stats()
+            entry["ig_insights"] = ig.get_recent_insights(10)
+        except Exception:
+            entry["ig_account"]  = {"status": "error"}
+            entry["ig_insights"] = {"status": "error"}
+        # 投稿エンゲージメントログ（ローカルYAML）
+        try:
+            from sns.performance import get_engagement_report
+            entry["engagement"] = get_engagement_report(bid, days=28)
+        except Exception:
+            entry["engagement"] = {}
+        sns_data[bid] = entry
+
     return render_template("analytics.html",
         funnel=funnel, monthly=monthly, channels=channels,
         stats=stats, mrr_history=mrr_history, brand_traffic=brand_traffic,
-        ga_summary=ga_summary, ga_daily=ga_daily, ga_brand_series=ga_brand_series)
+        ga_summary=ga_summary, ga_daily=ga_daily, ga_brand_series=ga_brand_series,
+        sns_data=sns_data, stripe_data=stripe_data)
 
 
 @app.route("/brands")

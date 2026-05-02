@@ -245,7 +245,7 @@ CREATE INDEX IF NOT EXISTS idx_esc_status ON escalations(status);
 
 CREATE TABLE IF NOT EXISTS approvals (
     id                      TEXT PRIMARY KEY,
-    task_id                 TEXT NOT NULL REFERENCES agent_tasks(id),
+    task_id                 TEXT REFERENCES agent_tasks(id),
     title                   TEXT NOT NULL,
     description             TEXT,
     requested_by_agent_id   TEXT REFERENCES ai_agents(id),

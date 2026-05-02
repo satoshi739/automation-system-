@@ -25,9 +25,8 @@ logger = logging.getLogger(__name__)
 QUEUE_DIR = Path(__file__).parent.parent / "content_queue" / "instagram"
 CREDENTIALS_PATH = Path(__file__).parent.parent / "credentials.json"
 
-# Googleドライブの「投稿素材フォルダ」のID
-# URLの https://drive.google.com/drive/folders/[ここ] の部分
-DRIVE_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_FOLDER_ID", "")
+# DRIVE_FOLDER_ID は load_dotenv() 前にモジュールロードされる可能性があるため
+# sync_from_drive() 内で os.environ から毎回読む（後述）
 
 
 def _get_drive_service():
@@ -65,7 +64,7 @@ def sync_from_drive(folder_id: str = "", caption_default: str = "") -> int:
     Returns:
         追加したファイル数
     """
-    target_folder = folder_id or DRIVE_FOLDER_ID
+    target_folder = folder_id or os.environ.get("GOOGLE_DRIVE_FOLDER_ID", "")
     if not target_folder:
         logger.warning("GOOGLE_DRIVE_FOLDER_ID が設定されていません")
         return 0

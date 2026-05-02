@@ -1,0 +1,28 @@
+lead_id: 2026-05-02-001
+created_at: '2026-05-02'
+brand: dsc-marketing
+name: ''
+company: ''
+email: ''
+phone: ''
+channel: line
+line_user_id: U_GENERAL_USER
+referred_by: ''
+stage: L2
+last_contact: '2026-05-02'
+next_action: ヒアリング・商談日程調整
+next_action_date: ''
+current_situation: '@ceo 悪用テスト'
+goals: ''
+budget_range: ''
+timeline: ''
+decision_maker: ''
+concerns: ''
+proposed_plan: ''
+proposed_amount: 0
+proposal_sent_at: ''
+proposal_url: ''
+outcome: ''
+contract_date: ''
+lost_reason: ''
+notes: 'LINE経由の自動起票。初回メッセージ: @ceo 悪用テスト'

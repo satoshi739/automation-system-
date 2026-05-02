@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - 'automation-system/**'
+      - 'finance-system/**'
+      - 'customer-success-system/**'
+      - 'project-system/**'
+      - 'marketing-system/**'
+      - 'sales-system/**'
       - '.github/workflows/bug-finder.yml'
 
 jobs:

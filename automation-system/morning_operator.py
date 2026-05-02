@@ -39,7 +39,7 @@ from sns.instagram import InstagramPoster
 from sns.line_api import LINEMessenger
 from sales.followup import run_followup_check
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -131,27 +131,24 @@ def post_instagram_queue() -> int:
     except Exception:
         brands_cfg = {}
 
-    poster = InstagramPoster()
-
     for brand_id, bcfg in brands_cfg.items():
         if not bcfg.get("channels", {}).get("instagram"):
             continue
         item = db.next_pending(brand_id, "instagram")
         if item:
             try:
+                poster = InstagramPoster(brand_id)
                 media_type = item.get("media_type", "image")
                 if media_type == "reel":
                     poster.post_reel(
                         video_url=item["video_url"],
                         caption=item.get("caption",""),
                         cover_url=item.get("cover_url",""),
-                        brand=brand_id,
                     )
                 else:
                     poster.post_image(
                         image_url=item.get("image_url",""),
                         caption=item.get("caption",""),
-                        brand=brand_id,
                     )
                 db.mark_posted(item["id"])
                 db.log_activity("post", brand=brand_id, platform="instagram",
@@ -206,7 +203,7 @@ def post_instagram_queue() -> int:
 
 def post_line_queue() -> int:
     """LINE配信キューを処理（DB優先、YAML後方互換）"""
-    messenger = LINEMessenger()
+    from sns.line_api import get_brand_messenger
     sent_total = 0
 
     # LINE配信曜日チェック
@@ -236,11 +233,14 @@ def post_line_queue() -> int:
         item = db.next_pending(brand_id, "line")
         if item:
             try:
+                messenger = get_brand_messenger(brand_id)
+                if not messenger.enabled:
+                    logger.warning(f"LINE配信スキップ: {brand_id} のLINEトークン未設定")
+                    continue
                 if item.get("image_url"):
-                    messenger.broadcast_with_image(item.get("message",""), item["image_url"],
-                                                   brand=brand_id)
+                    messenger.broadcast_with_image(item.get("message",""), item["image_url"])
                 else:
-                    messenger.broadcast(item.get("message",""), brand=brand_id)
+                    messenger.broadcast(item.get("message",""))
                 db.mark_posted(item["id"])
                 db.log_activity("post", brand=brand_id, platform="line",
                                 detail=f"LINE配信完了: {item.get('message','')[:40]}")
@@ -321,6 +321,7 @@ def send_morning_summary(
     followup_sent: int,
     pending_leads: int,
     decisions: list[dict],
+    health_issues=None,  # list[str] | None
 ):
     """朝のサマリーをオーナーのLINEに送る"""
     if not OWNER_LINE_USER_ID:
@@ -347,6 +348,14 @@ def send_morning_summary(
     else:
         lines.append("")
         lines.append("✅ 判断が必要な案件はありません")
+
+    # スケジューラーヘルス異常があれば末尾に追記
+    if health_issues:
+        lines.append("")
+        lines.append(f"🚨 スケジューラー異常: {len(health_issues)}件")
+        for issue in health_issues:
+            lines.append(f"  • {issue}")
+        lines.append("対処: ./deploy.sh を実行してください")
 
     summary = "\n".join(lines)
     messenger = LINEMessenger()
@@ -388,6 +397,17 @@ def run():
     except Exception as e:
         logger.warning("ログローテーション失敗（無視して継続）: %s", e)
 
+    # 0-a. スケジューラーヘルスチェック（異常があれば LINE 警告）
+    health_issues: list[str] = []
+    try:
+        import scheduler_health
+        health_result = scheduler_health.check()
+        health_issues = health_result.get("issues", [])
+        for detail in health_result.get("details", []):
+            logger.info("[health] %s", detail)
+    except Exception as e:
+        logger.warning("ヘルスチェックスキップ: %s", e)
+
     # 0. alerts.log 読み上げ
     alert_msg = _read_unread_alerts()
     if alert_msg:
@@ -408,8 +428,23 @@ def run():
     # 5. 判断待ちキュー
     decisions = _load_decision_queue()
 
-    # 6. サマリーをオーナーのLINEへ
-    send_morning_summary(ig_posted, line_sent, followup_sent, pending_leads, decisions)
+    # 6. APIコスト・残高チェック
+    try:
+        from api_cost_tracker import check_balance_and_alert, get_cost_summary
+        check_balance_and_alert()  # $20/$5 閾値でLINE通知
+        cost_summary = get_cost_summary(30)
+        logger.info(
+            "APIコスト(30日): $%.4f (月次推計 $%.2f / %d tokens)",
+            cost_summary["total_cost_usd"],
+            cost_summary["monthly_est_usd"],
+            cost_summary["total_tokens"],
+        )
+    except Exception as e:
+        logger.warning("APIコストチェックスキップ: %s", e)
+
+    # 7. サマリーをオーナーのLINEへ（ヘルス異常があれば末尾に追記）
+    send_morning_summary(ig_posted, line_sent, followup_sent, pending_leads, decisions,
+                         health_issues=health_issues)
 
     logger.info("===== 朝のオペレーター完了 =====")
 

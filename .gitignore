@@ -23,3 +23,7 @@ automation-system/generated_media/
 # Screenshots
 スクリーンショット*.png
 Screenshot*.png
+
+# OAuth / API tokens (機密)
+automation-system/oauth_client_secret.json
+automation-system/scripts/ga4_admin_token.json

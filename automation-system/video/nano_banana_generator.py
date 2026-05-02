@@ -62,7 +62,7 @@ class NanaBananaGenerator:
         if img_path is None:
             img_path = self._make_slide(telop or prompt[:20], scene_index)
 
-        return self._ken_burns(img_path, duration, out_path)
+        return self._ken_burns(img_path, duration, out_path, scene_index)
 
     # ──────────────────────────────────────────────
     # Gemini 画像生成
@@ -200,13 +200,32 @@ class NanaBananaGenerator:
     # Ken Burns（ffmpeg zoompan）
     # ──────────────────────────────────────────────
 
-    def _ken_burns(self, img_path: Path, duration: int, out_path: Path) -> Path:
-        """画像 → 静止動画 MP4（高速変換）"""
+    # 画像を1.15倍にスケールしてパン（4方向ローテーション）
+    # crop の x/y 式で n（フレーム番号）を使って滑らかに移動
+    _W15 = int(REEL_W * 1.15)
+    _H15 = int(REEL_H * 1.15)
+
+    _MOTIONS = [
+        # 0: 左→右パン
+        lambda f, w, h, W, H: f"scale={W}:{H},crop={w}:{h}:'(iw-{w})*n/max({f}-1,1)':'(ih-{h})/2',setsar=1",
+        # 1: 上→下パン
+        lambda f, w, h, W, H: f"scale={W}:{H},crop={w}:{h}:'(iw-{w})/2':'(ih-{h})*n/max({f}-1,1)',setsar=1",
+        # 2: 右→左パン
+        lambda f, w, h, W, H: f"scale={W}:{H},crop={w}:{h}:'(iw-{w})*(1-n/max({f}-1,1))':'(ih-{h})/2',setsar=1",
+        # 3: 下→上パン
+        lambda f, w, h, W, H: f"scale={W}:{H},crop={w}:{h}:'(iw-{w})/2':'(ih-{h})*(1-n/max({f}-1,1))',setsar=1",
+    ]
+
+    def _ken_burns(self, img_path: Path, duration: int, out_path: Path, scene_index: int = 0) -> Path:
+        frames = duration * FPS
+        vf = self._MOTIONS[scene_index % len(self._MOTIONS)](
+            frames, REEL_W, REEL_H, self._W15, self._H15
+        )
         cmd = [
             "ffmpeg", "-y",
             "-loop", "1", "-t", str(duration),
             "-i", str(img_path),
-            "-vf", f"scale={REEL_W}:{REEL_H},setsar=1",
+            "-vf", vf,
             "-c:v", "libx264", "-preset", "ultrafast",
             "-threads", "4",
             "-r", str(FPS),

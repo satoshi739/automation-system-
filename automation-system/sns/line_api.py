@@ -14,6 +14,38 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+# ブランドスラッグ → (トークン環境変数名, シークレット環境変数名)
+_BRAND_LINE_ENV: dict[str, tuple[str, str]] = {
+    "cashflowsupport": ("LINE_CHANNEL_ACCESS_TOKEN",            "LINE_CHANNEL_SECRET"),
+    "dsc-marketing":   ("LINE_CHANNEL_ACCESS_TOKEN_DSC",         "LINE_CHANNEL_SECRET_DSC"),
+    "bangkok-peach":   ("BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN", "BANGKOK_PEACH_LINE_CHANNEL_SECRET"),
+}
+
+
+def get_brand_messenger(brand_slug: str) -> "LINEMessenger":
+    """
+    ブランドに対応した LINEMessenger を返す。
+    ブランド固有トークンが未設定の場合は enabled=False のメッセンジャーを返す
+    （デフォルトチャンネルへのフォールバックはしない）。
+    """
+    token_key, secret_key = _BRAND_LINE_ENV.get(
+        brand_slug, ("LINE_CHANNEL_ACCESS_TOKEN", "LINE_CHANNEL_SECRET")
+    )
+    token  = os.environ.get(token_key, "")
+    secret = os.environ.get(secret_key, "")
+
+    # ブランド固有スロットがあるのにトークン未設定 → 誤チャンネルへの送信を防ぐ
+    if brand_slug in _BRAND_LINE_ENV and (not token or not secret):
+        m = object.__new__(LINEMessenger)
+        m.token = ""
+        m.secret = ""
+        m.dry_run = False
+        m.enabled = False
+        m._headers = {}
+        return m
+
+    return LINEMessenger(token=token, secret=secret)
+
 
 class LINEMessenger:
     BASE_URL = "https://api.line.me/v2/bot"
@@ -88,6 +120,14 @@ class LINEMessenger:
             return False
         logger.info(f"LINEプッシュ完了: user_id={user_id}")
         return True
+
+    def push_to_owner(self, message: str) -> bool:
+        """OWNER_LINE_USER_ID に設定されたオーナーへのプッシュ"""
+        owner_id = os.environ.get("OWNER_LINE_USER_ID", "")
+        if not owner_id:
+            logger.warning("OWNER_LINE_USER_ID 未設定 — オーナーへのLINE送信をスキップ")
+            return False
+        return self.push(owner_id, message)
 
     def broadcast(self, message: str) -> bool:
         """全友だちへの一斉配信"""

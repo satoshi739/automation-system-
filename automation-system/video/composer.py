@@ -1,10 +1,11 @@
 """
 ffmpeg による動画合成モジュール。
-シーンクリップ + 音声 + テロップ + 効果音 → 最終動画
+シーンクリップ + 音声 + テロップ + 効果音 + BGM → 最終動画
 """
 
 import logging
 import os
+import random
 import shutil
 import subprocess
 import tempfile
@@ -16,16 +17,42 @@ from PIL import Image, ImageDraw, ImageFont
 
 log = logging.getLogger(__name__)
 
+_ROOT    = Path(os.environ.get("AUTOMATION_ROOT", "/Users/satoshi/会社全体設定/automation-system"))
 TEMP_DIR = Path("/tmp/reel_pipeline/compose")
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
-SE_DIR = Path(os.environ.get("AUTOMATION_ROOT", "/Users/satoshi/会社全体設定/automation-system")) / "generated_media" / "se"
+SE_DIR  = _ROOT / "generated_media" / "se"
+BGM_DIR = _ROOT / "generated_media" / "bgm"
 SE_DIR.mkdir(parents=True, exist_ok=True)
+BGM_DIR.mkdir(parents=True, exist_ok=True)
 
-FONT_BOLD = "/System/Library/Fonts/ヒラギノ角ゴシック W7.ttc"
+# フォント（ヒラギノ W7 → W6 → デフォルトの順で試す）
+_FONT_CANDIDATES = [
+    "/System/Library/Fonts/ヒラギノ角ゴシック W7.ttc",
+    "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+    "/System/Library/Fonts/ヒラギノ角ゴ ProN W6.ttc",
+    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+]
+FONT_BOLD = next((p for p in _FONT_CANDIDATES if Path(p).exists()), None)
+
 REEL_W = 1080
 REEL_H = 1920
-FPS = 25
+FPS    = 25
+
+# テロップ帯の高さ
+_STRIP_H = 320
+
+# シーンごとのアクセントカラー
+_ACCENTS = [
+    (255, 215,   0),   # ゴールド
+    (  0, 200, 255),   # シアン
+    (255,  70, 120),   # ホットピンク
+    ( 80, 255, 160),   # ネオングリーン
+    (180, 100, 255),   # パープル
+]
+
+# BGMの音量（0.0〜1.0 / TTS音声に対する相対ボリューム）
+BGM_VOLUME = float(os.environ.get("BGM_VOLUME", "0.12"))
 
 
 def _ffmpeg(*args):
@@ -61,7 +88,7 @@ class VideoComposer:
         scene_finals = []
 
         for i, scene in enumerate(scenes):
-            log.info(f"  シーン{i+1}を合成中...")
+            log.info("  シーン%d を合成中...", i + 1)
             final_clip = self._compose_scene(scene, i)
             scene_finals.append(final_clip)
 
@@ -75,30 +102,37 @@ class VideoComposer:
             except Exception:
                 pass
 
+        # BGMミックス
+        total_dur = sum(s.get("duration", 5) for s in scenes)
+        merged = self._mix_bgm(merged, total_dur)
+
         return merged
+
+    # ─────────────────────────────────────────────────
+    # シーン合成
+    # ─────────────────────────────────────────────────
 
     def _compose_scene(self, scene: dict, idx: int) -> Path:
         """1シーンを合成: 映像 + テロップ + 音声 + SE"""
-        clip: Path = scene["clip"]
+        clip: Path     = scene["clip"]
         audio: Optional[Path] = scene.get("audio")
-        telop: str = scene.get("telop", "")
-        duration: int = scene.get("duration", 5)
-        se_type: str = scene.get("se", "none")
+        telop: str     = scene.get("telop", "")
+        duration: int  = scene.get("duration", 5)
+        se_type: str   = scene.get("se", "none")
 
         out = TEMP_DIR / f"scene_{idx:02d}_final_{uuid.uuid4().hex[:6]}.mp4"
 
-        # Step 1: テロップをPNGオーバーレイ画像として生成
-        telop_png = None
-        if telop:
-            telop_png = self._make_telop_png(telop, idx)
+        # Step 1: テロップPNGを生成
+        telop_png = self._make_telop_png(telop, idx) if telop else None
 
-        # Step 2: テロップを動画に合成
+        # Step 2: テロップを動画に合成（下から 120px の位置に配置）
         if telop_png:
             clip_with_telop = TEMP_DIR / f"scene_{idx:02d}_telop.mp4"
+            overlay_y = f"H-h-120"
             _ffmpeg(
                 "-i", str(clip),
                 "-i", str(telop_png),
-                "-filter_complex", f"[0:v][1:v]overlay=(W-w)/2:H-h-80[v]",
+                "-filter_complex", f"[0:v][1:v]overlay=(W-w)/2:{overlay_y}[v]",
                 "-map", "[v]",
                 "-c:v", "libx264", "-preset", "ultrafast",
                 "-pix_fmt", "yuv420p",
@@ -107,7 +141,6 @@ class VideoComposer:
             )
             clip = clip_with_telop
         else:
-            # 秒数だけ揃える
             trimmed = TEMP_DIR / f"scene_{idx:02d}_trim.mp4"
             _ffmpeg(
                 "-i", str(clip),
@@ -133,11 +166,10 @@ class VideoComposer:
                 str(out),
             )
         else:
-            # 無音で出力
             _ffmpeg(
                 "-i", str(clip),
                 "-f", "lavfi",
-                "-i", f"anullsrc=r=44100:cl=stereo",
+                "-i", "anullsrc=r=44100:cl=stereo",
                 "-map", "0:v",
                 "-map", "1:a",
                 "-c:v", "copy",
@@ -155,30 +187,75 @@ class VideoComposer:
 
         return out
 
-    def _make_telop_png(self, text: str, idx: int) -> Path:
-        """テロップ用透過PNGを生成（Pillow）"""
-        out = TEMP_DIR / f"telop_{idx:02d}.png"
+    # ─────────────────────────────────────────────────
+    # テロップ PNG 生成（刷新版）
+    # ─────────────────────────────────────────────────
 
-        img = Image.new("RGBA", (REEL_W, 200), (0, 0, 0, 0))
+    def _make_telop_png(self, text: str, idx: int) -> Path:
+        """
+        映画風テロップPNGを生成。
+
+        デザイン:
+          - グラデーション背景（上→透明 / 下→半透明ダーク）
+          - アクセントカラーの上辺ライン（シーンごとに変化）
+          - 大きめフォント（1行=100px / 2行=80px）
+          - ドロップシャドウ + カラーグロー
+        """
+        out = TEMP_DIR / f"telop_{idx:02d}.png"
+        accent = _ACCENTS[idx % len(_ACCENTS)]
+
+        img  = Image.new("RGBA", (REEL_W, _STRIP_H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
+        # ── グラデーション背景（上→透明 / 下→濃い半透明）──
+        for y in range(_STRIP_H):
+            alpha = int(210 * (y / _STRIP_H) ** 0.65)
+            draw.line([(0, y), (REEL_W, y)], fill=(6, 6, 14, alpha))
+
+        # ── アクセントライン（上辺、グロー風）──
+        for i in range(6):
+            a = max(0, 255 - i * 38)
+            draw.line([(0, i), (REEL_W, i)], fill=(*accent, a))
+
+        # ── テキスト ──
+        lines = self._split_telop(text)
+        font_size = 100 if len(lines) == 1 else 80
         try:
-            font = ImageFont.truetype(FONT_BOLD, 72)
+            font = ImageFont.truetype(FONT_BOLD, font_size) if FONT_BOLD else ImageFont.load_default()
         except Exception:
             font = ImageFont.load_default()
 
-        # 背景帯（半透明黒）
-        draw.rectangle([(0, 0), (REEL_W, 200)], fill=(0, 0, 0, 160))
+        line_gap  = 14
+        total_h   = len(lines) * font_size + (len(lines) - 1) * line_gap
+        start_y   = (_STRIP_H - total_h) // 2 + 16   # 帯内で縦中央寄り
 
-        # テキスト（白・中央揃え）
-        lines = self._split_telop(text)
-        y = 20
         for line in lines:
-            draw.text((REEL_W // 2, y), line, font=font, fill=(255, 255, 255, 255), anchor="mt")
-            y += 90
+            cx = REEL_W // 2
+            cy = start_y + font_size // 2
+
+            # ドロップシャドウ（濃い黒、4方向）
+            for dx, dy in [(4, 4), (-4, 4), (4, -4), (-4, -4), (0, 5)]:
+                draw.text((cx + dx, cy + dy), line, font=font,
+                          fill=(0, 0, 0, 220), anchor="mm")
+
+            # アクセントカラー グロー（淡く）
+            r, g, b = accent
+            for dx, dy in [(2, 2), (-2, 2), (2, -2), (-2, -2)]:
+                draw.text((cx + dx, cy + dy), line, font=font,
+                          fill=(r, g, b, 70), anchor="mm")
+
+            # 本体テキスト（白）
+            draw.text((cx, cy), line, font=font,
+                      fill=(255, 255, 255, 255), anchor="mm")
+
+            start_y += font_size + line_gap
 
         img.save(str(out), "PNG")
         return out
+
+    # ─────────────────────────────────────────────────
+    # シーン結合
+    # ─────────────────────────────────────────────────
 
     def _concat_scenes(self, clips: List[Path], output: Path) -> Path:
         """全シーンを結合"""
@@ -204,8 +281,62 @@ class VideoComposer:
 
         return output
 
+    # ─────────────────────────────────────────────────
+    # BGM ミックス（NEW）
+    # ─────────────────────────────────────────────────
+
+    def _mix_bgm(self, video_path: Path, duration: float) -> Path:
+        """
+        BGMをバックグラウンドに低音量でミックスする。
+
+        BGMファイルは generated_media/bgm/ に MP3/WAV を入れておく。
+        ファイルがなければスキップ（ログメッセージのみ）。
+
+        ファイル名アルファベット順で選択（複数ある場合はランダム）。
+        """
+        bgm_files = sorted(BGM_DIR.glob("*.mp3")) + sorted(BGM_DIR.glob("*.wav"))
+        if not bgm_files:
+            log.info(
+                "BGMスキップ — %s に MP3/WAV を入れると自動ミックスされます", BGM_DIR
+            )
+            return video_path
+
+        bgm = random.choice(bgm_files)
+        out = video_path.with_stem(video_path.stem + "_bgm")
+
+        try:
+            _ffmpeg(
+                "-i", str(video_path),
+                "-stream_loop", "-1",
+                "-i", str(bgm),
+                "-filter_complex",
+                (
+                    f"[1:a]atrim=duration={duration},volume={BGM_VOLUME:.2f}[bgm];"
+                    "[0:a][bgm]amix=inputs=2:duration=first:weights=1 1[aout]"
+                ),
+                "-map", "0:v",
+                "-map", "[aout]",
+                "-c:v", "copy",
+                "-c:a", "aac",
+                str(out),
+            )
+            video_path.unlink()
+            out.rename(video_path)
+            log.info("✓ BGMミックス完了: %s (vol=%.2f)", bgm.name, BGM_VOLUME)
+        except Exception as e:
+            log.warning("BGMミックスエラー (%s) — スキップ", e)
+            if out.exists():
+                out.unlink()
+
+        return video_path
+
+    # ─────────────────────────────────────────────────
+    # ユーティリティ
+    # ─────────────────────────────────────────────────
+
     @staticmethod
-    def _split_telop(text: str, chars: int = 15) -> list:
+    def _split_telop(text: str, chars: int = 14) -> list:
+        """テロップを最大2行に分割（14文字/行）"""
         lines = []
         while text:
             lines.append(text[:chars])

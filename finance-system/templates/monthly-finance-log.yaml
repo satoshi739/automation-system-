@@ -24,6 +24,14 @@ invoices_paid: 0                # 入金済み件数
 invoices_overdue: 0             # 期日超過件数
 overdue_amount: 0               # 未回収金額（税込）
 
+# --- 未回収明細（invoices_overdue > 0 の場合に記入）---
+overdue_invoices: []
+# 記入例:
+# overdue_invoices:
+#   - client: "株式会社◯◯"
+#     amount: 110000
+#     invoice_date: "YYYY-MM-DD"
+
 # --- ブランド別内訳 ---
 by_brand:
   dsc_marketing:

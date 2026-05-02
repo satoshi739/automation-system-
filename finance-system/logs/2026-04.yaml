@@ -1,0 +1,33 @@
+month: "2026-04"
+
+mrr_start: 350000
+new_mrr: 0
+churned_mrr: 0
+mrr_end: 350000
+
+one_time_revenue: 55000
+
+total_revenue_excl_tax: 368182
+total_revenue_incl_tax: 405000
+cogs: 80000
+gross_profit: 288182
+
+invoices_sent: 4
+invoices_paid: 4
+invoices_overdue: 0
+overdue_amount: 0
+
+by_brand:
+  dsc_marketing:
+    mrr: 200000
+    one_time: 55000
+  cashflowsupport:
+    mrr: 100000
+    one_time: 0
+  upjapan:
+    mrr: 50000
+    one_time: 0
+
+new_clients: []
+churned_clients: []
+notes: "前月は全件入金完了"

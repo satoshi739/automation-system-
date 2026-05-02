@@ -28,8 +28,12 @@
 <!-- KPI サマリーバー -->
 <div class="org-bar">
   <div class="org-bar-item">
-    <div class="org-bar-label">MRR</div>
+    <div class="org-bar-label">MRR <span style="font-size:8px;color:#10b981;">● Stripe</span></div>
+    {% if stripe_data.mrr.status == 'ok' %}
+    <div class="org-bar-val" style="color:var(--green2);">{{ stripe_data.mrr.mrr_display }}</div>
+    {% else %}
     <div class="org-bar-val" style="color:var(--green2);">¥{{ "{:,}".format(stats.mrr) }}</div>
+    {% endif %}
   </div>
   <div class="org-bar-item">
     <div class="org-bar-label">総セッション</div>
@@ -528,5 +532,106 @@ const mr = {{ mrr_history | tojson }};
 })();
 {% endif %}
 </script>
+
+<!-- ── SNSアナリティクス ──────────────────────────────────── -->
+<div style="margin-top:40px;">
+  <div style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+    <i data-lucide="activity" style="width:16px;height:16px;color:#22d3ee;"></i>
+    ブランド別サマリー（Web + SNS）
+  </div>
+  <div style="font-size:11.5px;color:var(--muted2);margin-bottom:16px;">GA4接続済み — Instagramインサイトは META_ACCESS_TOKEN 設定後に追加表示</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;">
+    {% for bid, brand_info in brand_traffic.items() %}
+    {% set sn = sns_data.get(bid, {}) %}
+    {% set ig_acct = sn.get('ig_account', {}) %}
+    {% set ig_ins  = sn.get('ig_insights', {}) %}
+    {% set eng     = sn.get('engagement', {}) %}
+    <div style="background:var(--s1);border:1px solid var(--border);border-left:3px solid {{ brand_info.color }};border-radius:10px;padding:16px;">
+
+      <!-- ブランド名 + Instagramバッジ -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:{{ brand_info.color }};display:inline-block;flex-shrink:0;"></span>
+        <span style="font-size:13px;font-weight:700;color:{{ brand_info.color }};">{{ brand_info.name }}</span>
+        {% if ig_acct.get('status') == 'ok' %}
+          <span style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(225,48,108,.15);color:#E1306C;border:1px solid rgba(225,48,108,.3);">IG 接続済み</span>
+        {% elif ig_acct.get('status') == 'token_expired' %}
+          <span style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25);">IG トークン期限切れ</span>
+        {% else %}
+          <span style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(100,100,100,.1);color:var(--muted);border:1px solid var(--border);">IG 未接続</span>
+        {% endif %}
+      </div>
+
+      <!-- GA4データ（常に表示） -->
+      {% if brand_info.configured %}
+      <div style="margin-bottom:10px;">
+        <div style="font-size:9px;color:#22d3ee;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600;">GA4 — 過去28日</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">セッション</div>
+            <div style="font-size:15px;font-weight:800;color:#22d3ee;">{{ "{:,}".format(brand_info.sessions) }}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">PV</div>
+            <div style="font-size:15px;font-weight:800;color:var(--accent);">{{ "{:,}".format(brand_info.pageviews) }}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">ユーザー</div>
+            <div style="font-size:15px;font-weight:800;color:#a78bfa;">{{ "{:,}".format(brand_info.users) }}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:6px;font-size:10.5px;color:var(--muted);">
+          <span>直帰率 <strong style="color:{% if brand_info.bounce_rate > 70 %}#f59e0b{% else %}#10b981{% endif %};">{{ brand_info.bounce_rate }}%</strong></span>
+          <span>平均滞在 <strong style="color:var(--text);">{{ brand_info.avg_duration }}分</strong></span>
+        </div>
+      </div>
+      {% else %}
+      <div style="font-size:11px;color:var(--muted);padding:8px 0;margin-bottom:10px;">GA4 未設定</div>
+      {% endif %}
+
+      <!-- Instagramインサイト（META接続後） -->
+      {% if ig_acct.get('status') == 'ok' %}
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
+        <div style="font-size:9px;color:#E1306C;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600;">Instagram インサイト</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">フォロワー</div>
+            <div style="font-size:15px;font-weight:800;color:#E1306C;">{{ "{:,}".format(ig_acct.get('followers',0)) }}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">投稿数</div>
+            <div style="font-size:15px;font-weight:800;color:var(--accent);">{{ ig_acct.get('media_count',0) }}</div>
+          </div>
+        </div>
+        {% if ig_ins.get('status') == 'ok' %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">いいね合計</div>
+            <div style="font-size:15px;font-weight:800;color:#f43f5e;">{{ "{:,}".format(ig_ins.get('total_likes',0)) }}</div>
+          </div>
+          <div style="background:var(--s2);border-radius:6px;padding:8px;text-align:center;">
+            <div style="font-size:8.5px;color:var(--muted);margin-bottom:3px;">平均いいね</div>
+            <div style="font-size:15px;font-weight:800;color:#a78bfa;">{{ ig_ins.get('avg_likes',0) }}</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- 投稿ログ -->
+      {% if eng.get('total_posts', 0) > 0 %}
+      <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:8px;">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;">投稿ログ（過去28日）</div>
+        <div style="display:flex;gap:12px;font-size:10.5px;flex-wrap:wrap;">
+          <span>{{ eng.total_posts }}件</span>
+          <span>ENG <strong style="color:#22d3ee;">{{ eng.avg_engagement_rate }}%</strong></span>
+          <span>最強 <strong style="color:var(--accent);">{{ eng.best_platform }}</strong></span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
 
 {% endblock %}

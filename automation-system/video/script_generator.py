@@ -67,51 +67,63 @@ def _build_system_prompt(format_key: str, target_key: str, cta_key: str) -> str:
     tone_lines = "\n".join(f"  - {t}" for t in tgt["tone"])
     cta_text = random.choice(cta) if isinstance(cta, list) and cta else "保存しといて"
 
-    return f"""あなたはショート動画（リール・TikTok）の台本ライターです。
+    return f"""あなたはTikTok/Instagram Reelsでバズらせる台本の専門家です。
 ブログ記事を元に、15〜25秒の縦型ショート動画の台本を生成してください。
 
 ## 今回のフォーマット: {format_key}
 {fmt['description']}
 
-### 構成（このシーン順を守る）:
+### 構成（このシーン順を厳守）:
 {structure_lines}
 
-### フックの例:
+### バズるフックの参考例:
 {hook_lines}
 
 ## ターゲット: {tgt['label']}
-### 痛み:
+### この人が抱えている痛み:
 {pain_lines}
-### 使う語彙: {vocab_lines}
+### 使う語彙（難しい言葉を使わない）: {vocab_lines}
 ### トーン:
 {tone_lines}
 
-## CTA(シーン5の最後に必ず含める)
+## CTA（シーン5の最後に必ず入れる）
 {cta_text}
-↑この文言を、トピックに関連した前置きと組み合わせてシーン5のnarrationとtelopに配置。売り込み禁止。
+↑トピックと自然につながる前置きを添えてシーン5に配置。押し売り厳禁。
+
+## 映像プロンプト（visual_prompt）の書き方
+- 必ず英語で書く
+- カメラアングルを指定: close-up / wide shot / overhead / POV / dolly in
+- 光の質を指定: golden hour light / soft diffused light / neon glow / dramatic rim light
+- 動きを指定: slow motion / time-lapse / handheld / static / tracking shot
+- 例: "close-up of hands counting cash money on a wooden desk, warm golden light, shallow depth of field, cinematic 9:16"
 
 ## 出力フォーマット（YAML）
-title: 動画タイトル
+title: バズりやすい動画タイトル（20字以内）
 scenes:
   - id: 1
-    duration: 5
-    narration: ナレーションのテキスト（自然な話し言葉）
-    telop: 画面に表示するテキスト（短く・1行15文字以内）
-    visual_prompt: Scene description in English for AI video generation (cinematic, specific, vivid)
-    se: whoosh
+    duration: 4
+    narration: ナレーション（話し言葉、1文20字以内。読んで3〜4秒で終わる長さ）
+    telop: 画面テキスト（14文字以内・1行・インパクト重視）
+    visual_prompt: Cinematic scene description in English, specific camera angle and lighting
+    se: impact
   - id: 2
-    ...
-caption: Instagram/TikTokに投稿するキャプション（200字程度）
+    duration: 4
+    narration: ...
+    telop: ...
+    visual_prompt: ...
+    se: whoosh
+caption: Instagram/TikTokキャプション（冒頭2行で止まらせる・200字）
 hashtags:
   - "#副業"
-  - "#お金"
+  - "#お金の話"
 
-## ルール
-- シーン数: 5シーン(合計15〜25秒)
-- フックは上記フォーマットのシーン1に従う
-- visual_promptは必ず英語、具体的な映像描写
-- テロップは1行15文字以内、改行絶対禁止(\n や 改行コードを含めない、半角スペースのみ可)
-- 必ずYAMLのみ出力（```yaml ブロック不要、コメント不要）"""
+## 絶対守るルール
+- シーン数: 5シーン（合計15〜25秒）
+- narrationは1シーン1文、20字以内（TTSで3〜4秒に収める）
+- telopは14文字以内、改行コード(\n)を絶対に含めない
+- visual_promptは必ず英語、カメラアングル+光の質+動きを含める
+- seは whoosh / impact / none のどれか
+- YAMLのみ出力（```yaml ブロック不要、コメント行不要）"""
 
 
 class ScriptGenerator:
@@ -141,9 +153,13 @@ class ScriptGenerator:
             import anthropic
             client = anthropic.Anthropic(api_key=self.api_key)
             message = client.messages.create(
-                model="claude-haiku-4-5-20251001",
+                model="claude-sonnet-4-6",
                 max_tokens=2000,
-                system=system_prompt,
+                system=[{
+                    "type": "text",
+                    "text": system_prompt,
+                    "cache_control": {"type": "ephemeral"},
+                }],
                 messages=[{"role": "user", "content": prompt}],
             )
             raw = message.content[0].text

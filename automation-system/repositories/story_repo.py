@@ -7,15 +7,57 @@ story_templates / story_runs / social_accounts / social_posts の CRUD。
 from __future__ import annotations
 
 import json
+import logging
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
 import database as db
 
+log = logging.getLogger(__name__)
 _NOW = lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def _get_fernet():
+    """TOKEN_ENCRYPTION_KEY 環境変数から Fernet インスタンスを返す。未設定なら None。"""
+    key = os.environ.get("TOKEN_ENCRYPTION_KEY", "")
+    if not key:
+        return None
+    try:
+        from cryptography.fernet import Fernet
+        return Fernet(key.encode() if isinstance(key, str) else key)
+    except Exception as e:
+        log.warning("Fernet初期化失敗（TOKEN_ENCRYPTION_KEY が不正）: %s", e)
+        return None
+
+
+def _encrypt_token(plain: str) -> str:
+    """アクセストークンを暗号化。KEY未設定時は平文のまま（警告を出す）。"""
+    if not plain:
+        return plain
+    f = _get_fernet()
+    if f is None:
+        log.warning("TOKEN_ENCRYPTION_KEY未設定 — access_token を平文で保存します")
+        return plain
+    return f.encrypt(plain.encode()).decode()
+
+
+def _decrypt_token(cipher: str) -> str:
+    """暗号化されたトークンを復号。KEY未設定・復号失敗時は元の文字列を返す。"""
+    if not cipher:
+        return cipher
+    f = _get_fernet()
+    if f is None:
+        return cipher
+    try:
+        return f.decrypt(cipher.encode()).decode()
+    except Exception:
+        return cipher
 
 
 # ═══════════════════════════════════════════════════════
@@ -35,23 +77,44 @@ class SocialAccountRepo:
         with db.get_conn() as conn:
             return [dict(r) for r in conn.execute(sql, params).fetchall()]
 
+    def _decrypt_row(self, row: dict) -> dict:
+        if row.get("access_token"):
+            row["access_token"] = _decrypt_token(row["access_token"])
+        return row
+
     def get(self, account_id: str) -> Optional[dict]:
         with db.get_conn() as conn:
             row = conn.execute("SELECT * FROM social_accounts WHERE id=?", (account_id,)).fetchone()
-        return dict(row) if row else None
+        return self._decrypt_row(dict(row)) if row else None
+
+    def list(self, brand: str = "", platform: str = "instagram") -> list[dict]:
+        sql = "SELECT * FROM social_accounts WHERE 1=1"
+        params: list = []
+        if brand:
+            sql += " AND brand=?"; params.append(brand)
+        if platform:
+            sql += " AND platform=?"; params.append(platform)
+        sql += " ORDER BY created_at DESC"
+        with db.get_conn() as conn:
+            rows = [dict(r) for r in conn.execute(sql, params).fetchall()]
+        return [self._decrypt_row(r) for r in rows]
 
     def upsert(self, data: dict) -> str:
         now = _NOW()
         aid = data.get("id") or f"sa_{data['brand']}_{data.get('platform','instagram')}"
+        raw_token = data.get("access_token", "")
+        encrypted_token = _encrypt_token(raw_token) if raw_token else None
         with db.get_conn() as conn:
             conn.execute("""
                 INSERT INTO social_accounts
                     (id, brand, platform, account_id, account_name, account_type,
-                     ig_user_id, page_id, provider, status, validated_at, created_at, updated_at)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+                     access_token, ig_user_id, page_id, provider, status,
+                     validated_at, created_at, updated_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 ON CONFLICT(id) DO UPDATE SET
                     account_name=excluded.account_name,
                     account_id=excluded.account_id,
+                    access_token=COALESCE(excluded.access_token, access_token),
                     ig_user_id=excluded.ig_user_id,
                     page_id=excluded.page_id,
                     provider=excluded.provider,
@@ -65,6 +128,7 @@ class SocialAccountRepo:
                 data.get("account_id"),
                 data.get("account_name"),
                 data.get("account_type", "business"),
+                encrypted_token,
                 data.get("ig_user_id"),
                 data.get("page_id"),
                 data.get("provider", "mock"),

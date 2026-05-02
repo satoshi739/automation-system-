@@ -38,8 +38,7 @@ from video.veo_generator import VeoGenerator
 from video.tts_generator import TTSGenerator
 from video.composer import VideoComposer
 
-_PROJECT_ROOT = Path(os.environ.get("AUTOMATION_ROOT", "/Users/satoshi/会社全体設定/automation-system"))
-OUTPUT_DIR = _PROJECT_ROOT / "generated_media" / "reels"
+OUTPUT_DIR = _ROOT / "generated_media" / "reels"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 _CHANNELS_CONFIG = _ROOT / "config" / "channel_settings.yaml"
@@ -156,30 +155,45 @@ def run_pipeline(
     else:
         log.info("映像生成: Nano Banana 2 (gemini-3.1-flash-image-preview)")
         video_gen = NanaBananaGenerator()
-    tts = TTSGenerator()
+    # チャネル設定から video_defaults を読み込む
+    try:
+        with open(_CHANNELS_CONFIG, encoding="utf-8") as _f:
+            vdef = yaml.safe_load(_f).get("video_defaults", {})
+    except Exception:
+        vdef = {}
+    tts_speed = vdef.get("tts_speed", 1.0)
+    min_scene_dur = vdef.get("min_scene_duration", 3)
+    tail_padding = vdef.get("scene_tail_padding", 0.2)
+
+    tts = TTSGenerator(speed=tts_speed)
     composer = VideoComposer()
 
     scene_clips = []
     for i, scene in enumerate(script["scenes"]):
         log.info(f"  シーン {i+1}/{len(script['scenes'])}: {scene.get('telop', '')[:20]}")
 
-        # 動画クリップ生成
+        # TTS音声を先に生成して実際の長さを確定
+        narration = scene.get("narration", "")
+        audio_path = tts.generate(narration) if narration else None
+        if audio_path:
+            actual_dur = tts.get_duration(audio_path)
+            scene_duration = max(min_scene_dur, round(actual_dur + tail_padding))
+        else:
+            scene_duration = max(min_scene_dur, scene.get("duration", 5))
+
+        # 確定した duration で映像クリップを生成
         clip_path = video_gen.generate(
             prompt=scene.get("visual_prompt", ""),
             telop=scene.get("telop", ""),
-            duration=scene.get("duration", 5),
+            duration=scene_duration,
             scene_index=i,
         )
-
-        # TTS音声生成
-        narration = scene.get("narration", "")
-        audio_path = tts.generate(narration) if narration else None
 
         scene_clips.append({
             "clip": clip_path,
             "audio": audio_path,
             "telop": scene.get("telop", ""),
-            "duration": scene.get("duration", 5),
+            "duration": scene_duration,
             "se": scene.get("se", None),
         })
 
@@ -214,11 +228,24 @@ def run_pipeline(
     return final_video
 
 
+def _make_public_video_url(video_path: Path) -> str:
+    """ローカル動画ファイルの公開URLを生成する。
+    Railway の RAILWAY_PUBLIC_DOMAIN env var が設定されていれば
+    https://{domain}/media/{filename} を返す。未設定時は空文字。
+    """
+    domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "").strip()
+    if not domain:
+        return ""
+    return f"https://{domain}/media/{video_path.name}"
+
+
 def _add_to_queue(video_path: Path, script: dict, brand: str, channel_cfg: dict = None):
-    """完成動画を投稿キューに追加"""
+    """完成動画をブランド別投稿キューに追加"""
     from datetime import datetime
 
-    queue_dir = Path(__file__).parent.parent / "content_queue" / "instagram"
+    # ブランド別キュー構造: content_queue/{brand}/instagram/
+    # check_scheduled_posts() が brands.yaml に登録済みのブランドをスキャンする
+    queue_dir = Path(__file__).parent.parent / "content_queue" / brand / "instagram"
     queue_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -233,7 +260,6 @@ def _add_to_queue(video_path: Path, script: dict, brand: str, channel_cfg: dict 
     if channel_cfg:
         cta = channel_cfg.get("cta_template", "")
         if channel_cfg.get("profile_link_url") == "TBD":
-            # プロフィールリンク未設定のためリンク誘導文言を除去
             cta = cta.replace("プロフィールのリンクから →", "").replace("プロフィールリンク", "").strip()
 
     # instagram_account_id が TBD の場合は自動投稿を無効化
@@ -241,21 +267,28 @@ def _add_to_queue(video_path: Path, script: dict, brand: str, channel_cfg: dict 
     if not auto_post_enabled:
         log.info("instagram_account_id が未設定のため auto_post_enabled=false で保存します")
 
+    # Railway 経由の公開 URL（Meta API が動画を pull するために必要）
+    video_url = _make_public_video_url(video_path)
+
     body_parts = [p for p in [caption, cta, hashtags] if p]
     entry = {
         "status": "pending",
-        "media_type": "REELS",
+        "media_type": "reel",
         "media_path": str(video_path),
+        "video_url": video_url,
         "caption": "\n\n".join(body_parts),
         "brand": brand,
         "channel": (channel_cfg or {}).get("name", brand),
         "auto_post_enabled": auto_post_enabled,
         "created_at": timestamp,
     }
+    if auto_post_enabled and video_url:
+        # scheduled_at を即時にセット → check_scheduled_posts() が次の1分以内に拾う
+        entry["scheduled_at"] = timestamp[:15].replace("_", " ").replace("T", " ")
 
     out_file = queue_dir / f"{timestamp}_{brand}_reel.yaml"
     with open(out_file, "w", encoding="utf-8") as f:
-        yaml.dump(entry, f, allow_unicode=True)
+        yaml.dump(entry, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
     log.info(f"投稿キューに追加: {out_file}")
 
 

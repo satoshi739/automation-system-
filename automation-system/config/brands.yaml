@@ -45,6 +45,21 @@ brands:
       line:      true
       wordpress: true
 
+  satoshi:
+    name: "Satoshi（個人チャネル）"
+    name_short: Satoshi
+    color: "#d97706"
+    url: "https://www.instagram.com/satoshi51314/"
+    channels:
+      instagram: true
+      threads:   false
+      facebook:  false
+      twitter:   false
+      youtube:   false
+      tiktok:    true
+      line:      false
+      wordpress: false
+
   satoshi-blog:
     name: "Satoshi Life Blog"
     name_short: Blog

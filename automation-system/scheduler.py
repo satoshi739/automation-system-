@@ -23,23 +23,37 @@ try:
 except AttributeError:
     pass  # Windowsでは不要
 from pathlib import Path
+from dotenv import load_dotenv
+
+# load_dotenv() をモジュールインポートより先に呼ぶ
+# → sns/google_drive.py 等のモジュールレベル変数が正しい env 値を受け取れる
+load_dotenv(Path(__file__).parent / ".env")
 
 import schedule
 import subprocess
 import time
 import yaml
 from datetime import datetime
-from dotenv import load_dotenv
 
 from sns.instagram import InstagramPoster
 from sns.line_api import LINEMessenger
-from sns.google_drive import sync_from_drive
+try:
+    from sns.google_drive import sync_from_drive
+except Exception as _gdrive_import_err:
+    logging.warning("Google Drive モジュール読み込みスキップ: %s", _gdrive_import_err)
+    def sync_from_drive(*a, **kw): pass
 from sns.performance import log_post, update_metrics, get_optimal_post_time
 from sns.photo_importer import process_inbox
 from sales.followup import run_followup_check
 from morning_operator import run as morning_run
 
-load_dotenv()
+_ROOT = Path(__file__).parent
+_FINANCE_TRACKER   = _ROOT.parent / "finance-system"           / "finance_tracker.py"
+_HEALTH_CHECKER    = _ROOT.parent / "customer-success-system"  / "health_checker.py"
+_PROJECT_DASHBOARD = _ROOT.parent / "project-system"           / "project_dashboard.py"
+_LEAD_PIPELINE     = _ROOT.parent / "sales-system"             / "lead_pipeline.py"
+_SHOP_SYNC         = _ROOT.parent / "shop-update-system"       / "sync_all_channels.py"
+_CONTENT_PLANNER   = _ROOT.parent / "marketing-system"         / "content_planner.py"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,6 +65,7 @@ logging.basicConfig(
             encoding="utf-8",
         ),
     ],
+    force=True,  # morning_operator の import が basicConfig を先取りするのを上書き
 )
 logger = logging.getLogger(__name__)
 
@@ -175,7 +190,8 @@ def post_to_instagram():
         logger.info("Instagram: キューに投稿がありません")
         return
 
-    poster = InstagramPoster()
+    brand = post.get("brand", "")
+    poster = InstagramPoster(brand=brand)
     try:
         media_type = post.get("media_type", "image")
         if media_type == "reel":
@@ -231,7 +247,6 @@ def fetch_instagram_insights():
         logger.error("performance_log.yaml 読み込み失敗: %s", exc)
         return
 
-    poster = InstagramPoster()
     updated = 0
     for entry in data:
         if entry.get("platform") != "instagram":
@@ -242,6 +257,7 @@ def fetch_instagram_insights():
         if not post_id:
             continue
         try:
+            poster = InstagramPoster(brand=entry.get("brand", ""))
             metrics = poster.get_insights_parsed(post_id)
             if metrics.get("reach", 0) > 0:
                 update_metrics(post_id, metrics)
@@ -445,6 +461,33 @@ def agent_tick_job():
         _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
 
 
+def balance_check_job():
+    """
+    Anthropic クレジット残高チェック（毎朝9:00 JST）。
+    推計残高が ANTHROPIC_CREDIT_WARN_USD（デフォルト$10）を下回ったら LINE 通知。
+    ANTHROPIC_CREDIT_TOTAL_USD が未設定の場合はスキップ（ログのみ）。
+    """
+    logger.info("=== Anthropic 残高チェック開始 ===")
+    try:
+        from api_cost_tracker import check_balance_and_alert, get_balance_info
+        info = get_balance_info()
+        if not info["tracking_enabled"]:
+            logger.info(
+                "残高チェックスキップ: .env に ANTHROPIC_CREDIT_TOTAL_USD=<金額> を設定してください"
+            )
+            return
+        result = check_balance_and_alert()
+        bi = result["balance_info"]
+        logger.info(
+            "残高チェック完了: $%.2f 残 (状態=%s, 通知=%s)",
+            bi.get("estimated_balance", 0),
+            bi.get("status", "unknown"),
+            result.get("alerted", False),
+        )
+    except Exception as e:
+        logger.error("残高チェックエラー: %s", e, exc_info=True)
+
+
 def ceo_dispatch_job():
     """AI CEO ディスパッチジョブ（毎朝5:30）"""
     logger.info("=== AI CEO ディスパッチ開始 ===")
@@ -617,6 +660,10 @@ def setup_schedule():
     schedule.every(5).minutes.do(agent_tick_job)
     logger.info("エージェントタスク実行: 5分ごと")
 
+    # Anthropic 残高チェック（毎朝9:00 JST = 00:00 UTC）
+    schedule.every().day.at("00:00").do(balance_check_job)
+    logger.info("Anthropic残高チェック: 毎朝9:00 JST (00:00 UTC)")
+
     # AI CEO ディスパッチ（毎朝5:30 JST = 20:30 UTC前日）
     schedule.every().day.at("20:30").do(ceo_dispatch_job)
     logger.info("AI CEO ディスパッチ: 毎朝5:30 JST (20:30 UTC)")
@@ -630,6 +677,180 @@ def setup_schedule():
     # 死活監視 heartbeat（毎分: logs/scheduler.heartbeat を更新）
     schedule.every(1).minutes.do(_touch_heartbeat)
     logger.info("heartbeat: 毎分更新")
+
+    # 動画パイプライン（毎日 20:00 JST = 11:00 UTC）
+    schedule.every().day.at("11:00").do(video_pipeline_job)
+    logger.info("動画パイプライン: 毎日20:00 JST (11:00 UTC)")
+
+    # 財務月次レポート（毎月1日 09:00 JST = 00:00 UTC）
+    schedule.every().day.at("00:00").do(finance_monthly_job)
+    logger.info("財務月次レポート: 毎日チェック（1日のみ実行）")
+
+    # CSヘルスチェック（毎週月曜 09:00 JST = 日曜 00:00 UTC）
+    schedule.every().sunday.at("00:00").do(cs_health_check_job)
+    logger.info("CSヘルスチェック: 毎週月曜09:00 JST (日曜00:00 UTC)")
+
+    # プロジェクトダッシュボード（毎週月曜 09:30 JST = 日曜 00:30 UTC）
+    schedule.every().sunday.at("00:30").do(project_dashboard_job)
+    logger.info("プロジェクトダッシュボード: 毎週月曜09:30 JST (日曜00:30 UTC)")
+
+    # 営業パイプラインチェック（毎週月曜 08:00 JST = 日曜 23:00 UTC）
+    schedule.every().sunday.at("23:00").do(lead_pipeline_job)
+    logger.info("営業パイプラインチェック: 毎週月曜08:00 JST (日曜23:00 UTC)")
+
+    # 店舗チャネル同期（毎週月曜 07:30 JST = 日曜 22:30 UTC）
+    schedule.every().sunday.at("22:30").do(shop_sync_job)
+    logger.info("店舗チャネル同期: 毎週月曜07:30 JST (日曜22:30 UTC)")
+
+    # コンテンツプランナー（毎週日曜 20:00 JST = 11:00 UTC: 翌週分を生成）
+    schedule.every().sunday.at("11:00").do(content_planner_job)
+    logger.info("コンテンツプランナー: 毎週日曜20:00 JST (11:00 UTC)")
+
+
+def video_pipeline_job():
+    """毎日20:00 JST: satoshi-blog の最新記事を取得して動画生成 → 投稿キューへ追加"""
+    logger.info("=== 動画パイプラインジョブ開始 ===")
+    try:
+        import sys
+        if str(_ROOT) not in sys.path:
+            sys.path.insert(0, str(_ROOT))
+        from video.blog_fetcher import BlogFetcher
+        from video.pipeline import run_pipeline
+
+        fetcher = BlogFetcher(brand="satoshi-blog")
+        latest = fetcher.fetch_latest()
+        if not latest:
+            logger.warning("最新記事が取得できませんでした — 動画パイプラインをスキップ")
+            return
+
+        run_pipeline(
+            blog_text=latest["content"],
+            blog_title=latest["title"],
+            brand="satoshi-blog",
+            channel="satoshi",
+            post=True,
+            dry_run=False,
+        )
+        logger.info("動画パイプラインジョブ完了: %s", latest.get("title", ""))
+    except Exception as exc:
+        _alert_owner(f"動画パイプラインジョブエラー: {exc}", dedup_key="video_pipeline_error")
+        logger.error("動画パイプラインジョブエラー: %s", exc, exc_info=True)
+
+
+def finance_monthly_job():
+    """毎月1日09:00 JST: 月次財務レポートを生成してLINEに送信する"""
+    if datetime.now().day != 1:
+        return
+    logger.info("=== 財務月次レポートジョブ開始 ===")
+    try:
+        if _FINANCE_TRACKER.exists():
+            result = subprocess.run(
+                ["python3", str(_FINANCE_TRACKER), "--report"],
+                capture_output=True, text=True, timeout=120,
+            )
+            logger.info("財務レポート出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("財務レポートエラー: %s", result.stderr)
+        else:
+            logger.warning("finance_tracker.py が見つかりません: %s", _FINANCE_TRACKER)
+    except Exception as exc:
+        _alert_owner(f"財務月次レポートエラー: {exc}", dedup_key="finance_report_error")
+        logger.error("財務月次レポートエラー: %s", exc, exc_info=True)
+
+
+def cs_health_check_job():
+    """毎週月曜09:00 JST: 顧客ヘルスチェックを実行してLINEにアラートを送信する"""
+    logger.info("=== CSヘルスチェックジョブ開始 ===")
+    try:
+        if _HEALTH_CHECKER.exists():
+            result = subprocess.run(
+                ["python3", str(_HEALTH_CHECKER)],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("CSヘルスチェック出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("CSヘルスチェックエラー: %s", result.stderr)
+        else:
+            logger.warning("health_checker.py が見つかりません: %s", _HEALTH_CHECKER)
+    except Exception as exc:
+        _alert_owner(f"CSヘルスチェックエラー: {exc}", dedup_key="cs_health_error")
+        logger.error("CSヘルスチェックエラー: %s", exc, exc_info=True)
+
+
+def project_dashboard_job():
+    """毎週月曜09:30 JST: プロジェクトダッシュボードを生成してLINEに送信する"""
+    logger.info("=== プロジェクトダッシュボードジョブ開始 ===")
+    try:
+        if _PROJECT_DASHBOARD.exists():
+            result = subprocess.run(
+                ["python3", str(_PROJECT_DASHBOARD)],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("プロジェクトダッシュボード出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("プロジェクトダッシュボードエラー: %s", result.stderr)
+        else:
+            logger.warning("project_dashboard.py が見つかりません: %s", _PROJECT_DASHBOARD)
+    except Exception as exc:
+        _alert_owner(f"プロジェクトダッシュボードエラー: {exc}", dedup_key="project_dashboard_error")
+        logger.error("プロジェクトダッシュボードエラー: %s", exc, exc_info=True)
+
+
+def lead_pipeline_job():
+    """毎週月曜08:00 JST: 営業パイプラインをチェックして期限超過リードをLINEで通知する"""
+    logger.info("=== 営業パイプラインジョブ開始 ===")
+    try:
+        if _LEAD_PIPELINE.exists():
+            result = subprocess.run(
+                ["python3", str(_LEAD_PIPELINE)],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("営業パイプライン出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("営業パイプラインエラー: %s", result.stderr)
+        else:
+            logger.warning("lead_pipeline.py が見つかりません: %s", _LEAD_PIPELINE)
+    except Exception as exc:
+        _alert_owner(f"営業パイプラインエラー: {exc}", dedup_key="lead_pipeline_error")
+        logger.error("営業パイプラインエラー: %s", exc, exc_info=True)
+
+
+def shop_sync_job():
+    """毎週月曜07:30 JST: 全店舗のチャネル情報を同期する"""
+    logger.info("=== 店舗チャネル同期ジョブ開始 ===")
+    try:
+        if _SHOP_SYNC.exists():
+            result = subprocess.run(
+                ["python3", str(_SHOP_SYNC)],
+                capture_output=True, text=True, timeout=120,
+            )
+            logger.info("店舗チャネル同期出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("店舗チャネル同期エラー: %s", result.stderr)
+        else:
+            logger.warning("sync_all_channels.py が見つかりません: %s", _SHOP_SYNC)
+    except Exception as exc:
+        _alert_owner(f"店舗チャネル同期エラー: {exc}", dedup_key="shop_sync_error")
+        logger.error("店舗チャネル同期エラー: %s", exc, exc_info=True)
+
+
+def content_planner_job():
+    """毎週日曜20:00 JST: 翌週分のコンテンツプランをキューに生成する"""
+    logger.info("=== コンテンツプランナージョブ開始 ===")
+    try:
+        if _CONTENT_PLANNER.exists():
+            result = subprocess.run(
+                ["python3", str(_CONTENT_PLANNER)],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("コンテンツプランナー出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("コンテンツプランナーエラー: %s", result.stderr)
+        else:
+            logger.warning("content_planner.py が見つかりません: %s", _CONTENT_PLANNER)
+    except Exception as exc:
+        _alert_owner(f"コンテンツプランナーエラー: {exc}", dedup_key="content_planner_error")
+        logger.error("コンテンツプランナーエラー: %s", exc, exc_info=True)
 
 
 def story_autopilot_job():

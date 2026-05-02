@@ -1,4 +1,5 @@
 requests>=2.32.3
+cryptography>=41.0.0
 flask==3.0.3
 schedule==1.2.2
 python-dotenv==1.0.1
@@ -15,7 +16,8 @@ gunicorn==22.0.0
 # ── 動画パイプライン（video/）──────────────────────
 # Google AI Studio SDK（Veo動画生成 + Gemini）
 google-genai>=1.0.0
-# TTS（完全無料）
+# TTS: OpenAI TTS（高品質・プライマリ）→ gTTS（無料・フォールバック）
+openai>=1.0.0
 gTTS>=2.5.0
 # 画像処理（既存のimage_generator.pyも使用）
 Pillow>=10.0.0
