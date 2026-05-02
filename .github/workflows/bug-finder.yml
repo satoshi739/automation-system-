@@ -1,0 +1,98 @@
+name: Bug Finding Agent
+
+on:
+  push:
+    branches: ["main"]   # コスト管理: main への push のみ解析 (#9)
+
+jobs:
+  bug-finder:
+    name: 🐛 Analyze commit for bugs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # fix ブランチの push に必要
+      pull-requests: write  # Draft PR 作成に必要
+
+    steps:
+      # ── 前処理 ────────────────────────────────────────────────
+
+      - name: Skip if [skip-bugcheck] in commit message
+        id: skip_check
+        run: |
+          MSG="${{ github.event.head_commit.message }}"
+          if echo "$MSG" | grep -qF '[skip-bugcheck]'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "⏭ [skip-bugcheck] 検出 — スキップ"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout (with history)
+        if: steps.skip_check.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── diff 生成（初回コミット対応 #5）────────────────────────
+
+      - name: Generate diff
+        if: steps.skip_check.outputs.skip != 'true'
+        id: diff
+        run: |
+          if git rev-parse HEAD^ > /dev/null 2>&1; then
+            git diff HEAD^ HEAD > /tmp/commit.diff
+          else
+            echo "初回コミット — git show で diff を生成"
+            git show HEAD > /tmp/commit.diff
+          fi
+          SIZE=$(wc -c < /tmp/commit.diff)
+          echo "diff_size=$SIZE" >> "$GITHUB_OUTPUT"
+          echo "Diff size: ${SIZE} bytes"
+          # 500バイト未満はほぼ設定変更のみ → スキップ対象
+          if [ "$SIZE" -lt 500 ]; then
+            echo "too_small=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "too_small=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Python セットアップ（pip キャッシュ付き #8）───────────
+
+      - name: Set up Python
+        if: steps.skip_check.outputs.skip != 'true' && steps.diff.outputs.diff_size != '0' && steps.diff.outputs.too_small != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        if: steps.skip_check.outputs.skip != 'true' && steps.diff.outputs.diff_size != '0' && steps.diff.outputs.too_small != 'true'
+        run: pip install anthropic requests
+
+      # ── git 設定（自動修正 PR の push 用 #3）────────────────────
+
+      - name: Configure git for auto-fix commits
+        if: steps.skip_check.outputs.skip != 'true' && steps.diff.outputs.diff_size != '0' && steps.diff.outputs.too_small != 'true'
+        run: |
+          git config user.email "bug-finder-bot@github-actions"
+          git config user.name "Bug Finding Agent"
+
+      # ── バグ解析・通知・PR 作成 ────────────────────────────────
+
+      - name: Run Bug Finding Agent
+        if: steps.skip_check.outputs.skip != 'true' && steps.diff.outputs.diff_size != '0' && steps.diff.outputs.too_small != 'true'
+        env:
+          ANTHROPIC_API_KEY:              ${{ secrets.ANTHROPIC_API_KEY }}
+          ALERT_LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.ALERT_LINE_CHANNEL_ACCESS_TOKEN }}
+          OWNER_LINE_USER_ID:             ${{ secrets.OWNER_LINE_USER_ID }}
+          GITHUB_TOKEN:                   ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_SHA:                     ${{ github.sha }}
+          COMMIT_MESSAGE:                 ${{ github.event.head_commit.message }}
+          REPO:                           ${{ github.repository }}
+          BRANCH:                         ${{ github.ref_name }}
+        run: python automation-system/agents/bug_finder_agent.py /tmp/commit.diff
+
+      # ── スキップ時のログ ──────────────────────────────────────
+
+      - name: Skip (empty or tiny diff)
+        if: steps.skip_check.outputs.skip != 'true' && (steps.diff.outputs.diff_size == '0' || steps.diff.outputs.too_small == 'true')
+        run: echo "Diff is empty or too small — analysis skipped."
