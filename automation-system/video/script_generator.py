@@ -68,7 +68,7 @@ def _build_system_prompt(format_key: str, target_key: str, cta_key: str) -> str:
     cta_text = random.choice(cta) if isinstance(cta, list) and cta else "保存しといて"
 
     return f"""あなたはショート動画（リール・TikTok）の台本ライターです。
-ブログ記事を元に、30〜60秒の縦型ショート動画の台本を生成してください。
+ブログ記事を元に、15〜25秒の縦型ショート動画の台本を生成してください。
 
 ## 今回のフォーマット: {format_key}
 {fmt['description']}
@@ -110,7 +110,7 @@ hashtags:
 - シーン数: 5シーン(合計15〜25秒)
 - フックは上記フォーマットのシーン1に従う
 - visual_promptは必ず英語、具体的な映像描写
-- テロップは1行15文字以内
+- テロップは1行15文字以内、改行絶対禁止(\n や 改行コードを含めない、半角スペースのみ可)
 - 必ずYAMLのみ出力（```yaml ブロック不要、コメント不要）"""
 
 
@@ -173,10 +173,26 @@ class ScriptGenerator:
                 continue  # コメント行はスキップ
             lines.append(line)
         raw = "\n".join(lines).strip()
+        yaml_keys_pattern = r"^(\s*-?\s*)(id|duration|narration|telop|visual_prompt|se|caption|hashtags|scenes|title|format|target|cta)\s*:"
+        fixed_lines = []
+        prev_was_telop = False
+        for line in raw.split("\n"):
+            stripped = line.strip()
+            if prev_was_telop and stripped and not re.match(yaml_keys_pattern, line) and not stripped.startswith("-"):
+                fixed_lines[-1] = fixed_lines[-1].rstrip() + " " + stripped
+                prev_was_telop = bool(re.match(r"^\s*telop\s*:", line))
+            else:
+                fixed_lines.append(line)
+                prev_was_telop = bool(re.match(r"^\s*telop\s*:", line))
+        raw = "\n".join(fixed_lines)
         try:
             result = yaml.safe_load(raw)
             if not isinstance(result, dict) or "scenes" not in result:
                 raise ValueError("scenesキーが見つかりません")
+            for scene in result.get("scenes", []):
+                if "telop" in scene and isinstance(scene["telop"], str):
+                    scene["telop"] = scene["telop"].replace("\n", " ").replace("\r", " ").strip()
+                    scene["telop"] = " ".join(scene["telop"].split())
             return result
         except Exception as e:
             log.error(f"YAML解析エラー: {e}\n---\n{raw[:500]}")
