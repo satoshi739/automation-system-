@@ -1,12 +1,12 @@
 """
 Bug Finding Agent
 =================
-git diff を受け取り Claude API でバグを検出。
+PR の累積 diff を Claude API で解析してバグを検出。
   - バグあり     → LINE通知（バグなしは通知しない）
   - auto_fixable → ブランチ作成 → パッチ適用 → push → GitHub Draft PR 作成
 
-Usage:
-    python bug_finder_agent.py <diff_file>
+Usage (引数なし):
+    python bug_finder_agent.py
 
 Environment:
     ANTHROPIC_API_KEY
@@ -14,9 +14,12 @@ Environment:
     OWNER_LINE_USER_ID
     GITHUB_TOKEN      (GitHub Actions で自動供給)
     REPO              e.g. satoshi739/automation-system-
-    BRANCH            push されたブランチ名
-    COMMIT_SHA
-    COMMIT_MESSAGE
+    BRANCH            PR のベースブランチ (base_ref)
+    COMMIT_SHA        PR head SHA
+    COMMIT_MESSAGE    PR タイトル
+    BASE_SHA          PR ベースの SHA（origin/main が取れない場合のフォールバック）
+    HEAD_SHA          PR head SHA（COMMIT_SHA と同値）
+    PR_NUMBER         PR 番号
 """
 
 from __future__ import annotations
@@ -72,26 +75,47 @@ git diff を受け取り、バグを検出して JSON だけを返してくだ�
 """
 
 
-# ── diff 読み込み ──────────────────────────────────────────────
+# ── diff 生成（PR の累積差分） ─────────────────────────────────
 
-def read_diff(diff_path: str) -> str:
-    text = Path(diff_path).read_text(errors="replace")
-    if len(text) > MAX_DIFF_CHARS:
-        text = text[:MAX_DIFF_CHARS] + "\n\n[... diff truncated ...]"
-    return text
+def get_diff() -> str:
+    """origin/main...HEAD で PR 全体の累積 diff を取得。失敗時は BASE_SHA にフォールバック。"""
+
+    # まず origin/main...HEAD を試みる
+    r = subprocess.run(
+        ["git", "diff", "origin/main...HEAD"],
+        capture_output=True, text=True,
+    )
+    if r.returncode == 0 and r.stdout.strip():
+        diff = r.stdout
+    else:
+        # フォールバック: BASE_SHA が env に渡されている場合
+        base_sha = os.environ.get("BASE_SHA", "")
+        head_sha = os.environ.get("HEAD_SHA", "HEAD")
+        if base_sha:
+            print(f"[BugFinder] origin/main 取得失敗 — BASE_SHA ({base_sha[:7]}) にフォールバック")
+            r2 = subprocess.run(
+                ["git", "diff", base_sha, head_sha],
+                capture_output=True, text=True,
+            )
+            diff = r2.stdout if r2.returncode == 0 else ""
+        else:
+            print("[BugFinder] diff 生成失敗 — スキップ")
+            diff = ""
+
+    if len(diff) > MAX_DIFF_CHARS:
+        diff = diff[:MAX_DIFF_CHARS] + "\n\n[... diff truncated ...]"
+    return diff
 
 
 # ── Claude 解析 ────────────────────────────────────────────────
 
 def extract_json(text: str) -> dict:
     """Claude の返答から JSON を頑健に抽出する。"""
-    # 1. 直接パース
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
 
-    # 2. ```json ... ``` ブロック
     m = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
     if m:
         try:
@@ -99,7 +123,6 @@ def extract_json(text: str) -> dict:
         except json.JSONDecodeError:
             pass
 
-    # 3. 最外の { } を探す
     m = re.search(r"\{.*\}", text, re.DOTALL)
     if m:
         try:
@@ -107,7 +130,6 @@ def extract_json(text: str) -> dict:
         except json.JSONDecodeError:
             pass
 
-    # 4. 解析不能 → バグなし扱いで安全に続行
     print("[BugFinder] JSON 解析失敗 — バグなし扱いで続行")
     return {"has_bugs": False, "bugs": [], "patches": [], "summary": "解析エラー", "auto_fixable": False}
 
@@ -149,14 +171,15 @@ def send_line(message: str) -> None:
         print(f"[LINE] 送信失敗: {resp.status_code} {resp.text[:100]}")
 
 
-def build_line_message(result: dict, commit_sha: str, commit_msg: str, repo: str) -> str:
+def build_line_message(result: dict, commit_sha: str, pr_title: str, repo: str, pr_number: str) -> str:
     sha_short = commit_sha[:7] if commit_sha else "unknown"
     severity_icon = {"critical": "🔴", "high": "🟠", "medium": "🟡"}
+    pr_ref = f"PR #{pr_number}" if pr_number else sha_short
 
     bugs = result.get("bugs", [])
     lines = [
         "🐛 Bug Finding Agent",
-        f"{sha_short} — {commit_msg[:50]}",
+        f"{pr_ref} — {pr_title[:50]}",
         f"repo: {repo}",
         "",
         f"⚠️ {len(bugs)} 件のバグを検出",
@@ -187,24 +210,21 @@ def apply_patches_and_push(
 ) -> bool:
     """パッチを適用して fix_branch へ push する。成功したら True。"""
 
-    # git 認証設定
     subprocess.run(["git", "config", "user.email", "bug-finder-bot@github-actions"], check=False)
     subprocess.run(["git", "config", "user.name", "Bug Finding Agent"], check=False)
     remote_url = f"https://x-access-token:{token}@github.com/{repo}.git"
     subprocess.run(["git", "remote", "set-url", "origin", remote_url], check=False)
 
-    # ブランチ作成
     r = subprocess.run(["git", "checkout", "-b", fix_branch], capture_output=True)
     if r.returncode != 0:
         print(f"[PR] ブランチ作成失敗: {r.stderr.decode()[:200]}")
         return False
 
-    # パッチ適用
     changed: list[str] = []
     for patch in patches:
         file_path = patch.get("file", "")
-        search = patch.get("search", "")
-        replace = patch.get("replace", "")
+        search    = patch.get("search", "")
+        replace   = patch.get("replace", "")
         if not (file_path and search and replace):
             continue
         p = Path(file_path)
@@ -225,15 +245,12 @@ def apply_patches_and_push(
         subprocess.run(["git", "branch", "-D", fix_branch], check=False)
         return False
 
-    # コミット（[skip-bugcheck] で無限ループ防止）
     subprocess.run(["git", "add"] + changed, check=True)
     subprocess.run(
-        ["git", "commit", "-m",
-         f"fix: auto-fix bugs from {commit_sha[:7]} [skip-bugcheck]"],
+        ["git", "commit", "-m", f"fix: auto-fix bugs from {commit_sha[:7]} [skip-bugcheck]"],
         check=True,
     )
 
-    # Push
     r = subprocess.run(["git", "push", "origin", fix_branch], capture_output=True)
     if r.returncode != 0:
         print(f"[PR] push 失敗: {r.stderr.decode()[:200]}")
@@ -256,11 +273,9 @@ def create_fix_pr(result: dict, base_branch: str, repo: str, commit_sha: str) ->
 
     fix_branch = f"bugfix/auto-{commit_sha[:7]}-{datetime.now().strftime('%m%d%H%M')}"
 
-    # ブランチ作成・パッチ適用・push
     if not apply_patches_and_push(patches, fix_branch, base_branch, repo, commit_sha, token):
         return None
 
-    # PR 本文
     bugs = result.get("bugs", [])
     body_lines = [
         "## 🐛 自動バグ修正 PR",
@@ -276,7 +291,6 @@ def create_fix_pr(result: dict, base_branch: str, repo: str, commit_sha: str) ->
             body_lines.append(f"  > {bug['fix_snippet']}")
     body_lines += ["\n---", "_Generated by Bug Finding Agent_"]
 
-    # PR 作成
     resp = requests.post(
         f"https://api.github.com/repos/{repo}/pulls",
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
@@ -301,45 +315,36 @@ def create_fix_pr(result: dict, base_branch: str, repo: str, commit_sha: str) ->
 # ── エントリーポイント ─────────────────────────────────────────
 
 def main() -> None:
-    if len(sys.argv) < 2:
-        print("Usage: bug_finder_agent.py <diff_file>")
-        sys.exit(1)
+    commit_sha  = os.environ.get("COMMIT_SHA", "")
+    pr_title    = os.environ.get("COMMIT_MESSAGE", "")
+    repo        = os.environ.get("REPO", "")
+    branch      = os.environ.get("BRANCH", "main")
+    pr_number   = os.environ.get("PR_NUMBER", "")
 
-    diff_path    = sys.argv[1]
-    commit_sha   = os.environ.get("COMMIT_SHA", "")
-    commit_msg   = os.environ.get("COMMIT_MESSAGE", "")
-    repo         = os.environ.get("REPO", "")
-    branch       = os.environ.get("BRANCH", "main")
+    print(f"[BugFinder] PR #{pr_number} sha={commit_sha[:7] if commit_sha else '?'} base={branch}")
 
-    print(f"[BugFinder] sha={commit_sha[:7] if commit_sha else '?'} branch={branch}")
-
-    diff_text = read_diff(diff_path)
+    diff_text = get_diff()
     if not diff_text.strip():
         print("[BugFinder] diff が空 — スキップ")
         return
 
-    print("[BugFinder] Claude API でバグ解析中...")
-    result = analyze_diff(diff_text)
+    print(f"[BugFinder] diff {len(diff_text)} chars — Claude API で解析中...")
+    result   = analyze_diff(diff_text)
     has_bugs = result.get("has_bugs", False)
     bugs     = result.get("bugs", [])
     print(f"[BugFinder] has_bugs={has_bugs} count={len(bugs)}")
 
-    # バグなし → 通知なしで終了（ノイズ防止 #4）
     if not has_bugs:
-        print("[BugFinder] バグなし — LINE通知スキップ")
+        print("[BugFinder] バグなし — 終了")
         return
 
-    # LINE 通知
-    msg = build_line_message(result, commit_sha, commit_msg, repo)
-    send_line(msg)
+    send_line(build_line_message(result, commit_sha, pr_title, repo, pr_number))
 
-    # 自動修正 PR
     if result.get("auto_fixable"):
         pr_url = create_fix_pr(result, branch, repo, commit_sha)
         if pr_url:
             send_line(f"🔧 自動修正PR作成完了\n{pr_url}")
 
-    # critical バグ → CI 失敗でマージをブロック
     critical = [b for b in bugs if b.get("severity") == "critical"]
     if critical:
         print(f"[BugFinder] ⛔ critical {len(critical)} 件 — exit 1")
