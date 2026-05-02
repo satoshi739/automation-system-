@@ -17,6 +17,9 @@ automation-system/.env.backup*
 # Shop text output (generated files)
 shop-update-system/output/
 
+# Generated media (video pipeline output)
+automation-system/generated_media/
+
 # Screenshots
 スクリーンショット*.png
 Screenshot*.png
