@@ -76,7 +76,15 @@ def sync_from_drive(folder_id: str = "", caption_default: str = "") -> int:
         )
         return 0
 
-    service = _get_drive_service()
+    try:
+        service = _get_drive_service()
+    except Exception as svc_err:
+        err_str = str(svc_err)
+        if "Service Accounts do not have storage quota" in err_str:
+            logger.error("Google Drive: サービスアカウントのストレージ制限エラー — スキップ: %s", svc_err)
+        else:
+            logger.error("Google Drive サービス初期化エラー: %s", svc_err)
+        return 0
     QUEUE_DIR.mkdir(parents=True, exist_ok=True)
 
     # 既にキューにあるファイルIDを取得（重複防止）
@@ -138,8 +146,12 @@ def sync_from_drive(folder_id: str = "", caption_default: str = "") -> int:
             "original_filename": name,
         }
 
-        with open(out_file, "w", encoding="utf-8") as f:
-            yaml.dump(entry, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+        try:
+            with open(out_file, "w", encoding="utf-8") as f:
+                yaml.dump(entry, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+        except Exception as write_err:
+            logger.error("キューファイル書き込み失敗 (%s): %s", name, write_err)
+            continue
 
         logger.info(f"Driveから投稿キューに追加: {name}")
         added += 1

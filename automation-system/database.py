@@ -1582,17 +1582,21 @@ def list_viral_patterns(status: str = "", limit: int = 200) -> list[dict]:
     return result
 
 
+_VIRAL_PATTERN_SCALAR_FIELDS = frozenset([
+    "hook","problem_framing","emotional_arc","cta","notes","status",
+    "source_type","source_url","source_caption","title",
+    "metrics_likes","metrics_comments","metrics_saves","metrics_views",
+])
+_VIRAL_PATTERN_JSON_FIELDS = frozenset(["format_suitability","risk_flags"])
+
+
 def update_viral_pattern(pid: int, data: dict):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    scalar_fields = ["hook","problem_framing","emotional_arc","cta","notes","status",
-                     "source_type","source_url","source_caption","title",
-                     "metrics_likes","metrics_comments","metrics_saves","metrics_views"]
-    json_fields = ["format_suitability","risk_flags"]
     sets, params = [], []
-    for f in scalar_fields:
+    for f in _VIRAL_PATTERN_SCALAR_FIELDS:
         if f in data:
             sets.append(f"{f}=?"); params.append(data[f])
-    for f in json_fields:
+    for f in _VIRAL_PATTERN_JSON_FIELDS:
         if f in data:
             sets.append(f"{f}=?"); params.append(json.dumps(data[f]))
     if not sets:
@@ -1670,11 +1674,13 @@ def list_campaigns(brand: str = "", status: str = "", limit: int = 100) -> list[
     return [dict(r) for r in rows]
 
 
+_CAMPAIGN_FIELDS = frozenset(["title","brand","objective","start_date","end_date","status","notes"])
+
+
 def update_campaign(cid: int, data: dict):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    fields = ["title","brand","objective","start_date","end_date","status","notes"]
     sets, params = [], []
-    for f in fields:
+    for f in _CAMPAIGN_FIELDS:
         if f in data:
             sets.append(f"{f}=?"); params.append(data[f])
     if not sets:
@@ -1741,11 +1747,13 @@ def list_content_ideas(brand: str = "", campaign_id: int = 0,
     return result
 
 
+_CONTENT_IDEA_FIELDS = frozenset(["brand","title","hook","body","cta","tone","notes","status","campaign_id"])
+
+
 def update_content_idea(iid: int, data: dict):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    fields = ["brand","title","hook","body","cta","tone","notes","status","campaign_id"]
     sets, params = [], []
-    for f in fields:
+    for f in _CONTENT_IDEA_FIELDS:
         if f in data:
             sets.append(f"{f}=?"); params.append(data[f])
     if "target_formats" in data:

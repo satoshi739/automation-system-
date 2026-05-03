@@ -382,7 +382,7 @@ class GBPRealConnector(GBPConnector):
             "city":            addr.get("locality", ""),
             "phone":           phones.get("primaryPhone", ""),
             "website":         raw.get("websiteUri", ""),
-            "avg_rating":      float(meta.get("mapsUri", "0").split("=")[-1] if False else 0),
+            "avg_rating":      None,
         }
 
     # ── レビュー ──────────────────────────────────────────

@@ -10,6 +10,7 @@ TTS（Text-to-Speech）音声生成モジュール。
 import json
 import logging
 import os
+import shutil
 import subprocess
 import uuid
 from pathlib import Path
@@ -51,7 +52,11 @@ class TTSGenerator:
             try:
                 return self._openai_tts(text, out_path)
             except Exception as e:
-                log.warning("OpenAI TTS失敗 (%s) → gTTSフォールバック", e)
+                err_str = str(e)
+                if "insufficient_quota" in err_str or "quota" in err_str.lower():
+                    log.warning("WARNING: OpenAI quota exceeded, falling back to gTTS")
+                else:
+                    log.warning("OpenAI TTS失敗 (%s) → gTTSフォールバック", e)
 
         # 2. gTTS（無料）
         try:
@@ -142,6 +147,9 @@ class TTSGenerator:
 
     def get_duration(self, audio_path: Path) -> float:
         """音声ファイルの実際の長さ（秒）を返す"""
+        if not shutil.which("ffprobe"):
+            log.error("ffprobe が見つかりません。動画生成をスキップします（brew install ffmpeg 等でインストールしてください）")
+            return 5.0
         result = subprocess.run(
             ["ffprobe", "-v", "quiet", "-print_format", "json",
              "-show_streams", str(audio_path)],

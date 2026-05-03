@@ -215,6 +215,9 @@ def post_to_instagram():
         logger.info(f"Instagram投稿完了: {result}")
 
         # 投稿成功時にパフォーマンスログへ記録（メトリクスは翌日更新）
+        if result is None:
+            logger.warning("Instagram投稿: result が None のためログをスキップ")
+            return
         media_id = result.get("media_id", "")
         if media_id and result.get("status") == "posted":
             log_post(
@@ -520,10 +523,10 @@ def blog_auto_post_job():
                 content=result["content_html"],
                 status="publish",
             )
-            logger.info(f"ブログ公開: [{brand}] {result['title']} → {wp_result.get('url','')}")
+            logger.info(f"ブログ公開: [{brand}] {result.get('title', '(タイトル不明)')} → {wp_result.get('url','')}")
             db.log_activity(
                 "blog_post", brand=brand, platform="wordpress",
-                detail=f"{result['title']} ({result.get('estimated_read_time',0)}分読)",
+                detail=f"{result.get('title', '(タイトル不明)')} ({result.get('estimated_read_time',0)}分読)",
             )
         except Exception as e:
             logger.error(f"ブログ投稿エラー [{brand}]: {e}", exc_info=True)

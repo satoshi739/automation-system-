@@ -55,6 +55,10 @@ class WordPressPoster:
             f"{self.wp_url}/wp-json/wp/v2/posts",
             headers=self._auth(), json=body
         )
+        if r.status_code == 401:
+            brand = self.wp_user or "(不明)"
+            log.error(f"WordPress認証失敗: {brand} — アプリパスワードを確認してください")
+            return {"status": "auth_error", "error": "401 Unauthorized"}
         r.raise_for_status()
         post = r.json()
         post_url = post.get("link", "")

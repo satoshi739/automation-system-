@@ -211,8 +211,8 @@ def load_yamls(d: Path) -> list[dict]:
             if data:
                 data["_file"] = f.name
                 out.append(data)
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning("YAML読込失敗: %s — %s", f.name, e)
     return out
 
 
@@ -791,12 +791,16 @@ def analytics():
 
     # Stripeデータ
     try:
-        import sys as _sys
-        _sys.path.insert(0, str(BASE_DIR))
         from finance.stripe_client import get_summary as stripe_summary
         stripe_data = stripe_summary()
     except Exception as e:
-        stripe_data = {"mrr": {"status": "error"}, "churn": {"status": "error"}, "series": {"dates": [], "values": []}, "total_revenue_30d": 0}
+        log.warning("Stripe summary取得失敗: %s", e)
+        stripe_data = {
+            "mrr":   {"status": "error"},
+            "churn": {"status": "error"},
+            "series": {"status": "error", "dates": [], "values": []},
+            "total_revenue_30d": 0,
+        }
 
     # SNSアナリティクス（Instagram インサイト + エンゲージメントログ）
     sns_data = {}
