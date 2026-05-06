@@ -55,20 +55,44 @@ VIDEO_EXTS = {".mp4", ".mov", ".m4v"}
 
 # ─── WordPress メディアアップロード ──────────────────────────
 
+_WP_MAX_BYTES = 60 * 1024  # ホスティングWAFが大きいファイルをブロックするため60KB上限
+
+
+def _compress_image(file_path: Path) -> tuple[bytes, str]:
+    """画像をWAF制限内に収まるよう圧縮して返す (data, content_type)"""
+    from PIL import Image
+    import io
+    img = Image.open(file_path).convert("RGB")
+    for quality in (85, 70, 50, 30):
+        buf = io.BytesIO()
+        img.save(buf, "JPEG", quality=quality, optimize=True)
+        data = buf.getvalue()
+        if len(data) <= _WP_MAX_BYTES:
+            logger.info(f"画像圧縮: {file_path.name} quality={quality} → {len(data)//1024}KB")
+            return data, "image/jpeg"
+    return data, "image/jpeg"
+
+
 def _upload_to_wordpress_media(file_path: Path, brand: str) -> str:
     """ファイルをWordPressメディアライブラリにアップロードして公開URLを返す"""
     from sns.wordpress import WordPressPoster
     wp = WordPressPoster(brand=brand)
     if not wp.wp_url:
         raise ValueError(f"WordPress URL未設定: {brand}")
-    ct = mimetypes.guess_type(str(file_path))[0] or "image/jpeg"
+
+    if file_path.suffix.lower() in IMAGE_EXTS and file_path.stat().st_size > _WP_MAX_BYTES:
+        data, ct = _compress_image(file_path)
+    else:
+        with open(file_path, "rb") as f:
+            data = f.read()
+        ct = mimetypes.guess_type(str(file_path))[0] or "image/jpeg"
+
     headers = {
         **wp._auth(),
-        "Content-Disposition": f'attachment; filename="{file_path.name}"',
+        "Content-Disposition": f'attachment; filename="{file_path.stem}.jpg"',
         "Content-Type": ct,
     }
-    with open(file_path, "rb") as f:
-        r = requests.post(f"{wp.wp_url}/wp-json/wp/v2/media", headers=headers, data=f, timeout=60)
+    r = requests.post(f"{wp.wp_url}/wp-json/wp/v2/media", headers=headers, data=data, timeout=60)
     r.raise_for_status()
     url = r.json().get("source_url", "")
     logger.info(f"WordPressメディアアップロード完了: {file_path.name} → {url}")
