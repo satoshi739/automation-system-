@@ -14,8 +14,8 @@
   </div>
 </div>
 
-{% set open = decisions | selectattr('resolved', 'falsy') | list %}
-{% set closed = decisions | selectattr('resolved', 'truthy') | list %}
+{% set open = decisions | selectattr('resolved', 'equalto', 0) | list %}
+{% set closed = decisions | selectattr('resolved', 'equalto', 1) | list %}
 
 <!-- ステータスサマリー -->
 <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px;">

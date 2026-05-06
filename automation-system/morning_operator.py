@@ -136,20 +136,26 @@ def post_instagram_queue() -> int:
             continue
         item = db.next_pending(brand_id, "instagram")
         if item:
+            if not item.get("image_url") and item.get("needs_review"):
+                logger.warning(f"Instagram投稿スキップ (needs_review): {brand_id} DB id={item['id']}")
+                continue
             try:
                 poster = InstagramPoster(brand_id)
                 media_type = item.get("media_type", "image")
                 if media_type == "reel":
                     poster.post_reel(
-                        video_url=item["video_url"],
+                        video_url=item.get("video_url",""),
                         caption=item.get("caption",""),
                         cover_url=item.get("cover_url",""),
                     )
                 else:
-                    poster.post_image(
+                    result = poster.post_image(
                         image_url=item.get("image_url",""),
                         caption=item.get("caption",""),
                     )
+                    if not result:
+                        logger.warning(f"Instagram投稿スキップ (トークン未設定): {brand_id}")
+                        continue
                 db.mark_posted(item["id"])
                 db.log_activity("post", brand=brand_id, platform="instagram",
                                 detail=f"投稿完了: {item.get('caption','')[:40]}")

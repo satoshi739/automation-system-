@@ -3,6 +3,6 @@ reason: post_image() got an unexpected keyword argument 'brand'
 detail:
   db_id: 5678
   brand: bangkok-peach
-created_at: '2026-05-02 20:00:12'
+created_at: '2026-05-05 20:06:35'
 resolved: true
 resolution: 'auto-closed: root cause fixed in code'

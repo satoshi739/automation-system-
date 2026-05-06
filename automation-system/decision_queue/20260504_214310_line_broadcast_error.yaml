@@ -1,0 +1,11 @@
+type: line_broadcast_error
+reason: 'HTTPSConnectionPool(host=''api.line.me'', port=443): Max retries exceeded
+  with url: /v2/bot/message/broadcast (Caused by NameResolutionError("HTTPSConnection(host=''api.line.me'',
+  port=443): Failed to resolve ''api.line.me'' ([Errno 8] nodename nor servname provided,
+  or not known)"))'
+detail:
+  db_id: 5686
+  brand: bangkok-peach
+created_at: '2026-05-04 21:43:10'
+resolved: true
+resolution: 'auto-closed: root cause fixed in code'

@@ -146,8 +146,14 @@ def _next_queued_post(subdir: str = "instagram") -> dict | None:
     for f in files:
         with open(f, encoding="utf-8") as fh:
             data = yaml.safe_load(fh)
-        if not data.get("posted"):
-            return {"path": f, **data}
+        if not data:
+            continue
+        if data.get("posted"):
+            continue
+        # image_url が空で needs_review のアイテムは手動対応待ち — スキップ
+        if not data.get("image_url") and data.get("needs_review"):
+            continue
+        return {"path": f, **data}
     return None
 
 
@@ -211,14 +217,13 @@ def post_to_instagram():
                 caption=post["caption"],
             )
 
+        if not result:
+            logger.warning("Instagram投稿: トークン未設定またはスキップ — mark_posted しない")
+            return
         _mark_posted(post["path"])
         logger.info(f"Instagram投稿完了: {result}")
 
-        # 投稿成功時にパフォーマンスログへ記録（メトリクスは翌日更新）
-        if result is None:
-            logger.warning("Instagram投稿: result が None のためログをスキップ")
-            return
-        media_id = result.get("media_id", "")
+        media_id = (result or {}).get("media_id", "")
         if media_id and result.get("status") == "posted":
             log_post(
                 brand=post.get("brand", "dsc-marketing"),
@@ -383,7 +388,12 @@ def check_scheduled_posts():
                     sched_str = data.get("scheduled_at")
                     if not sched_str:
                         continue
-                    sched_dt = datetime.strptime(str(sched_str), "%Y-%m-%d %H:%M")
+                    try:
+                        sched_dt = datetime.strptime(str(sched_str), "%Y-%m-%d %H:%M")
+                    except ValueError:
+                        from datetime import timezone
+                        dt = datetime.fromisoformat(str(sched_str))
+                        sched_dt = dt.replace(tzinfo=None) if dt.tzinfo else dt
                     if sched_dt > now:
                         continue  # まだ予約時刻前
 

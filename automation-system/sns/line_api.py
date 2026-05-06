@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # ブランドスラッグ → (トークン環境変数名, シークレット環境変数名)
 _BRAND_LINE_ENV: dict[str, tuple[str, str]] = {
-    "cashflowsupport": ("LINE_CHANNEL_ACCESS_TOKEN",            "LINE_CHANNEL_SECRET"),
+    "cashflowsupport": ("LINE_CHANNEL_ACCESS_TOKEN_CSF",         "LINE_CHANNEL_SECRET_CSF"),
     "dsc-marketing":   ("LINE_CHANNEL_ACCESS_TOKEN_DSC",         "LINE_CHANNEL_SECRET_DSC"),
     "bangkok-peach":   ("BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN", "BANGKOK_PEACH_LINE_CHANNEL_SECRET"),
 }
@@ -101,6 +101,13 @@ class LINEMessenger:
         """特定ユーザーへのプッシュメッセージ"""
         if not self.enabled:
             logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINEプッシュをスキップ")
+            return False
+        if not user_id or not user_id.strip():
+            logger.warning("LINEプッシュ: user_id が空のためスキップ")
+            return False
+        uid = user_id.strip()
+        if not (uid.startswith("U") and len(uid) == 33 and uid[1:].isalnum()):
+            logger.warning(f"LINEプッシュ: 無効な user_id '{uid}' — スキップ")
             return False
         if self.dry_run:
             logger.info(f"[DRY RUN] LINEプッシュ to {user_id}: {message[:40]}...")
