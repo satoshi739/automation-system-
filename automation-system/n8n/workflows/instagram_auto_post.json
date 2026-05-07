@@ -1,0 +1,205 @@
+{
+  "name": "Instagram Auto Post",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 20 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "毎日05:00 JST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.PYTHON_API_URL }}/api/n8n/instagram/queue",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-queue",
+      "name": "キュー取得",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "n8n-api-key",
+          "name": "Python API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true},
+          "conditions": [
+            {
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": {"type": "number", "operation": "gt"}
+            }
+          ]
+        }
+      },
+      "id": "check-has-items",
+      "name": "投稿あり？",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.first().json.items;\nconst brands = {\n  'bangkok-peach': {\n    token: $env.BANGKOK_PEACH_META_ACCESS_TOKEN,\n    ig_id: $env.BANGKOK_PEACH_INSTAGRAM_ACCOUNT_ID\n  },\n  'dsc-marketing': {\n    token: $env.DSC_MARKETING_META_ACCESS_TOKEN,\n    ig_id: $env.DSC_MARKETING_INSTAGRAM_ACCOUNT_ID\n  },\n  'cashflowsupport': {\n    token: $env.CASHFLOWSUPPORT_META_ACCESS_TOKEN,\n    ig_id: $env.CASHFLOWSUPPORT_INSTAGRAM_ACCOUNT_ID\n  },\n  'upjapan': {\n    token: $env.UPJAPAN_META_ACCESS_TOKEN,\n    ig_id: $env.UPJAPAN_INSTAGRAM_ACCOUNT_ID\n  },\n  'satoshi': {\n    token: $env.SATOSHI_META_ACCESS_TOKEN,\n    ig_id: $env.SATOSHI_INSTAGRAM_ACCOUNT_ID\n  }\n};\n\nconst result = [];\nfor (const item of items) {\n  const cfg = brands[item.brand];\n  if (!cfg || !cfg.token || !cfg.ig_id) continue;\n  result.push({ json: { ...item, access_token: cfg.token, ig_user_id: cfg.ig_id } });\n  break; // 1回につき1投稿\n}\nreturn result;"
+      },
+      "id": "pick-post",
+      "name": "ブランド設定マッピング",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 220]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.ig_user_id }}/media",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "image_url", "value": "={{ $json.image_url }}"},
+            {"name": "caption", "value": "={{ $json.caption }}"},
+            {"name": "access_token", "value": "={{ $json.access_token }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-container",
+      "name": "メディアコンテナ作成",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 220]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "wait",
+      "name": "10秒待機",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1340, 220]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.id }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {"name": "fields", "value": "status_code"},
+            {"name": "access_token", "value": "={{ $('ブランド設定マッピング').item.json.access_token }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "check-status",
+      "name": "コンテナ状態確認",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 220]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v21.0/{{ $('ブランド設定マッピング').item.json.ig_user_id }}/media_publish",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "creation_id", "value": "={{ $('メディアコンテナ作成').item.json.id }}"},
+            {"name": "access_token", "value": "={{ $('ブランド設定マッピング').item.json.access_token }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "publish",
+      "name": "Instagram公開",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 220]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.PYTHON_API_URL }}/api/n8n/instagram/posted",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "file", "value": "={{ $('ブランド設定マッピング').item.json.file }}"},
+            {"name": "ig_media_id", "value": "={{ $json.id }}"}
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "mark-posted",
+      "name": "投稿済みマーク",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 220],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "n8n-api-key",
+          "name": "Python API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.PYTHON_API_URL }}/api/n8n/alert",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "message", "value": "=Instagram投稿エラー: {{ $json.message || $json.error?.message || '不明なエラー' }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "error-alert",
+      "name": "エラーLINE通知",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 460]
+    }
+  ],
+  "connections": {
+    "毎日05:00 JST": {"main": [[{"node": "キュー取得", "type": "main", "index": 0}]]},
+    "キュー取得": {"main": [[{"node": "投稿あり？", "type": "main", "index": 0}]]},
+    "投稿あり？": {
+      "main": [
+        [{"node": "ブランド設定マッピング", "type": "main", "index": 0}],
+        []
+      ]
+    },
+    "ブランド設定マッピング": {"main": [[{"node": "メディアコンテナ作成", "type": "main", "index": 0}]]},
+    "メディアコンテナ作成": {"main": [[{"node": "10秒待機", "type": "main", "index": 0}]]},
+    "10秒待機": {"main": [[{"node": "コンテナ状態確認", "type": "main", "index": 0}]]},
+    "コンテナ状態確認": {"main": [[{"node": "Instagram公開", "type": "main", "index": 0}]]},
+    "Instagram公開": {"main": [[{"node": "投稿済みマーク", "type": "main", "index": 0}]]}
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "error-alert-workflow"
+  },
+  "meta": {
+    "templateId": "upjapan-instagram-auto-post"
+  }
+}

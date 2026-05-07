@@ -1,0 +1,10 @@
+[build]
+builder = "image"
+image = "n8nio/n8n:latest"
+
+[deploy]
+startCommand = "n8n start"
+healthcheckPath = "/healthz"
+healthcheckTimeout = 60
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

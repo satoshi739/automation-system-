@@ -1347,6 +1347,115 @@ def health():
     return {"status": "ok"}
 
 
+# ═══════════════════════════════════════════════════
+# N8N 連携 API
+# ═══════════════════════════════════════════════════
+
+def _n8n_auth():
+    """N8N_API_KEY ヘッダー認証。未設定時はスキップ（開発用）。"""
+    key = os.environ.get("N8N_API_KEY", "")
+    if key and request.headers.get("X-Api-Key") != key:
+        abort(401)
+
+
+@app.route("/api/n8n/instagram/queue", methods=["GET"])
+def n8n_instagram_queue():
+    """N8N用: 投稿可能なInstagramキューを返す（image_urlあり・未投稿）"""
+    _n8n_auth()
+    from pathlib import Path as _Path
+    import yaml as _yaml
+    q_dir = _Path(__file__).parent / "content_queue" / "instagram"
+    items = []
+    for f in sorted(q_dir.glob("*.yaml")):
+        try:
+            d = _yaml.safe_load(f.read_text(encoding="utf-8"))
+            if d.get("posted"):
+                continue
+            url = (d.get("image_url") or "").strip()
+            if not url:
+                continue
+            items.append({
+                "file": f.name,
+                "brand": d.get("brand", ""),
+                "image_url": url,
+                "caption": d.get("caption", ""),
+                "media_type": d.get("media_type", "image"),
+                "video_url": d.get("video_url", ""),
+            })
+        except Exception:
+            continue
+    return jsonify({"items": items, "count": len(items)})
+
+
+@app.route("/api/n8n/instagram/posted", methods=["POST"])
+def n8n_instagram_posted():
+    """N8N用: 投稿完了をマーク"""
+    _n8n_auth()
+    data = request.get_json(force=True) or {}
+    filename = data.get("file", "")
+    if not filename:
+        abort(400)
+    from pathlib import Path as _Path
+    import yaml as _yaml
+    f = _Path(__file__).parent / "content_queue" / "instagram" / filename
+    if not f.exists():
+        abort(404)
+    try:
+        d = _yaml.safe_load(f.read_text(encoding="utf-8"))
+        d["posted"] = True
+        d["posted_at"] = __import__("datetime").datetime.now().isoformat()
+        d["ig_media_id"] = data.get("ig_media_id", "")
+        import yaml as _yaml2
+        f.write_text(_yaml2.dump(d, allow_unicode=True, default_flow_style=False), encoding="utf-8")
+        return jsonify({"ok": True, "file": filename})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/n8n/alert", methods=["POST"])
+def n8n_alert():
+    """N8N用: エラーアラートをLINEに転送"""
+    _n8n_auth()
+    data = request.get_json(force=True) or {}
+    message = data.get("message", "N8N エラー（詳細なし）")
+    try:
+        import requests as _req
+        token   = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
+        user_id = os.environ.get("OWNER_LINE_USER_ID", "")
+        if token and user_id:
+            _req.post(
+                "https://api.line.me/v2/bot/message/push",
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                json={"to": user_id, "messages": [{"type": "text", "text": f"[N8N Alert]\n{message}"}]},
+                timeout=5,
+            )
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/n8n/queue/stats", methods=["GET"])
+def n8n_queue_stats():
+    """N8N用: キュー統計（ダッシュボード表示用）"""
+    _n8n_auth()
+    from pathlib import Path as _Path
+    import yaml as _yaml
+    q_dir = _Path(__file__).parent / "content_queue" / "instagram"
+    stats = {"ready": 0, "posted": 0, "stale": 0}
+    for f in q_dir.glob("*.yaml"):
+        try:
+            d = _yaml.safe_load(f.read_text(encoding="utf-8"))
+            if d.get("posted"):
+                stats["posted"] += 1
+            elif (d.get("image_url") or "").strip():
+                stats["ready"] += 1
+            else:
+                stats["stale"] += 1
+        except Exception:
+            continue
+    return jsonify(stats)
+
+
 _MEDIA_ROOT = Path(__file__).parent / "generated_media" / "reels"
 
 @app.route("/media/<path:filename>", methods=["GET"])
