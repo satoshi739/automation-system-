@@ -1,9 +1,9 @@
-from utils import claude_resp_text, safe_int
 """
 管理ダッシュボード v2
 起動: python dashboard/app.py
 ブラウザで http://localhost:8080 を開く
 """
+from utils import claude_resp_text, safe_int
 
 import hmac
 import os
@@ -1659,7 +1659,6 @@ def api_test_connection(brand_id, conn_type):
 
     elif conn_type == "wordpress":
         try:
-            sys.path.insert(0, str(AUTO))
             from sns.wordpress import WordPressPoster
             wp = WordPressPoster(brand_id)
             posts = wp.get_posts("draft", 1)
@@ -3664,10 +3663,14 @@ def _publish_story_run(run_id: int, run: dict, acct_repo) -> dict:
     ig_uid    = acct.get("ig_user_id", run["brand"])
     provider  = acct.get("provider", "auto")  # autoならトークン有無で自動切替
 
+    media_url = run.get("media_url") or ""
+    if not media_url:
+        run_repo.update_status(run_id, "failed", error_message="media_url が未設定のため公開できません（画像レンダリング未実装）")
+        return {"ok": False, "error": "media_url が未設定です。ストーリー画像を先にレンダリング・アップロードしてください。"}
+
     connector = get_meta_connector(provider)
     try:
-        # モック: ダミー画像URLで publish_story を呼ぶ
-        result = connector.publish_story(ig_uid, media_url="https://placehold.co/1080x1920/png")
+        result = connector.publish_story(ig_uid, media_url=media_url)
         if result.get("error"):
             run_repo.update_status(run_id, "failed", error_message=result["error"])
             return {"ok": False, "error": result["error"]}
@@ -3728,11 +3731,10 @@ if __name__ == "__main__":
             logging.FileHandler(str(AUTO / "logs" / "dashboard.log"), encoding="utf-8"),
         ]
     )
-    startup()
     port = int(os.environ.get("PORT", os.environ.get("DASHBOARD_PORT", 8080)))
     debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
     print(f"\n✅ ダッシュボード起動: http://localhost:{port}")
-    if os.environ.get("DASHBOARD_PASSWORD"):
-        print("🔒 認証有効 (DASHBOARD_PASSWORD 設定済み)")
+    if os.environ.get("ADMIN_PASSWORD"):
+        print("🔒 認証有効 (ADMIN_PASSWORD 設定済み)")
     print()
     app.run(host="0.0.0.0", port=port, debug=debug)
