@@ -1,3 +1,4 @@
+from utils import claude_resp_text, safe_int
 """
 管理ダッシュボード v2
 起動: python dashboard/app.py
@@ -1383,7 +1384,7 @@ JSONのみ返す。"""
         import json as _json
         if not resp.content:
             return jsonify({"error": "AIレスポンスが空でした"}), 500
-        raw = resp.content[0].text.strip()
+        raw = claude_resp_text(resp)
         parts = raw.split("```")
         if len(parts) >= 2:
             raw = parts[1].lstrip("json").strip()
@@ -1966,7 +1967,7 @@ def api_generate_blog_post():
     topic       = d.get("topic", "")
     style       = d.get("style", "体験談・実践寄り")
     try:
-        word_count = int(d.get("word_count", 1200))
+        word_count = safe_int(d.get("word_count", 1200), 1200)
     except (ValueError, TypeError):
         word_count = 1200
     save_to_wp  = d.get("save_to_wp", False)   # Trueで下書き保存
@@ -2066,7 +2067,7 @@ def api_reel_rich(brand_id):
         result = generate_reel_script_rich(
             topic=d.get("topic", ""),
             brand=brand_id,
-            duration_sec=int(d.get("duration_sec", 30)),
+            duration_sec=safe_int(d.get("duration_sec", 30), 30),
         )
         return jsonify(result)
     except Exception as e:
@@ -2126,7 +2127,7 @@ def api_reel_v2(brand_id):
         result = generate_reel_script_v2(
             topic=d.get("topic", ""),
             brand=brand_id,
-            duration=int(d.get("duration", 30)),
+            duration=safe_int(d.get("duration", 30), 30),
             style=d.get("style", "教育系"),
         )
         return jsonify(result)
@@ -2212,7 +2213,7 @@ def assets():
     season  = request.args.get("season", "")
     status  = request.args.get("status", "active")
     try:
-        tag_id = int(request.args.get("tag", 0))
+        tag_id = safe_int(request.args.get("tag", 0), 0)
     except (ValueError, TypeError):
         tag_id = 0
     q       = request.args.get("q", "")
@@ -2373,7 +2374,7 @@ def meo_detail(profile_id):
     rating_dist = {i: 0 for i in range(1, 6)}
     for r in reviews:
         try:
-            rating = max(1, min(5, int(r.get("rating", 1) or 1)))
+            rating = max(1, min(5, safe_int(r.get("rating", 1) or 1, 1)))
         except (ValueError, TypeError):
             rating = 1
         rating_dist[rating] = rating_dist[rating] + 1
@@ -2453,7 +2454,7 @@ def api_generate_draft(review_id):
                 max_tokens=300,
                 messages=[{"role": "user", "content": prompt}],
             )
-            draft = resp.content[0].text.strip()
+            draft = claude_resp_text(resp)
         except Exception as e:
             err_str = str(e)
             # クレジット不足など API エラー時はテンプレートにフォールバック
@@ -2658,7 +2659,7 @@ def api_create_task():
             title=d.get("title", ""),
             mode=d.get("mode", "full_auto"),
             assigned_to_agent_id=d.get("agent_id", ""),
-            priority=int(d.get("priority", 3)),
+            priority=safe_int(d.get("priority", 3), 3),
             description=d.get("description", ""),
             depends_on=d.get("depends_on", []),
             scheduled_at=d.get("scheduled_at", ""),
@@ -2689,7 +2690,7 @@ def api_complete_task(task_id):
     complete_task(task_id, runs[0]["id"],
                   output_data=d.get("output_data"),
                   log_entries=d.get("log_entries"),
-                  tokens_used=int(d.get("tokens_used", 0)),
+                  tokens_used=safe_int(d.get("tokens_used", 0), 0),
                   cost_usd=float(d.get("cost_usd", 0.0)))
     return jsonify({"ok": True})
 
@@ -2716,7 +2717,7 @@ def api_request_approval(task_id):
             title=d.get("title", "承認リクエスト"),
             description=d.get("description", ""),
             approver_user_ids=d.get("approver_user_ids"),
-            expires_in_hours=int(d.get("expires_in_hours", 48)),
+            expires_in_hours=safe_int(d.get("expires_in_hours", 48), 48),
         )
         return jsonify({"ok": True, "approval_id": approval_id})
     except Exception as e:
@@ -3177,7 +3178,7 @@ def noimos_convert(pid):
 def ideas_list():
     brand_filter    = request.args.get("brand", "")
     status_filter   = request.args.get("status", "")
-    campaign_filter = int(request.args.get("campaign_id") or 0)
+    campaign_filter = safe_int(request.args.get("campaign_id") or 0, 0)
     ideas     = db.list_content_ideas(brand=brand_filter, status=status_filter,
                                        campaign_id=campaign_filter)
     campaigns = db.list_campaigns()
@@ -3430,7 +3431,7 @@ def story_template_new():
     if request.method == "POST":
         days = request.form.getlist("active_days") or ["mon","tue","wed","thu","fri","sat","sun"]
         try:
-            frame_count_new = int(request.form.get("frame_count", 3))
+            frame_count_new = safe_int(request.form.get("frame_count", 3), 3)
         except (ValueError, TypeError):
             frame_count_new = 3
         tmpl_repo.create({
@@ -3462,7 +3463,7 @@ def story_template_detail(tmpl_id):
     if request.method == "POST":
         days = request.form.getlist("active_days") or tmpl["active_days"]
         try:
-            frame_count_upd = int(request.form.get("frame_count", 3))
+            frame_count_upd = safe_int(request.form.get("frame_count", 3), 3)
         except (ValueError, TypeError):
             frame_count_upd = 3
         tmpl_repo.update(tmpl_id, {
@@ -3570,7 +3571,7 @@ JSON形式で返してください:
                 messages=[{"role":"user","content":prompt}],
             )
             import re
-            raw = msg.content[0].text
+            raw = claude_resp_text(msg)
             m = re.search(r'\{[\s\S]*\}', raw)
             if m:
                 parsed = json.loads(m.group())
@@ -3708,7 +3709,7 @@ def api_story_accounts(brand):
 def api_story_insights(brand):
     _, _, _, insight_repo = _story_repos()
     try:
-        days = int(request.args.get("days", 28))
+        days = safe_int(request.args.get("days", 28), 28)
     except (ValueError, TypeError):
         days = 28
     return jsonify(insight_repo.summary_by_brand(brand, days))

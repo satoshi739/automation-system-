@@ -1,3 +1,4 @@
+from utils import claude_resp_text
 """
 ブログ本文 → リール台本 生成モジュール。
 Claude API（既存ANTHROPIC_API_KEY）を使用。
@@ -162,7 +163,7 @@ class ScriptGenerator:
                 }],
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = message.content[0].text
+            raw = claude_resp_text(message)
             result = self._parse_yaml(raw)
             result["format"] = format_key
             result["target"] = target_key

@@ -4,6 +4,24 @@ import yaml
 from pathlib import Path
 
 
+def claude_resp_text(resp) -> str:
+    """Claude API レスポンスからテキストを安全に抽出する（content が空/None でも安全）"""
+    try:
+        if resp and resp.content and len(resp.content) > 0:
+            return (resp.content[0].text or "").strip()
+    except (AttributeError, IndexError):
+        pass
+    return ""
+
+
+def safe_int(value, default: int = 0) -> int:
+    """ValueError/TypeError を握りつぶして安全に int 変換する"""
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
 def atomic_yaml_write(file_path: Path, data: dict, **dump_kwargs) -> None:
     """YAML をアトミックに書き込む（tmp → rename で途中クラッシュによるファイル破損を防止）"""
     dump_kwargs.setdefault("allow_unicode", True)

@@ -1,3 +1,4 @@
+from utils import claude_resp_text
 """
 X（Twitter）スレッド生成モジュール。
 """
@@ -80,7 +81,7 @@ class XGenerator:
                 max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = message.content[0].text.strip()
+            raw = claude_resp_text(message)
             if raw.startswith("```"):
                 raw = raw.split("```")[1]
                 if raw.startswith("json"):

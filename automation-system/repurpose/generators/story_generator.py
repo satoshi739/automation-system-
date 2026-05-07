@@ -1,3 +1,4 @@
+from utils import claude_resp_text
 """
 Instagram ストーリーズ生成モジュール。
 """
@@ -111,7 +112,7 @@ class StoryGenerator:
                 max_tokens=1200,
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = message.content[0].text.strip()
+            raw = claude_resp_text(message)
             if raw.startswith("```"):
                 raw = raw.split("```")[1]
                 if raw.startswith("json"):

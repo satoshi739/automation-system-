@@ -28,7 +28,7 @@ if str(_BASE) not in sys.path:
 
 import org_database as db
 from agents import orchestrator
-from utils import atomic_yaml_write
+from utils import atomic_yaml_write, claude_resp_text
 
 log = logging.getLogger(__name__)
 
@@ -1032,7 +1032,7 @@ def _h_multilingual_post(inp: dict, ctx: dict) -> dict:
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
-        results[lang] = resp.content[0].text
+        results[lang] = claude_resp_text(resp)
     log.info(f"multilingual_post: brand={brand} langs={languages}")
     return {"ok": True, "brand": brand, "platform": platform, "posts": results}
 
@@ -1062,7 +1062,7 @@ def _h_compliance_check(inp: dict, ctx: dict) -> dict:
         max_tokens=800,
         messages=[{"role": "user", "content": prompt}],
     )
-    result_text = resp.content[0].text
+    result_text = claude_resp_text(resp)
     is_ok = result_text.strip().upper().startswith("OK")
     log.info(f"compliance_check: brand={brand} ok={is_ok}")
     return {"ok": True, "compliant": is_ok, "result": result_text}
@@ -1150,7 +1150,7 @@ def _h_qualify_lead(inp: dict, ctx: dict) -> dict:
         max_tokens=400,
         messages=[{"role": "user", "content": prompt}],
     )
-    raw = resp.content[0].text
+    raw = claude_resp_text(resp)
     try:
         import re
         m = re.search(r"\{.*\}", raw, re.DOTALL)
@@ -1193,7 +1193,7 @@ def _h_generate_proposal(inp: dict, ctx: dict) -> dict:
         max_tokens=1000,
         messages=[{"role": "user", "content": prompt}],
     )
-    proposal = resp.content[0].text
+    proposal = claude_resp_text(resp)
     log.info(f"generate_proposal: lead_id={lead_id} brand={brand}")
     return {"ok": True, "lead_id": lead_id, "proposal": proposal}
 
@@ -1283,7 +1283,7 @@ def _h_generate_report(inp: dict, ctx: dict) -> dict:
         max_tokens=1500,
         messages=[{"role": "user", "content": prompt}],
     )
-    report_text = resp.content[0].text
+    report_text = claude_resp_text(resp)
     ts = datetime.now().strftime("%Y%m%d")
     report_dir = _BASE / "logs" / "reports"
     report_dir.mkdir(parents=True, exist_ok=True)
@@ -1334,7 +1334,7 @@ def _h_seo_research(inp: dict, ctx: dict) -> dict:
         max_tokens=800,
         messages=[{"role": "user", "content": prompt}],
     )
-    raw = resp.content[0].text
+    raw = claude_resp_text(resp)
     try:
         import re
         m = re.search(r"\{.*\}", raw, re.DOTALL)

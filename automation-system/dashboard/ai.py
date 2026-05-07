@@ -1,3 +1,4 @@
+from utils import claude_resp_text, atomic_yaml_write
 from __future__ import annotations
 
 """
@@ -27,7 +28,7 @@ import anthropic
 
 def _resp_text(resp) -> str:
     if resp.content and len(resp.content) > 0:
-        return resp.content[0].text.strip()
+        return claude_resp_text(resp)
     return ""
 
 
@@ -688,7 +689,7 @@ JSON配列で返してください（3要素）:
         max_tokens=2000,
         messages=[{"role": "user", "content": prompt_gen}],
     )
-    variants = _parse_json(resp1.content[0].text.strip(), [])
+    variants = _parse_json(claude_resp_text(resp1), [])
     if not isinstance(variants, list) or len(variants) == 0:
         return {"selected": {}, "variants": [], "selection_reason": "生成失敗"}
 
@@ -718,7 +719,7 @@ JSONのみ返す。
         max_tokens=200,
         messages=[{"role": "user", "content": prompt_select}],
     )
-    selection = _parse_json(resp2.content[0].text.strip(), {"best_index": 0, "reason": ""})
+    selection = _parse_json(claude_resp_text(resp2), {"best_index": 0, "reason": ""})
     best_idx = int(selection.get("best_index", 0))
     if best_idx >= len(variants):
         best_idx = 0
@@ -1004,7 +1005,7 @@ def generate_blog_post(
         max_tokens=4000,
         messages=[{"role": "user", "content": prompt}],
     )
-    raw = msg.content[0].text.strip()
+    raw = claude_resp_text(msg)
 
     # JSON抽出
     import re, json
@@ -1072,7 +1073,7 @@ def generate_blog_post_auto(brand: str, word_count: int = 1200) -> dict:
             {"role": "user", "content": prompt},
         ],
     )
-    raw = msg.content[0].text.strip()
+    raw = claude_resp_text(msg)
 
     result = None
     # まずそのままパース試行
@@ -1412,10 +1413,6 @@ def save_weekly_calendar(calendar: dict, brand: str = "dsc-marketing") -> Path:
     filename   = f"{week_start}_{brand}_calendar.yaml"
     path       = calendar_dir / filename
 
-    import yaml
-    path.write_text(
-        yaml.dump(calendar, allow_unicode=True, default_flow_style=False, sort_keys=False),
-        encoding="utf-8",
-    )
+    atomic_yaml_write(path, calendar)
     logger.info(f"週次カレンダー保存: {path}")
     return path

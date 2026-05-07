@@ -1,3 +1,4 @@
+from utils import claude_resp_text
 """
 ラウンジ・夜の店舗向け Instagram/TikTok 投稿生成モジュール。
 
@@ -136,7 +137,7 @@ class VenuePostGenerator:
                 system=system,
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = message.content[0].text.strip()
+            raw = claude_resp_text(message)
             if raw.startswith("```"):
                 raw = raw.split("```")[1]
                 if raw.startswith("json"):

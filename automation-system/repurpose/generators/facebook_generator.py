@@ -1,3 +1,4 @@
+from utils import claude_resp_text
 """
 Facebook 長文投稿生成モジュール。
 """
@@ -90,7 +91,7 @@ class FacebookGenerator:
                 max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = message.content[0].text.strip()
+            raw = claude_resp_text(message)
             if raw.startswith("```"):
                 raw = raw.split("```")[1]
                 if raw.startswith("json"):

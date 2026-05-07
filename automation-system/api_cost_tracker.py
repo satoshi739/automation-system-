@@ -162,9 +162,14 @@ def get_balance_info() -> dict:
           "tracking_enabled": bool,
         }
     """
-    credit_total = float(os.environ.get("ANTHROPIC_CREDIT_TOTAL_USD", "0") or "0")
-    warn_thr = float(os.environ.get("ANTHROPIC_CREDIT_WARN_USD", "10") or "10")
-    crit_thr = float(os.environ.get("ANTHROPIC_CREDIT_CRIT_USD", "3") or "3")
+    def _env_float(key: str, default: float) -> float:
+        try:
+            return float(os.environ.get(key, "") or default)
+        except (ValueError, TypeError):
+            return default
+    credit_total = _env_float("ANTHROPIC_CREDIT_TOTAL_USD", 0.0)
+    warn_thr     = _env_float("ANTHROPIC_CREDIT_WARN_USD", 10.0)
+    crit_thr     = _env_float("ANTHROPIC_CREDIT_CRIT_USD", 3.0)
 
     try:
         spent = get_cumulative_spend()
