@@ -25,6 +25,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 from flask import Flask, abort, request, send_from_directory
+from utils import atomic_yaml_write
 
 from sales.lead_intake import create_lead_from_line, load_lead_by_line_id
 from sns.line_api import LINEMessenger
@@ -424,8 +425,9 @@ def _load_queue_items() -> list:
                 data = yaml.safe_load(fp)
             if isinstance(data, dict):
                 items.append((f.name, data))
-        except Exception:
-            pass
+        except Exception as e:
+            import logging as _logging
+            _logging.getLogger(__name__).warning(f"キューファイル読み込みスキップ ({f.name}): {e}")
     return items
 
 
@@ -486,6 +488,14 @@ _BRAND_GA4_ENV = {
     "bangkok-peach": "BANGKOK_PEACH_GA4_PROPERTY_ID",
 }
 
+_BRAND_GSC_ENV = {
+    "upjapan":         "UPJAPAN_GSC_SITE_URL",
+    "dsc-marketing":   "DSC_MARKETING_GSC_SITE_URL",
+    "cashflowsupport": "CASHFLOWSUPPORT_GSC_SITE_URL",
+    "satoshi-blog":    "SATOSHI_BLOG_GSC_SITE_URL",
+    "bangkok-peach":   "BANGKOK_PEACH_GSC_SITE_URL",
+}
+
 def _get_ga4_all() -> list:
     """全ブランドのGA4サマリーを返す。接続不可は statusフィールドで表現する。"""
     import os as _os
@@ -514,6 +524,80 @@ def _get_ga4_all() -> list:
     return results
 
 
+def _get_gsc_all() -> list:
+    """全ブランドのSearch Consoleサマリーを返す。接続不可は statusフィールドで表現する。"""
+    import os as _os
+    results = []
+    try:
+        from sns.analytics import SearchConsoleClient
+    except Exception:
+        return results
+    for slug, env_key in _BRAND_GSC_ENV.items():
+        site_url = _os.environ.get(env_key, "")
+        cfg = _brand_cfg(slug)
+        entry = {"slug": slug, "label": cfg["label"], "color": cfg["color"], "emoji": cfg["emoji"]}
+        if not site_url:
+            entry.update({"status": "unset"})
+        else:
+            data = SearchConsoleClient(site_url_env=env_key).get_overview(28)
+            if "error" in data:
+                msg = data["error"]
+                if "403" in msg:
+                    entry.update({"status": "no_permission"})
+                else:
+                    entry.update({"status": "error", "error_msg": msg[:80]})
+            else:
+                entry.update({"status": "ok", **data})
+        results.append(entry)
+    return results
+
+
+def _build_gsc_html(gsc_data: list) -> str:
+    if not gsc_data:
+        return '<p style="color:#555;font-size:.85rem">GSCデータなし</p>'
+    rows = ""
+    for d in gsc_data:
+        color = d["color"]
+        label = d["label"]
+        emoji = d["emoji"]
+        status = d["status"]
+        if status == "ok":
+            status_html = '<span style="color:#00ff88;font-size:.75rem">● 接続済み</span>'
+            clicks      = f'{d["clicks"]:,}'
+            impressions = f'{d["impressions"]:,}'
+            ctr         = f'{d["ctr"]}%'
+            position    = f'{d["position"]}'
+        elif status == "no_permission":
+            status_html = '<span style="color:#ff4466;font-size:.75rem">● 権限なし</span>'
+            clicks = impressions = ctr = position = '<span style="color:#555">—</span>'
+        elif status == "unset":
+            status_html = '<span style="color:#555;font-size:.75rem">○ 未設定</span>'
+            clicks = impressions = ctr = position = '<span style="color:#555">—</span>'
+        else:
+            status_html = '<span style="color:#ff4466;font-size:.75rem">● エラー</span>'
+            clicks = impressions = ctr = position = '<span style="color:#555">—</span>'
+        rows += f"""
+        <tr>
+          <td><span style="color:{color};font-weight:700">{emoji} {label}</span></td>
+          <td>{status_html}</td>
+          <td style="text-align:right">{clicks}</td>
+          <td style="text-align:right">{impressions}</td>
+          <td style="text-align:right">{ctr}</td>
+          <td style="text-align:right">{position}</td>
+        </tr>"""
+    return f"""<table>
+  <tr>
+    <th>ブランド</th>
+    <th>状態</th>
+    <th style="text-align:right">クリック</th>
+    <th style="text-align:right">表示回数</th>
+    <th style="text-align:right">CTR</th>
+    <th style="text-align:right">平均順位</th>
+  </tr>
+  {rows}
+</table>"""
+
+
 def _get_brand_counts() -> dict:
     from collections import defaultdict
     counts = defaultdict(lambda: {"total": 0, "pending": 0, "needs_review": 0, "posted": 0})
@@ -531,55 +615,57 @@ def _get_brand_counts() -> dict:
 
 _NB_CSS = """
 :root {
-  --banana:#FFD700;--banana-dim:#c9a900;
-  --bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;
-  --text:#f0f0f0;--muted:#888;
-  --green:#00ff88;--red:#ff4466;--cyan:#00d4ff;
+  --accent:#8B5CF6;--accent-dim:#6D28D9;--accent2:#EC4899;
+  --bg:#13111C;--surface:#1E1A2E;--surface2:#252038;
+  --text:#F3F0FF;--muted:#9187B0;
+  --green:#34D399;--red:#F87171;--cyan:#67E8F9;
+  --border:#2E2845;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;min-height:100vh}
-a{color:var(--banana);text-decoration:none}
+a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
-.header{background:linear-gradient(135deg,#111 0%,#1a1500 100%);border-bottom:2px solid var(--banana);padding:16px 28px;display:flex;align-items:center;gap:12px}
-.header-title{font-size:1.3rem;font-weight:900;color:var(--banana);letter-spacing:2px;text-transform:uppercase}
-.header-sub{color:var(--muted);font-size:.78rem;margin-top:2px}
-.breadcrumbs{padding:10px 28px;background:#0d0d0d;border-bottom:1px solid #1a1a1a;font-size:.82rem;display:flex;align-items:center;gap:6px}
+.header{background:linear-gradient(135deg,#1A1630 0%,#0F0D1A 100%);border-bottom:2px solid var(--accent);padding:14px 28px;display:flex;align-items:center;gap:14px}
+.header-mascot{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(139,92,246,.5))}
+.header-title{font-size:1.25rem;font-weight:900;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;text-transform:uppercase}
+.header-sub{color:var(--muted);font-size:.75rem;margin-top:2px}
+.breadcrumbs{padding:9px 28px;background:#0F0D1A;border-bottom:1px solid var(--border);font-size:.82rem;display:flex;align-items:center;gap:6px}
 .breadcrumbs a{color:var(--muted)}
-.breadcrumbs a:hover{color:var(--banana)}
+.breadcrumbs a:hover{color:var(--accent)}
 .breadcrumbs span{color:var(--text)}
-.breadcrumbs .sep{color:#333}
+.breadcrumbs .sep{color:#3D3560}
 .page-body{padding:24px 28px}
-.section-title{font-size:.7rem;color:var(--banana-dim);text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #222;padding-bottom:8px;margin-bottom:16px}
+.section-title{font-size:.68rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:24px}
-.card{background:var(--surface);border:1px solid #222;border-radius:10px;padding:18px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
-.card:hover{border-color:var(--banana)}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--banana)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:var(--accent);box-shadow:0 0 16px rgba(139,92,246,.15)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
 .card-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
-.card-value{font-size:2rem;font-weight:900;color:var(--banana);line-height:1}
+.card-value{font-size:2rem;font-weight:900;color:var(--accent);line-height:1}
 .card-sub{font-size:.75rem;color:var(--muted);margin-top:5px}
-.brand-tag{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s}
-.brand-tag:hover{opacity:.8;text-decoration:none}
+.brand-tag{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s,box-shadow .2s}
+.brand-tag:hover{opacity:.85;text-decoration:none;box-shadow:0 0 10px rgba(139,92,246,.2)}
 .tags-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
-.badge-pending{background:#1a2a1a;color:var(--green);border:1px solid var(--green)}
-.badge-review{background:#2a1a0a;color:#F39C12;border:1px solid #F39C12}
-.badge-posted{background:#1a1a2a;color:var(--cyan);border:1px solid var(--cyan)}
-.badge-error{background:#2a1a1a;color:var(--red);border:1px solid var(--red)}
+.badge-pending{background:#0D2E1F;color:var(--green);border:1px solid var(--green)}
+.badge-review{background:#2A1F0A;color:#FBBF24;border:1px solid #FBBF24}
+.badge-posted{background:#0D1F2E;color:var(--cyan);border:1px solid var(--cyan)}
+.badge-error{background:#2E0D0D;color:var(--red);border:1px solid var(--red)}
 table{width:100%;border-collapse:collapse;font-size:.86rem}
-th{text-align:left;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:1px;padding:7px 10px;border-bottom:1px solid #222}
-td{padding:10px 10px;border-bottom:1px solid #191919;vertical-align:top}
-tr:hover td{background:#141414}
+th{text-align:left;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:1px;padding:7px 10px;border-bottom:1px solid var(--border)}
+td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:#221E35}
 .caption-preview{color:var(--text);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .btn{display:inline-block;padding:8px 18px;border-radius:6px;font-size:.85rem;font-weight:600;border:none;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.8}
 .btn-approve{background:var(--green);color:#000}
 .btn-reject{background:var(--red);color:#fff}
-.btn-outline{background:transparent;border:1px solid var(--banana);color:var(--banana)}
-.content-box{background:var(--surface);border:1px solid #222;border-radius:10px;padding:20px;margin-bottom:16px}
+.btn-outline{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.content-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
 .content-caption{white-space:pre-wrap;line-height:1.7;font-size:.9rem;color:var(--text)}
-.img-preview{max-width:100%;max-height:400px;border-radius:8px;border:1px solid #222;margin:12px 0}
-.footer{text-align:center;color:var(--muted);font-size:.72rem;padding:28px;border-top:1px solid #1a1a1a;margin-top:32px}
-@media(max-width:600px){.page-body{padding:16px}.header{padding:14px 16px}}
+.img-preview{max-width:100%;max-height:400px;border-radius:8px;border:1px solid var(--border);margin:12px 0}
+.footer{text-align:center;color:var(--muted);font-size:.72rem;padding:28px;border-top:1px solid var(--border);margin-top:32px}
+@media(max-width:600px){.page-body{padding:16px}.header{padding:12px 16px}}
 """
 
 
@@ -605,10 +691,10 @@ def _nb_page(title: str, body: str, breadcrumbs: list = None) -> str:
 </head>
 <body>
 <div class="header">
-  <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:12px">
-    <span style="font-size:1.8rem">🍌</span>
+  <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:14px">
+    <img src="/static/mascot.png" class="header-mascot" alt="UPJ mascot">
     <div>
-      <div class="header-title">Nano Banana OS</div>
+      <div class="header-title">UPJ OS</div>
       <div class="header-sub">UPJ Autonomous Brand OS</div>
     </div>
   </a>
@@ -618,7 +704,7 @@ def _nb_page(title: str, body: str, breadcrumbs: list = None) -> str:
 <div class="page-body">
 {body}
 </div>
-<div class="footer">🍌 Nano Banana OS · Claude Sonnet 4.6</div>
+<div class="footer">UPJ OS · Powered by Claude Sonnet 4.6</div>
 </body>
 </html>"""
 
@@ -672,8 +758,9 @@ def index():
     except Exception:
         agent_run_count = 0
 
-    # GA4アナリティクス
+    # GA4 / GSC アナリティクス
     ga4_data = _get_ga4_all()
+    gsc_data = _get_gsc_all()
 
     # スケジューラー死活
     hb_path = _Path(__file__).parent / "logs" / "scheduler.heartbeat"
@@ -805,12 +892,17 @@ def index():
   {agent_rows if agent_rows else '<tr><td colspan="5" style="color:#555;text-align:center;padding:20px">データなし</td></tr>'}
 </table>
 
-<div class="section-title" style="margin-top:28px">アナリティクス（各事業 / 過去28日）</div>
+<div class="section-title" style="margin-top:28px">GA4 アナリティクス（各事業 / 過去28日）</div>
 <div style="font-size:.75rem;color:#555;margin-bottom:12px">
   サービスアカウント: <code style="color:#888">upjapan-drive-bot@gen-lang-client-0671871313.iam.gserviceaccount.com</code>
-  — GA4管理画面でこのアカウントを「閲覧者」に追加すると接続されます
 </div>
 {_build_ga4_html(ga4_data)}
+
+<div class="section-title" style="margin-top:28px">Search Console（各事業 / 過去28日）</div>
+<div style="font-size:.75rem;color:#555;margin-bottom:12px">
+  クリック数・表示回数・CTR・平均掲載順位（Google 検索）
+</div>
+{_build_gsc_html(gsc_data)}
 """
 
     return Response(_nb_page("指令室", body), mimetype="text/html")
@@ -956,8 +1048,7 @@ def content_approve(filename: str):
         data["posted"] = True
         data["needs_review"] = False
         data["approved_at"] = datetime.now().isoformat()
-        with open(fpath, "w", encoding="utf-8") as fp:
-            yaml.dump(data, fp, allow_unicode=True, default_flow_style=False)
+        atomic_yaml_write(fpath, data)
     return redirect(f"/content/instagram/{filename}")
 
 
@@ -973,8 +1064,7 @@ def content_reject(filename: str):
         data["rejected"] = True
         data["needs_review"] = False
         data["rejected_at"] = datetime.now().isoformat()
-        with open(fpath, "w", encoding="utf-8") as fp:
-            yaml.dump(data, fp, allow_unicode=True, default_flow_style=False)
+        atomic_yaml_write(fpath, data)
     return redirect(f"/brands/{brand}" if brand else "/")
 
 
@@ -1006,8 +1096,9 @@ def _load_pending_approvals():
         ctx = {}
         try:
             ctx = _json.loads(r["context"] or "{}")
-        except Exception:
-            pass
+        except Exception as e:
+            import logging as _logging
+            _logging.getLogger(__name__).warning(f"エスカレーション context パース失敗 (id={r.get('id')}): {e}")
         escalations.append({
             "id":        r["id"],
             "task_id":   r["task_id"],
@@ -1037,8 +1128,9 @@ def _load_pending_approvals():
                     d = yaml.safe_load(fp)
                 if isinstance(d, dict) and d.get("status") == "pending_review":
                     reviews.append((f.name, d))
-            except Exception:
-                pass
+            except Exception as e:
+                import logging as _logging
+                _logging.getLogger(__name__).warning(f"レビューファイル読み込みスキップ ({f.name}): {e}")
 
     return {"escalations": escalations, "approvals": approvals, "reviews": reviews}
 
@@ -1304,8 +1396,7 @@ def review_approve(filename: str):
         for c in d.get("contents", []):
             if c.get("status") == "pending":
                 c["status"] = "approved"
-        with open(fpath, "w", encoding="utf-8") as fp:
-            yaml.dump(d, fp, allow_unicode=True, default_flow_style=False)
+        atomic_yaml_write(fpath, d)
         # instagram_post / instagram_carousel → content_queue/instagram へコピー
         brand = d.get("brand", "unknown")
         for c in d.get("contents", []):
@@ -1323,8 +1414,7 @@ def review_approve(filename: str):
                         "hashtags": " ".join(c.get("hashtags", [])) if isinstance(c.get("hashtags"), list) else c.get("hashtags", ""),
                         "created_at": datetime.now().isoformat(),
                     }
-                    with open(out, "w", encoding="utf-8") as fp:
-                        yaml.dump(entry, fp, allow_unicode=True, default_flow_style=False)
+                    atomic_yaml_write(out, entry)
     return redirect("/approvals")
 
 
@@ -1337,8 +1427,7 @@ def review_reject(filename: str):
             d = yaml.safe_load(fp)
         d["status"] = "rejected"
         d["rejected_at"] = datetime.now().isoformat()
-        with open(fpath, "w", encoding="utf-8") as fp:
-            yaml.dump(d, fp, allow_unicode=True, default_flow_style=False)
+        atomic_yaml_write(fpath, d)
     return redirect("/approvals")
 
 
@@ -1457,6 +1546,15 @@ def n8n_queue_stats():
 
 
 _MEDIA_ROOT = Path(__file__).parent / "generated_media" / "reels"
+_STATIC_ROOT = Path(__file__).parent / "static"
+
+@app.route("/static/<path:filename>", methods=["GET"])
+def serve_static(filename: str):
+    """静的ファイル（マスコット画像等）を配信する"""
+    if not _STATIC_ROOT.exists() or not (_STATIC_ROOT / filename).exists():
+        abort(404)
+    return send_from_directory(str(_STATIC_ROOT), filename)
+
 
 @app.route("/media/<path:filename>", methods=["GET"])
 def serve_media(filename: str):

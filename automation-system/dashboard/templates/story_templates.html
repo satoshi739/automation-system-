@@ -36,12 +36,12 @@
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;">
   {% for t in templates %}
   {% set brand_cfg = brands.get(t.brand, {}) %}
-  <div class="card" style="border-left:3px solid {{ brand_cfg.get('color','#c9a227') }};">
+  <div class="card" style="border-left:3px solid {{ brand_cfg.get('color','#8B5CF6') }};">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
       <div>
         <div style="font-size:14px;font-weight:700;color:var(--text);">{{ t.name }}</div>
         <div style="font-size:11px;color:var(--muted2);margin-top:4px;">
-          <span style="color:{{ brand_cfg.get('color','#c9a227') }};font-weight:600;">{{ brand_cfg.get('name_short', t.brand) }}</span>
+          <span style="color:{{ brand_cfg.get('color','#8B5CF6') }};font-weight:600;">{{ brand_cfg.get('name_short', t.brand) }}</span>
           · {{ t.story_type }}
         </div>
       </div>
@@ -77,7 +77,7 @@
     <div style="display:flex;gap:4px;margin-bottom:14px;">
       {% for day, label in [('mon','月'),('tue','火'),('wed','水'),('thu','木'),('fri','金'),('sat','土'),('sun','日')] %}
       <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
-        {{ 'background:' + brand_cfg.get('color','#c9a227') + ';color:#fff;' if day in t.active_days else 'background:var(--s3);color:var(--muted);border:1px solid var(--border);' }}">
+        {{ 'background:' + brand_cfg.get('color','#8B5CF6') + ';color:#fff;' if day in t.active_days else 'background:var(--s3);color:var(--muted);border:1px solid var(--border);' }}">
         {{ label }}
       </div>
       {% endfor %}

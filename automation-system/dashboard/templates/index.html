@@ -126,13 +126,13 @@
 /* ── Activity Feed ── */
 .activity-item {
   display: flex; align-items: flex-start; gap: 11px;
-  padding: 10px 0; border-bottom: 1px solid rgba(201,162,39,.06);
+  padding: 10px 0; border-bottom: 1px solid rgba(139,92,246,.06);
 }
 .activity-item:last-child { border-bottom: none; }
 .activity-dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--accent); flex-shrink: 0; margin-top: 5px;
-  box-shadow: 0 0 5px rgba(201,162,39,.4);
+  box-shadow: 0 0 5px rgba(139,92,246,.4);
 }
 .activity-dot.ok   { background: var(--green2); }
 .activity-dot.warn { background: var(--yellow2); }
@@ -143,7 +143,7 @@
 /* ── Lead Pipeline ── */
 .pipeline-stage {
   display: flex; align-items: center; gap: 12px;
-  padding: 9px 0; border-bottom: 1px solid rgba(201,162,39,.06);
+  padding: 9px 0; border-bottom: 1px solid rgba(139,92,246,.06);
 }
 .pipeline-stage:last-child { border-bottom: none; }
 .pipeline-label { font-size: 11.5px; color: var(--muted2); width: 80px; flex-shrink: 0; }
@@ -164,7 +164,7 @@
 /* ── AI Recommendations ── */
 .ai-rec-item {
   display: flex; align-items: flex-start; gap: 12px;
-  padding: 12px 0; border-bottom: 1px solid rgba(201,162,39,.06);
+  padding: 12px 0; border-bottom: 1px solid rgba(139,92,246,.06);
 }
 .ai-rec-item:last-child { border-bottom: none; }
 .ai-rec-icon {
@@ -199,8 +199,8 @@
 .brand-ch   { font-size: 10.5px; color: var(--muted2); }
 .brand-queue-badge {
   font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
-  background: rgba(201,162,39,.1); color: var(--accent);
-  border: 1px solid rgba(201,162,39,.2);
+  background: rgba(139,92,246,.1); color: var(--accent);
+  border: 1px solid rgba(139,92,246,.2);
 }
 
 /* ── Empty State ── */
@@ -215,15 +215,15 @@
 .sample-badge {
   font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
   padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
-  background: rgba(201,162,39,.1); color: var(--accent);
-  border: 1px solid rgba(201,162,39,.25); margin-bottom: 4px;
+  background: rgba(139,92,246,.1); color: var(--accent);
+  border: 1px solid rgba(139,92,246,.25); margin-bottom: 4px;
   display: inline-block;
 }
 
 /* ── Decision Alert ── */
 .decision-item {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 9px 0; border-bottom: 1px solid rgba(201,162,39,.06);
+  padding: 9px 0; border-bottom: 1px solid rgba(139,92,246,.06);
 }
 .decision-item:last-child { border-bottom: none; }
 .decision-icon {
@@ -402,7 +402,7 @@
     </div>
     <div class="cc-panel-body">
       {% set stage_labels = {'L1':'初回接触','L2':'ヒアリング','L3':'提案中','L4':'クロージング','L5':'契約済み'} %}
-      {% set stage_colors = {'L1':'#c9a227','L2':'#e8c84a','L3':'#10b981','L4':'#34d399','L5':'#6ee7b7'} %}
+      {% set stage_colors = {'L1':'#8B5CF6','L2':'#A78BFA','L3':'#10b981','L4':'#34d399','L5':'#6ee7b7'} %}
       {% set funnel_vals = [funnel.get('L1', 0), funnel.get('L2', 0), funnel.get('L3', 0), funnel.get('L4', 0), funnel.get('L5', 0)] %}
       {% set max_val = [funnel_vals | max, 1] | max %}
       <div class="pipeline-stage" style="padding-top:0;">
@@ -446,7 +446,7 @@
       {% if brands %}
       <div class="brand-grid">
         {% for bid, b in brands.items() %}
-        {% set brand_color = b.color | default('#c9a227') %}
+        {% set brand_color = b.color | default('#8B5CF6') %}
         {% set ch_count = b.channels | length if b.channels else 0 %}
         <a href="/brands/{{ bid }}" class="brand-row">
           <div class="brand-dot" style="--bd-color:{{ brand_color }};"></div>
@@ -666,7 +666,7 @@ function sparkData(seed, scale) {
 }
 
 const SPARK_DEFS = [
-  { id: 'spark0', color: '#c9a227', data: sparkData(11, 20) },
+  { id: 'spark0', color: '#8B5CF6', data: sparkData(11, 20) },
   { id: 'spark1', color: '#10b981', data: sparkData(22, 10) },
   { id: 'spark2', color: '#c084fc', data: sparkData(33, 15) },
   { id: 'spark3', color: '#ef4444', data: sparkData(44, 5)  },
@@ -708,8 +708,8 @@ SPARK_DEFS.forEach(({ id, color, data }) => {
       labels: ['投稿済み', '待機中', 'エラー'],
       datasets: [{
         data: donutData,
-        backgroundColor: ['rgba(16,185,129,.8)', 'rgba(201,162,39,.8)', 'rgba(239,68,68,.8)'],
-        borderColor: ['rgba(16,185,129,1)', 'rgba(201,162,39,1)', 'rgba(239,68,68,1)'],
+        backgroundColor: ['rgba(16,185,129,.8)', 'rgba(139,92,246,.8)', 'rgba(239,68,68,.8)'],
+        borderColor: ['rgba(16,185,129,1)', 'rgba(139,92,246,1)', 'rgba(239,68,68,1)'],
         borderWidth: 1,
         hoverOffset: 3,
       }]
@@ -724,7 +724,7 @@ SPARK_DEFS.forEach(({ id, color, data }) => {
 })();
 
 const GOLD_PALETTE = [
-  'rgba(201,162,39,.85)',
+  'rgba(139,92,246,.85)',
   'rgba(232,200,74,.75)',
   'rgba(16,185,129,.75)',
   'rgba(52,211,153,.7)',
@@ -732,7 +732,7 @@ const GOLD_PALETTE = [
   'rgba(251,191,36,.65)',
 ];
 const GOLD_BORDER = [
-  'rgba(201,162,39,1)',
+  'rgba(139,92,246,1)',
   'rgba(232,200,74,1)',
   'rgba(16,185,129,1)',
   'rgba(52,211,153,1)',
@@ -745,7 +745,7 @@ const chartDefaults = {
     legend: { display: false },
     tooltip: {
       backgroundColor: '#0c0c0c',
-      borderColor: 'rgba(201,162,39,.3)',
+      borderColor: 'rgba(139,92,246,.3)',
       borderWidth: 1,
       titleColor: '#9a8660',
       bodyColor: '#f0e8d8',
@@ -766,8 +766,8 @@ const leadCtx = document.getElementById('leadChart');
 if (leadCtx) {
   const ctx2d = leadCtx.getContext('2d');
   const grad = ctx2d.createLinearGradient(0, 0, 0, 160);
-  grad.addColorStop(0, 'rgba(201,162,39,.35)');
-  grad.addColorStop(1, 'rgba(201,162,39,.02)');
+  grad.addColorStop(0, 'rgba(139,92,246,.35)');
+  grad.addColorStop(1, 'rgba(139,92,246,.02)');
   new Chart(leadCtx, {
     type: 'bar',
     data: {
@@ -777,7 +777,7 @@ if (leadCtx) {
       datasets: [{
         data: displayMonthly.values,
         backgroundColor: grad,
-        borderColor: 'rgba(201,162,39,.9)',
+        borderColor: 'rgba(139,92,246,.9)',
         borderWidth: 1.5,
         borderRadius: 6,
         borderSkipped: false,
@@ -800,7 +800,7 @@ if (leadCtx) {
         },
         y: {
           ticks: { color: '#564e3c', stepSize: 1, font: { size: 11 } },
-          grid: { color: 'rgba(201,162,39,.05)', drawBorder: false },
+          grid: { color: 'rgba(139,92,246,.05)', drawBorder: false },
           border: { display: false }, beginAtZero: true
         }
       }

@@ -309,7 +309,14 @@ def broadcast_line():
         logger.info("LINE: キューに配信がありません")
         return
 
-    messenger = LINEMessenger()
+    # ブランド別チャンネルに送信（未設定ブランドはスキップ）
+    from sns.line_api import get_brand_messenger
+    brand = post.get("brand", "")
+    messenger = get_brand_messenger(brand) if brand else LINEMessenger()
+    if not messenger.enabled:
+        logger.warning(f"LINE一斉配信スキップ: ブランド '{brand}' のトークン未設定")
+        return
+
     try:
         image_url = post.get("image_url", "")
         if image_url:
@@ -323,7 +330,7 @@ def broadcast_line():
 
         if ok:
             _mark_posted(post["path"])
-            logger.info("LINE一斉配信完了")
+            logger.info(f"LINE一斉配信完了 (brand={brand})")
     except Exception as e:
         logger.error(f"LINE配信エラー: {e}", exc_info=True)
 
@@ -391,9 +398,15 @@ def check_scheduled_posts():
                     try:
                         sched_dt = datetime.strptime(str(sched_str), "%Y-%m-%d %H:%M")
                     except ValueError:
-                        from datetime import timezone
-                        dt = datetime.fromisoformat(str(sched_str))
-                        sched_dt = dt.replace(tzinfo=None) if dt.tzinfo else dt
+                        try:
+                            # ISO 8601 の Z suffix (Python 3.9 非対応) を +00:00 に正規化
+                            sched_str_norm = str(sched_str).replace("Z", "+00:00")
+                            dt = datetime.fromisoformat(sched_str_norm)
+                            sched_dt = dt.replace(tzinfo=None) if dt.tzinfo else dt
+                        except ValueError:
+                            logger.error(f"scheduled_at のパース失敗 — failed に変更: {f.name} (値: {sched_str!r})")
+                            _mark_status(f, "failed")
+                            continue
                     if sched_dt > now:
                         continue  # まだ予約時刻前
 
@@ -965,8 +978,8 @@ def story_autopilot_job():
                     days = json.loads(active_days) if isinstance(active_days, str) else active_days
                     if weekday_idx not in days:
                         continue
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Story Autopilot: active_days パース失敗 tmpl={tmpl.get('id')} ({e!r}) — 全曜日として扱う")
 
             # 本日すでに実行済みかチェック
             today_str = now.strftime("%Y-%m-%d")

@@ -106,8 +106,8 @@
   </div>
 
   <!-- AI提案バナー -->
-  <div style="background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-    <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(201,162,39,.3),rgba(201,162,39,.2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
+  <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+    <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(139,92,246,.2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
     <div style="flex:1;">
       <div style="font-size:13px;font-weight:700;color:var(--purple2);margin-bottom:3px;">AI提案 — {{ brand.name_short }}</div>
       <div style="font-size:12px;color:var(--muted2);line-height:1.5;">
@@ -119,12 +119,12 @@
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;">
       {% if cockpit.story_pending > 0 %}
-      <a href="/story-autopilot/candidates?brand={{ brand_id }}" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(201,162,39,.3);">ストーリー確認</a>
+      <a href="/story-autopilot/candidates?brand={{ brand_id }}" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(139,92,246,.3);">ストーリー確認</a>
       {% endif %}
       {% if cockpit.publishing_pending > 0 %}
-      <a href="/publishing?status=pending_approval" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(201,162,39,.3);">コンテンツ承認</a>
+      <a href="/publishing?status=pending_approval" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(139,92,246,.3);">コンテンツ承認</a>
       {% endif %}
-      <button onclick="openBulkModal()" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(201,162,39,.3);"> AI生成</button>
+      <button onclick="openBulkModal()" class="btn btn-ghost btn-sm" style="color:var(--purple2);border-color:rgba(139,92,246,.3);"> AI生成</button>
     </div>
   </div>
 
@@ -136,9 +136,9 @@
   <div id="studio-wrap" style="max-width:980px;margin:0 auto;background:var(--s1);border-radius:20px;border:1px solid var(--border2);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);">
 
     <!-- ── ヘッダー ── -->
-    <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(201,162,39,.06),rgba(201,162,39,.04));">
+    <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(139,92,246,.04));">
       <div style="display:flex;align-items:center;gap:12px;">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 14px rgba(201,162,39,.4);"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 14px rgba(139,92,246,.4);"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
         <div>
           <div style="font-size:16px;font-weight:700;letter-spacing:-.3px;">AI コンテンツスタジオ</div>
           <div style="font-size:11px;color:var(--muted);margin-top:1px;">Claude が全プラットフォームのコンテンツを同時生成します</div>
@@ -172,12 +172,12 @@
             onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'">{{ topic }}</button>
           {% endfor %}
           <button id="btn-ai-suggest" onclick="aiSuggestTopics()"
-            style="background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);border-radius:20px;padding:5px 13px;font-size:11.5px;color:var(--purple2);cursor:pointer;transition:all .18s;white-space:nowrap;font-weight:500;"
-            onmouseover="this.style.background='rgba(201,162,39,.2)'" onmouseout="this.style.background='rgba(201,162,39,.1)'">
+            style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:5px 13px;font-size:11.5px;color:var(--purple2);cursor:pointer;transition:all .18s;white-space:nowrap;font-weight:500;"
+            onmouseover="this.style.background='rgba(139,92,246,.2)'" onmouseout="this.style.background='rgba(139,92,246,.1)'">
             <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIが今日の提案
           </button>
         </div>
-        <div id="ai-topic-suggestions" style="display:none;margin-top:10px;padding:12px;background:rgba(201,162,39,.05);border:1px solid rgba(201,162,39,.2);border-radius:10px;">
+        <div id="ai-topic-suggestions" style="display:none;margin-top:10px;padding:12px;background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.2);border-radius:10px;">
           <div style="font-size:10px;color:var(--purple2);font-weight:700;margin-bottom:8px;letter-spacing:.5px;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> AIの今日の提案</div>
           <div id="ai-topics-list" style="display:flex;flex-wrap:wrap;gap:7px;"></div>
         </div>
@@ -190,7 +190,7 @@
           {% for tone, icon, desc in [('実務的・わかりやすい','◎','シンプルで要点重視'),('フレンドリー・親しみやすい','','温かく身近な語り口'),('教育系・深堀り','<span style="display:inline-flex;align-items:center;"><i data-lucide="layout-grid"></i></span>','知識・事例を詳しく'),('インパクト重視','<span style="display:inline-flex;align-items:center;"><i data-lucide="zap"></i></span>','強いCTA・行動促進')] %}
           <button type="button" onclick="selectTone(this,'{{ tone }}')" data-tone="{{ tone }}"
             class="tone-btn {% if loop.first %}tone-active{% endif %}"
-            style="background:var(--s2);border:1px solid {{ 'rgba(201,162,39,.5)' if loop.first else 'var(--border)' }};border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .18s;">
+            style="background:var(--s2);border:1px solid {{ 'rgba(139,92,246,.5)' if loop.first else 'var(--border)' }};border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .18s;">
             <div style="font-size:18px;margin-bottom:6px;">{{ icon }}</div>
             <div style="font-size:12px;font-weight:600;color:var(--text);">{{ tone.split('・')[0] }}</div>
             <div style="font-size:10px;color:var(--muted);margin-top:2px;">{{ desc }}</div>
@@ -216,8 +216,8 @@
             <span>{{ info.icon }}</span> {{ p }}
           </label>
           {% endfor %}
-          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.3);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:500;transition:all .15s;user-select:none;"
-                 onmouseover="this.style.borderColor='var(--purple2)'" onmouseout="this.style.borderColor='rgba(201,162,39,.3)'">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:500;transition:all .15s;user-select:none;"
+                 onmouseover="this.style.borderColor='var(--purple2)'" onmouseout="this.style.borderColor='rgba(139,92,246,.3)'">
             <input type="checkbox" name="gen-platform" value="reel" checked style="accent-color:var(--purple);width:13px;height:13px;">
             <span><span style="display:inline-flex;align-items:center;"><i data-lucide="video"></i></span></span> リール画像
           </label>
@@ -225,9 +225,9 @@
       </div>
 
       <button onclick="startBulkGenerate()" id="btn-generate"
-        style="width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:-.2px;box-shadow:0 8px 24px rgba(201,162,39,.4);transition:all .2s;font-family:inherit;"
-        onmouseover="this.style.boxShadow='0 12px 32px rgba(201,162,39,.6)';this.style.transform='translateY(-1px)'"
-        onmouseout="this.style.boxShadow='0 8px 24px rgba(201,162,39,.4)';this.style.transform=''">
+        style="width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:-.2px;box-shadow:0 8px 24px rgba(139,92,246,.4);transition:all .2s;font-family:inherit;"
+        onmouseover="this.style.boxShadow='0 12px 32px rgba(139,92,246,.6)';this.style.transform='translateY(-1px)'"
+        onmouseout="this.style.boxShadow='0 8px 24px rgba(139,92,246,.4)';this.style.transform=''">
         <span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span> &nbsp;すべて一括生成する
       </button>
     </div>
@@ -240,7 +240,7 @@
       </div>
       <div style="display:flex;gap:20px;align-items:flex-start;">
         <!-- 左: アニメーション -->
-        <div style="flex-shrink:0;width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,rgba(201,162,39,.15),rgba(201,162,39,.1));border:1px solid rgba(201,162,39,.2);display:flex;align-items:center;justify-content:center;">
+        <div style="flex-shrink:0;width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;">
           <div id="loading-spinner" style="font-size:36px;animation:spin 3s linear infinite;"><span style="display:inline-flex;align-items:center;"><i data-lucide="sparkles"></i></span></div>
         </div>
         <!-- 右: テキスト + ステップ -->
@@ -318,7 +318,7 @@
 <style>
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes typewriter { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
-.tone-active { background:rgba(201,162,39,.1)!important; border-color:rgba(201,162,39,.5)!important; }
+.tone-active { background:rgba(139,92,246,.1)!important; border-color:rgba(139,92,246,.5)!important; }
 </style>
 
 <script>
@@ -351,7 +351,7 @@ function selectTone(el, tone) {
     b.style.borderColor = 'var(--border)';
   });
   el.classList.add('tone-active');
-  el.style.borderColor = 'rgba(201,162,39,.5)';
+  el.style.borderColor = 'rgba(139,92,246,.5)';
 }
 
 /* ── AI トピック提案 ── */
@@ -368,7 +368,7 @@ async function aiSuggestTopics() {
       d.topics.forEach(t => {
         const b = document.createElement('button');
         b.type = 'button'; b.textContent = t; b.onclick = () => setTopic(t);
-        b.style = 'background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);border-radius:20px;padding:5px 13px;font-size:11.5px;color:var(--purple2);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;';
+        b.style = 'background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:5px 13px;font-size:11.5px;color:var(--purple2);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;';
         list.appendChild(b);
       });
       box.style.display = '';
@@ -408,7 +408,7 @@ async function startBulkGenerate() {
     const active = platforms_gen[Math.floor((progress-10)/12)];
     if (active) {
       document.getElementById('ls-' + active.key)?.setAttribute('style',
-        'background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.4);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--accent2);transition:all .3s;');
+        'background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--accent2);transition:all .3s;');
     }
   }, 400);
 
@@ -581,7 +581,7 @@ function renderMockup(platform, content, meta) {
     c.innerHTML = `
     <div style="background:#000;border-radius:16px;border:1px solid #2f3336;padding:16px;max-width:300px;margin:0 auto;font-family:-apple-system,sans-serif;">
       <div style="display:flex;gap:10px;margin-bottom:10px;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,${BRAND_COLOR},#c9a227);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px;">${BRAND_SHORT[0]}</div>
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,${BRAND_COLOR},#8B5CF6);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px;">${BRAND_SHORT[0]}</div>
         <div><div style="font-size:13px;font-weight:700;color:#fff;">${BRAND_SHORT}</div><div style="font-size:12px;color:#71767b;">@${BRAND_SHORT.toLowerCase().replace(/\s/g,'_')}</div></div>
         <div style="margin-left:auto;color:#71767b;font-size:18px;font-weight:800;">𝕏</div>
       </div>
@@ -1034,7 +1034,7 @@ new Chart(document.getElementById('gaChart'), {
     datasets:[{data:s.sessions,borderColor:'rgba(91,138,245,1)',
       backgroundColor:'rgba(91,138,245,.15)',fill:true,tension:.4,pointRadius:2}]},
   options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#0c1228',borderColor:'rgba(201,162,39,.3)',borderWidth:1,titleColor:'#8892b0',bodyColor:'#e8eaf6',padding:10}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#0c1228',borderColor:'rgba(139,92,246,.3)',borderWidth:1,titleColor:'#8892b0',bodyColor:'#e8eaf6',padding:10}},
     scales:{x:{ticks:{color:'#5a6490',maxTicksLimit:10,font:{size:11}},grid:{color:'rgba(255,255,255,.04)'}},
             y:{ticks:{color:'#5a6490',font:{size:11}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}}}
 });

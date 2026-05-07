@@ -79,7 +79,7 @@
     <div style="display:flex;flex-direction:column;gap:10px;">
       {% for t in templates[:5] %}
       <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;">
-        <div style="width:8px;height:8px;border-radius:50%;background:{{ brands.get(t.brand, {}).get('color','#c9a227') }};box-shadow:0 0 8px {{ brands.get(t.brand, {}).get('color','#c9a227') }};flex-shrink:0;"></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:{{ brands.get(t.brand, {}).get('color','#8B5CF6') }};box-shadow:0 0 8px {{ brands.get(t.brand, {}).get('color','#8B5CF6') }};flex-shrink:0;"></div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ t.name }}</div>
           <div style="font-size:11px;color:var(--muted2);margin-top:2px;">

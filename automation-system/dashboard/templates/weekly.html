@@ -11,7 +11,7 @@
     color: var(--muted2); transition: all .15s; font-family: inherit;
   }
   .tab-btn.active {
-    background: rgba(201,162,39,.15); border-color: rgba(201,162,39,.4); color: var(--accent2);
+    background: rgba(139,92,246,.15); border-color: rgba(139,92,246,.4); color: var(--accent2);
   }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
@@ -94,7 +94,7 @@
 <div class="tabs">
   {% for bid in brands %}
   <button class="tab-btn {% if loop.first %}active{% endif %}" onclick="switchTab('{{ bid }}')">
-    <span style="width:8px;height:8px;border-radius:50%;background:{{ brands[bid].get('color','#c9a227') }};display:inline-block;margin-right:6px;"></span>
+    <span style="width:8px;height:8px;border-radius:50%;background:{{ brands[bid].get('color','#8B5CF6') }};display:inline-block;margin-right:6px;"></span>
     {{ brands[bid].get('name_short', bid) }}
   </button>
   {% endfor %}
@@ -114,7 +114,7 @@
     {% if cal %}
     <button class="btn" id="sched-btn-{{ bid }}"
             onclick="scheduleWeek('{{ bid }}')"
-            style="background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.35);color:var(--accent2);font-weight:600;">
+            style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);color:var(--accent2);font-weight:600;">
       <span style="display:inline-flex;align-items:center;"><i data-lucide="calendar"></i></span> 全部キューに予約
     </button>
     <span class="badge badge-ok">最新: {{ cal.get('week_start', '不明') }}</span>

@@ -6,8 +6,8 @@
   /* ── CoS 固有スタイル ── */
   .cos-header-badge {
     display: inline-flex; align-items: center; gap: 7px;
-    background: linear-gradient(135deg, rgba(201,162,39,.15), rgba(201,162,39,.1));
-    border: 1px solid rgba(201,162,39,.35); border-radius: 20px;
+    background: linear-gradient(135deg, rgba(139,92,246,.15), rgba(139,92,246,.1));
+    border: 1px solid rgba(139,92,246,.35); border-radius: 20px;
     padding: 6px 14px; font-size: 12px; color: var(--accent2); font-weight: 600;
   }
   .cos-header-badge::before {
@@ -58,13 +58,13 @@
   }
   .alert-mini.sev-alert { background: rgba(239,68,68,.06);   border: 1px solid rgba(239,68,68,.2);  color: #fca5a5; }
   .alert-mini.sev-warn  { background: rgba(245,158,11,.06);  border: 1px solid rgba(245,158,11,.2); color: #fcd34d; }
-  .alert-mini.sev-info  { background: rgba(201,162,39,.06);  border: 1px solid rgba(201,162,39,.2); color: var(--accent2); }
+  .alert-mini.sev-info  { background: rgba(139,92,246,.06);  border: 1px solid rgba(139,92,246,.2); color: var(--accent2); }
 
   .strategy-note {
     padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 9px;
     background: rgba(10,16,36,.7); border: 1px solid var(--border);
   }
-  .strategy-note.pinned { border-color: rgba(201,162,39,.3); background: rgba(201,162,39,.04); }
+  .strategy-note.pinned { border-color: rgba(139,92,246,.3); background: rgba(139,92,246,.04); }
 
   .brief-mini-row {
     display: flex; align-items: center; gap: 10px;
@@ -151,7 +151,7 @@
         <div class="rec-footer">
           <span class="cat-chip">{{ rec.category }}</span>
           <span class="prio-chip prio-{{ rec.priority }}-chip">
-            {% if rec.priority == 'high' %}<span style="color:#ef4444;">●</span> 優先高{% elif rec.priority == 'mid' %}<span style="color:#f59e0b;">●</span> 中{% else %}<span style="color:#c9a227;">●</span> 低{% endif %}
+            {% if rec.priority == 'high' %}<span style="color:#ef4444;">●</span> 優先高{% elif rec.priority == 'mid' %}<span style="color:#f59e0b;">●</span> 中{% else %}<span style="color:#8B5CF6;">●</span> 低{% endif %}
           </span>
           {% if rec.brand %}
           <span style="font-size:10.5px;color:{{ rec.brand_color }};font-weight:700;">{{ rec.brand }}</span>
@@ -174,7 +174,7 @@
       {% for alert in open[:4] %}
       <div class="alert-mini sev-{{ alert.severity }}">
         <span style="flex-shrink:0;">
-          {% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span>{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span>{% else %}<span style="color:#c9a227;">●</span>{% endif %}
+          {% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span>{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span>{% else %}<span style="color:#8B5CF6;">●</span>{% endif %}
         </span>
         <div>
           <div style="font-weight:600;margin-bottom:2px;">

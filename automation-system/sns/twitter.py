@@ -40,7 +40,10 @@ class TwitterPoster:
         if not self.api_key:
             raise ValueError("Twitter APIキーが設定されていません")
         r = self._client().create_tweet(text=text)
-        tweet_id = r.data["id"]
+        tweet_id = r.data.get("id") if r.data else None
+        if not tweet_id:
+            log.error(f"ツイート失敗: APIレスポンスにIDなし (data={r.data})")
+            return {"status":"error","error":"no tweet id returned"}
         log.info(f"ツイート完了: {tweet_id}")
         return {"status":"posted","id":tweet_id}
 
@@ -56,6 +59,10 @@ class TwitterPoster:
             if prev_id:
                 kw["in_reply_to_tweet_id"] = prev_id
             r = client.create_tweet(**kw)
-            prev_id = r.data["id"]
+            prev_id = r.data.get("id") if r.data else None
+            if not prev_id:
+                log.error(f"スレッドツイート失敗: APIレスポンスにIDなし")
+                results.append({"status":"error","error":"no tweet id returned"})
+                break
             results.append({"status":"posted","id":prev_id})
         return results

@@ -9,6 +9,7 @@ from pathlib import Path
 
 import yaml
 
+from utils import atomic_yaml_write
 from sns.line_api import LINEMessenger
 from sales.lead_intake import LEADS_DIR
 
@@ -97,8 +98,7 @@ def run_followup_check():
             followup_sent.append(msg_key)
             lead["followup_sent"] = followup_sent
             lead["last_contact"] = now.strftime("%Y-%m-%d")
-            with open(lead_file, "w", encoding="utf-8") as f:
-                yaml.dump(lead, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+            atomic_yaml_write(lead_file, lead)
             sent_count += 1
             logger.info(f"フォローアップ送信: {lead.get('lead_id', lead_file.stem)} → {msg_key}")
 

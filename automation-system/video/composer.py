@@ -260,7 +260,7 @@ class VideoComposer:
     def _concat_scenes(self, clips: List[Path], output: Path) -> Path:
         """全シーンを結合"""
         list_file = TEMP_DIR / "concat_list.txt"
-        with open(list_file, "w") as f:
+        with open(list_file, "w", encoding="utf-8") as f:
             for clip in clips:
                 f.write(f"file '{clip.resolve()}'\n")
 

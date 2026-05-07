@@ -31,6 +31,7 @@ sys.path.insert(0, str(_ROOT))
 
 load_dotenv(_ROOT / ".env")
 
+from utils import atomic_yaml_write
 from video.blog_fetcher import BlogFetcher
 from video.script_generator import ScriptGenerator
 from video.nano_banana_generator import NanaBananaGenerator
@@ -287,8 +288,7 @@ def _add_to_queue(video_path: Path, script: dict, brand: str, channel_cfg: dict 
         entry["scheduled_at"] = timestamp[:15].replace("_", " ").replace("T", " ")
 
     out_file = queue_dir / f"{timestamp}_{brand}_reel.yaml"
-    with open(out_file, "w", encoding="utf-8") as f:
-        yaml.dump(entry, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    atomic_yaml_write(out_file, entry)
     log.info(f"投稿キューに追加: {out_file}")
 
 

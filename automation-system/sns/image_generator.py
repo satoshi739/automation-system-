@@ -261,7 +261,7 @@ def slides_to_video(image_paths: list, output_name: str, duration_per_slide: flo
 
     # concat demuxerを使って各スライドの表示時間を設定
     concat_file = GENERATED_DIR / f"{output_name}_concat.txt"
-    with open(concat_file, "w") as f:
+    with open(concat_file, "w", encoding="utf-8") as f:
         for p in image_paths:
             f.write(f"file '{p.resolve()}'\n")
             f.write(f"duration {duration_per_slide}\n")

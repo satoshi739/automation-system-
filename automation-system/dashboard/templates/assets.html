@@ -20,7 +20,7 @@
     position: relative;
   }
   .asset-card:hover {
-    border-color: rgba(201,162,39,.4);
+    border-color: rgba(139,92,246,.4);
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(0,0,0,.4);
   }
@@ -60,8 +60,8 @@
     display: inline-flex; align-items: center;
     padding: 2px 8px; border-radius: 20px;
     font-size: 10px; font-weight: 600;
-    background: rgba(201,162,39,.1); color: var(--accent2);
-    border: 1px solid rgba(201,162,39,.2);
+    background: rgba(139,92,246,.1); color: var(--accent2);
+    border: 1px solid rgba(139,92,246,.2);
   }
   .asset-meta-row {
     display: flex; gap: 10px; font-size: 10.5px; color: var(--muted);
@@ -86,7 +86,7 @@
     font-size: 12px; font-family: inherit; outline: none;
     transition: border-color .15s;
   }
-  .filter-bar select:focus, .filter-bar input:focus { border-color: rgba(201,162,39,.5); }
+  .filter-bar select:focus, .filter-bar input:focus { border-color: rgba(139,92,246,.5); }
   .filter-sep { width: 1px; height: 20px; background: var(--border); }
 
   /* ── Tag pill (sidebar) ── */
@@ -98,7 +98,7 @@
     transition: all .15s; margin: 2px;
   }
   .tag-pill:hover { border-color: var(--border2); color: var(--text); background: var(--s2); }
-  .tag-pill.active { background: rgba(201,162,39,.12); border-color: rgba(201,162,39,.35); color: var(--accent2); }
+  .tag-pill.active { background: rgba(139,92,246,.12); border-color: rgba(139,92,246,.35); color: var(--accent2); }
   .tag-count { font-size: 9px; opacity: .7; }
 
   /* ── Alert card ── */
@@ -308,7 +308,7 @@
       {% for bid, cnt in stats.by_brand.items() %}
       {% set b = brands.get(bid, {}) %}
       <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:{{ b.get('color','#c9a227') }};flex-shrink:0;box-shadow:0 0 5px {{ b.get('color','#c9a227') }};"></span>
+        <span style="width:8px;height:8px;border-radius:50%;background:{{ b.get('color','#8B5CF6') }};flex-shrink:0;box-shadow:0 0 5px {{ b.get('color','#8B5CF6') }};"></span>
         <a href="/assets?brand={{ bid }}" style="color:var(--muted2);text-decoration:none;flex:1;">{{ b.get('name_short', bid) }}</a>
         <span style="color:var(--text);font-weight:700;">{{ cnt }}</span>
       </div>
@@ -336,7 +336,7 @@
           <div class="asset-title">{{ a.title or a.asset_id }}</div>
           <div class="asset-brand">
             {% set b = brands.get(a.brand, {}) %}
-            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:{{ b.get('color','#c9a227') }};vertical-align:middle;margin-right:4px;"></span>
+            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:{{ b.get('color','#8B5CF6') }};vertical-align:middle;margin-right:4px;"></span>
             {{ b.get('name_short', a.brand) }}
             {% if a.season and a.season != 'all' %}
             · {{ {'spring':'','summer':'<span style="display:inline-flex;align-items:center;"><i data-lucide="sun"></i></span>','fall':'','winter':'<span style="display:inline-flex;align-items:center;"><i data-lucide="snowflake"></i></span>️'}.get(a.season,'') }} {{ a.season }}
@@ -384,7 +384,7 @@
       {% set recs = [] %}
       <div style="margin-bottom:18px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <span style="width:8px;height:8px;border-radius:50%;background:{{ b.get('color','#c9a227') }};box-shadow:0 0 5px {{ b.get('color','#c9a227') }};"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:{{ b.get('color','#8B5CF6') }};box-shadow:0 0 5px {{ b.get('color','#8B5CF6') }};"></span>
           <span style="font-size:12px;font-weight:700;color:var(--text);">{{ b.get('name_short', bid) }}</span>
           <a href="/assets?brand={{ bid }}" style="font-size:11px;color:var(--accent2);text-decoration:none;margin-left:auto;">全件 →</a>
         </div>

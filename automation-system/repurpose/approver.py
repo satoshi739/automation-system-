@@ -32,6 +32,7 @@ sys.path.insert(0, str(_ROOT))
 from dotenv import load_dotenv
 load_dotenv(_ROOT / ".env")
 
+from utils import atomic_yaml_write
 from repurpose.validators import ContentValidator
 
 # ─── ディレクトリ定義 ────────────────────────────────────────
@@ -107,8 +108,7 @@ def _write_posting_yaml(item: dict, brand: str, source_file: str, dry_run: bool)
     }
 
     if not dry_run:
-        with open(out_path, "w", encoding="utf-8") as f:
-            yaml.dump(doc, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+        atomic_yaml_write(out_path, doc)
 
     return out_path
 
@@ -164,8 +164,7 @@ def process_file(path: Path, dry_run: bool = False) -> dict:
 
         if not dry_run:
             dest = HUMAN_REVIEW_DIR / filename
-            with open(dest, "w", encoding="utf-8") as f:
-                yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+            atomic_yaml_write(dest, data)
             path.unlink()
 
         reasons = "; ".join(e["message"] for e in vresult.critical_errors[:3])
@@ -188,8 +187,7 @@ def process_file(path: Path, dry_run: bool = False) -> dict:
 
         if not dry_run:
             dest = REJECTED_DIR / filename
-            with open(dest, "w", encoding="utf-8") as f:
-                yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+            atomic_yaml_write(dest, data)
             path.unlink()
 
         msg = (

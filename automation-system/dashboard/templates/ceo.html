@@ -7,7 +7,7 @@
   .ceo-header-badge {
     display: inline-flex; align-items: center; gap: 7px;
     background: var(--s2);
-    border: 1px solid rgba(201,162,39,.25); border-radius: 20px; padding: 6px 14px;
+    border: 1px solid rgba(139,92,246,.25); border-radius: 20px; padding: 6px 14px;
     font-size: 12px; color: var(--purple2); font-weight: 600;
   }
   .ceo-header-badge::before {
@@ -35,7 +35,7 @@
     font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
   }
   .status-waiting_human { background: rgba(239,68,68,.1);   color: var(--red);     border: 1px solid rgba(239,68,68,.25); }
-  .status-in_progress   { background: rgba(201,162,39,.1);  color: var(--accent2); border: 1px solid rgba(201,162,39,.25); }
+  .status-in_progress   { background: rgba(139,92,246,.1);  color: var(--accent2); border: 1px solid rgba(139,92,246,.25); }
   .status-pending       { background: rgba(245,158,11,.1);  color: var(--yellow2); border: 1px solid rgba(245,158,11,.25); }
   .status-scheduled     { background: rgba(16,185,129,.08); color: var(--green2);  border: 1px solid rgba(16,185,129,.2); }
   .status-done          { background: rgba(90,100,144,.1);  color: var(--muted2);  border: 1px solid rgba(90,100,144,.2); }
@@ -47,7 +47,7 @@
   }
   .bottleneck-item.impact-high { background: rgba(239,68,68,.06);   border: 1px solid rgba(239,68,68,.2);  }
   .bottleneck-item.impact-mid  { background: rgba(245,158,11,.06);  border: 1px solid rgba(245,158,11,.2); }
-  .bottleneck-item.impact-low  { background: rgba(201,162,39,.06);  border: 1px solid rgba(201,162,39,.2); }
+  .bottleneck-item.impact-low  { background: rgba(139,92,246,.06);  border: 1px solid rgba(139,92,246,.2); }
   .bottleneck-area {
     font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
     white-space: nowrap; flex-shrink: 0; margin-top: 1px;
@@ -66,7 +66,7 @@
   .escalation-urgency-low  { border-left: 3px solid var(--muted); }
   .escalation-badge {
     font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
-    background: rgba(201,162,39,.1); color: var(--purple2); border: 1px solid rgba(201,162,39,.25);
+    background: rgba(139,92,246,.1); color: var(--purple2); border: 1px solid rgba(139,92,246,.25);
     flex-shrink: 0; white-space: nowrap;
   }
   .escalation-body { flex: 1; }
@@ -85,8 +85,8 @@
     width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 800;
-    background: rgba(201,162,39,.12);
-    border: 1px solid rgba(201,162,39,.2); color: var(--accent2);
+    background: rgba(139,92,246,.12);
+    border: 1px solid rgba(139,92,246,.2); color: var(--accent2);
   }
   .priority-focus      { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
   .priority-rationale  { font-size: 12px; color: var(--muted2); line-height: 1.55; }
@@ -96,10 +96,10 @@
     display: flex; align-items: flex-start; gap: 13px;
     padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 9px;
     background: var(--s1);
-    border: 1px solid rgba(201,162,39,.2);
+    border: 1px solid rgba(139,92,246,.2);
     transition: border-color .18s;
   }
-  .to-president-item:hover { border-color: rgba(201,162,39,.45); }
+  .to-president-item:hover { border-color: rgba(139,92,246,.45); }
   .to-president-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
   .to-president-item-title   { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
   .to-president-context { font-size: 12px; color: var(--muted2); line-height: 1.55; }
@@ -173,16 +173,16 @@
       <div style="font-size:11px;font-weight:700;color:#f59e0b;">社長 (Satoshi)</div>
       <div style="font-size:9.5px;color:var(--muted);">最終意思決定</div>
     </div>
-    <div style="flex:1;height:2px;background:linear-gradient(90deg,#f59e0b,#e8c84a);min-width:20px;margin:0 6px;border-radius:2px;position:relative;">
+    <div style="flex:1;height:2px;background:linear-gradient(90deg,#f59e0b,#A78BFA);min-width:20px;margin:0 6px;border-radius:2px;position:relative;">
       <span style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap;">指示</span>
     </div>
     <!-- AI CEO -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:90px;">
-      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#e8c84a,#c9a227);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(201,162,39,.3);"><span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span></div>
-      <div style="font-size:11px;font-weight:700;color:#e8c84a;">AI CEO</div>
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#A78BFA,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(139,92,246,.3);"><span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span></div>
+      <div style="font-size:11px;font-weight:700;color:#A78BFA;">AI CEO</div>
       <div style="font-size:9.5px;color:var(--muted);">分析・タスク割り当て</div>
     </div>
-    <div style="flex:1;height:2px;background:linear-gradient(90deg,#e8c84a,#10b981);min-width:20px;margin:0 6px;border-radius:2px;position:relative;">
+    <div style="flex:1;height:2px;background:linear-gradient(90deg,#A78BFA,#10b981);min-width:20px;margin:0 6px;border-radius:2px;position:relative;">
       <span style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap;">ディスパッチ</span>
     </div>
     <!-- Agents -->
@@ -191,13 +191,13 @@
       <div style="font-size:11px;font-weight:700;color:#10b981;">AI Agents</div>
       <div style="font-size:9.5px;color:var(--muted);">専門スキル実行</div>
     </div>
-    <div style="flex:1;height:2px;background:linear-gradient(90deg,#10b981,#c9a227);min-width:20px;margin:0 6px;border-radius:2px;position:relative;">
+    <div style="flex:1;height:2px;background:linear-gradient(90deg,#10b981,#8B5CF6);min-width:20px;margin:0 6px;border-radius:2px;position:relative;">
       <span style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap;">実行</span>
     </div>
     <!-- 完了 -->
     <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:70px;">
-      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#c9a227,#c9a227);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(201,162,39,.3);"></div>
-      <div style="font-size:11px;font-weight:700;color:#c9a227;">完了</div>
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8B5CF6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(139,92,246,.3);"></div>
+      <div style="font-size:11px;font-weight:700;color:#8B5CF6;">完了</div>
       <div style="font-size:9.5px;color:var(--muted);">SNS投稿・リード等</div>
     </div>
   </div>
@@ -231,8 +231,8 @@
       <span style="display:inline-flex;align-items:center;"><i data-lucide="building"></i></span> CEO に指示を送る
     </button>
     <button onclick="triggerDispatch()" id="dispatch-btn"
-      style="background:rgba(201,162,39,.15);color:var(--purple2);font-weight:600;font-size:12px;
-             padding:9px 16px;border:1px solid rgba(201,162,39,.3);border-radius:10px;cursor:pointer;">
+      style="background:rgba(139,92,246,.15);color:var(--purple2);font-weight:600;font-size:12px;
+             padding:9px 16px;border:1px solid rgba(139,92,246,.3);border-radius:10px;cursor:pointer;">
       ↺ 日次ディスパッチを今すぐ実行
     </button>
     <span id="instruct-status" style="font-size:12px;color:var(--muted2);"></span>
@@ -241,7 +241,7 @@
 
 <!-- ══ 社長に上げるべき案件（最上位表示）══ -->
 {% if to_president %}
-<div class="card" style="margin-bottom:20px;border-color:rgba(201,162,39,.3);">
+<div class="card" style="margin-bottom:20px;border-color:rgba(139,92,246,.3);">
   <div class="section-header">
     <span class="section-title" style="color:var(--accent2);"><span style="display:inline-flex;align-items:center;"><i data-lucide="crown"></i></span> 社長に上げるべき案件</span>
     <a href="/president" class="section-action">社長画面を開く →</a>
@@ -410,7 +410,7 @@
 </div>
 
 <!-- ══ AI Chief of Staff パネル ══ -->
-<div style="margin-bottom:16px; padding:16px 20px; background:linear-gradient(135deg, rgba(201,162,39,.07), rgba(201,162,39,.04)); border:1px solid rgba(201,162,39,.2); border-radius:var(--radius); display:flex; align-items:flex-start; gap:20px;">
+<div style="margin-bottom:16px; padding:16px 20px; background:linear-gradient(135deg, rgba(139,92,246,.07), rgba(139,92,246,.04)); border:1px solid rgba(139,92,246,.2); border-radius:var(--radius); display:flex; align-items:flex-start; gap:20px;">
   <div style="font-size:26px; flex-shrink:0;"><span style="display:inline-flex;align-items:center;"><i data-lucide="brain"></i></span></div>
   <div style="flex:1; min-width:0;">
     <div style="font-size:13px; font-weight:700; margin-bottom:10px;">AI Chief of Staff — ブランド別おすすめアクション</div>
@@ -440,8 +440,8 @@
   </div>
   {% for alert in open_anomalies[:4] %}
   <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 14px; border-radius:var(--radius-sm); margin-bottom:8px;
-    {% if alert.severity == 'alert' %}background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);{% elif alert.severity == 'warn' %}background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);{% else %}background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);{% endif %}">
-    <span style="font-size:14px;flex-shrink:0;">{% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span>{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span>{% else %}<span style="color:#c9a227;">●</span>{% endif %}</span>
+    {% if alert.severity == 'alert' %}background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);{% elif alert.severity == 'warn' %}background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);{% else %}background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);{% endif %}">
+    <span style="font-size:14px;flex-shrink:0;">{% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span>{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span>{% else %}<span style="color:#8B5CF6;">●</span>{% endif %}</span>
     <div style="flex:1;">
       <div style="font-size:12.5px;font-weight:600;margin-bottom:2px;">
         {% if alert.brand %}[{{ alert.brand }}] {% endif %}{{ alert.metric }} — {{ alert.platform }}

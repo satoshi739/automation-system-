@@ -99,6 +99,15 @@ class WordPressPoster:
             f"{self.wp_url}/wp-json/wp/v2/posts/{post_id}",
             headers=self._auth(), json={"status":"publish"}
         )
+        if r.status_code == 401:
+            log.error(f"WordPress公開失敗: 認証エラー (post_id={post_id})")
+            return {"status":"auth_error","error":"401 Unauthorized"}
+        if r.status_code == 403:
+            log.error(f"WordPress公開失敗: 権限不足 (post_id={post_id})")
+            return {"status":"forbidden","error":"403 Forbidden"}
+        if r.status_code == 404:
+            log.error(f"WordPress公開失敗: 投稿が見つからない (post_id={post_id})")
+            return {"status":"not_found","error":"404 Not Found"}
         r.raise_for_status()
         post = r.json()
         return {"status":"published","url":post.get("link","")}

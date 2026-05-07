@@ -104,8 +104,8 @@ def retry_brand(brand: str, dry_run: bool) -> tuple[int, int]:
         data["image_url"] = public_url
         data.pop("error", None)
         data.pop("needs_review", None)
-        with open(yf, "w", encoding="utf-8") as f:
-            yaml.dump(data, f, allow_unicode=True, default_flow_style=False)
+        from utils import atomic_yaml_write
+        atomic_yaml_write(yf, data)
         logger.info("[%s] YAML 更新: %s", brand, yf.name)
 
         # processed に移動

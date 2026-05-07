@@ -34,13 +34,17 @@ class ThreadsPoster:
         # Step1: コンテナ作成
         c = self._api("POST", f"{self.account_id}/threads",
                       data={"media_type":"TEXT","text":text})
-        cid = c["id"]
+        cid = c.get("id")
+        if not cid:
+            log.error(f"Threadsコンテナ作成失敗: idなし (resp={c})")
+            return {"status":"error","error":"no container id"}
         time.sleep(3)
         # Step2: 公開
         r = self._api("POST", f"{self.account_id}/threads_publish",
                       data={"creation_id": cid})
-        log.info(f"Threads投稿完了: {r['id']}")
-        return {"status":"posted","id":r["id"]}
+        post_id = r.get("id")
+        log.info(f"Threads投稿完了: {post_id}")
+        return {"status":"posted","id":post_id}
 
     def post_image(self, image_url: str, text: str) -> dict:
         if self.dry_run:
@@ -48,8 +52,13 @@ class ThreadsPoster:
             return {"status":"dry_run"}
         c = self._api("POST", f"{self.account_id}/threads",
                       data={"media_type":"IMAGE","image_url":image_url,"text":text})
+        cid = c.get("id")
+        if not cid:
+            log.error(f"Threads画像コンテナ作成失敗: idなし (resp={c})")
+            return {"status":"error","error":"no container id"}
         time.sleep(5)
         r = self._api("POST", f"{self.account_id}/threads_publish",
-                      data={"creation_id": c["id"]})
-        log.info(f"Threads画像投稿完了: {r['id']}")
-        return {"status":"posted","id":r["id"]}
+                      data={"creation_id": cid})
+        post_id = r.get("id")
+        log.info(f"Threads画像投稿完了: {post_id}")
+        return {"status":"posted","id":post_id}

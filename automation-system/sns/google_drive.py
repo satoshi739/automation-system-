@@ -19,6 +19,9 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils import atomic_yaml_write
 
 logger = logging.getLogger(__name__)
 
@@ -147,8 +150,7 @@ def sync_from_drive(folder_id: str = "", caption_default: str = "") -> int:
         }
 
         try:
-            with open(out_file, "w", encoding="utf-8") as f:
-                yaml.dump(entry, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+            atomic_yaml_write(out_file, entry)
         except Exception as write_err:
             logger.error("キューファイル書き込み失敗 (%s): %s", name, write_err)
             continue

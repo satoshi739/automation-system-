@@ -58,7 +58,9 @@ class FacebookPoster:
                           params={"metric": metrics, "period": "month"})
             result = {}
             for item in r.get("data", []):
-                name = item["name"]
+                name = item.get("name")
+                if not name:
+                    continue
                 values = item.get("values", [{}])
                 result[name] = values[-1].get("value", 0) if values else 0
             return result

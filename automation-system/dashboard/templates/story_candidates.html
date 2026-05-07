@@ -70,16 +70,16 @@
         {% set frames = run.frames_json or [] %}
         {% for frame in frames[:3] %}
         {% set bg_map = {
-          'purple-blue':'linear-gradient(160deg,#c9a227,#3b82f6)',
+          'purple-blue':'linear-gradient(160deg,#8B5CF6,#3b82f6)',
           'orange-red':'linear-gradient(160deg,#f59e0b,#ef4444)',
           'green-teal':'linear-gradient(160deg,#10b981,#06b6d4)',
-          'pink-purple':'linear-gradient(160deg,#ec4899,#e8c84a)',
+          'pink-purple':'linear-gradient(160deg,#ec4899,#A78BFA)',
           'dark-blue':'linear-gradient(160deg,#1e3a8a,#1e40af)',
           'gold-orange':'linear-gradient(160deg,#d97706,#f59e0b)',
           'teal-cyan':'linear-gradient(160deg,#0d9488,#06b6d4)',
           'red-pink':'linear-gradient(160deg,#dc2626,#db2777)',
         } %}
-        {% set bg_grad = bg_map.get(frame.get('bg',''), 'linear-gradient(160deg,#c9a227,#3b82f6)') %}
+        {% set bg_grad = bg_map.get(frame.get('bg',''), 'linear-gradient(160deg,#8B5CF6,#3b82f6)') %}
         <div style="width:40px;height:70px;border-radius:8px;background:{{ bg_grad }};display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;overflow:hidden;">
           {{ frame.get('emoji','') }}
         </div>
@@ -243,17 +243,17 @@
 }
 .status-published { background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:var(--green); }
 .status-pending   { background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--yellow); }
-.status-approved  { background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.3);color:var(--accent2); }
+.status-approved  { background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:var(--accent2); }
 .status-rejected  { background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--red); }
 .status-failed    { background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--red); }
 </style>
 
 <script>
 const BG_GRAD = {
-  'purple-blue':'linear-gradient(160deg,#c9a227,#3b82f6)',
+  'purple-blue':'linear-gradient(160deg,#8B5CF6,#3b82f6)',
   'orange-red':'linear-gradient(160deg,#f59e0b,#ef4444)',
   'green-teal':'linear-gradient(160deg,#10b981,#06b6d4)',
-  'pink-purple':'linear-gradient(160deg,#ec4899,#e8c84a)',
+  'pink-purple':'linear-gradient(160deg,#ec4899,#A78BFA)',
   'dark-blue':'linear-gradient(160deg,#1e3a8a,#1e40af)',
   'gold-orange':'linear-gradient(160deg,#d97706,#f59e0b)',
   'teal-cyan':'linear-gradient(160deg,#0d9488,#06b6d4)',

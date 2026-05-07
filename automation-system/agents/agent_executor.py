@@ -28,6 +28,7 @@ if str(_BASE) not in sys.path:
 
 import org_database as db
 from agents import orchestrator
+from utils import atomic_yaml_write
 
 log = logging.getLogger(__name__)
 
@@ -675,15 +676,13 @@ def _h_queue_push(inp: dict, ctx: dict) -> dict:
     dest = QUEUE_ROOT / brand / platform
     dest.mkdir(parents=True, exist_ok=True)
     fname = f"{ts}_agent.yaml"
-    with open(dest / fname, "w", encoding="utf-8") as f:
-        yaml.dump(entry, f, allow_unicode=True, default_flow_style=False)
+    atomic_yaml_write(dest / fname, entry)
 
     # instagram キューにも追加
     if platform == "instagram":
         ig_dir = QUEUE_ROOT / "instagram"
         ig_dir.mkdir(parents=True, exist_ok=True)
-        with open(ig_dir / fname, "w", encoding="utf-8") as f:
-            yaml.dump(entry, f, allow_unicode=True, default_flow_style=False)
+        atomic_yaml_write(ig_dir / fname, entry)
 
     log.info(f"queue_push: {brand}/{platform} → {fname}")
     return {"ok": True, "file": fname, "brand": brand, "platform": platform}
@@ -809,8 +808,7 @@ def _h_stage_update(inp: dict, ctx: dict) -> dict:
             "at": datetime.now().isoformat(), "note": note
         })
 
-    with open(lead_path, "w", encoding="utf-8") as f:
-        yaml.dump(lead, f, allow_unicode=True, default_flow_style=False)
+    atomic_yaml_write(lead_path, lead)
 
     log.info(f"stage_update: lead_id={lead_id} {old_stage} → {stage}")
     return {"ok": True, "lead_id": lead_id, "old_stage": old_stage, "new_stage": stage}
@@ -1099,8 +1097,7 @@ def _h_lead_create(inp: dict, ctx: dict) -> dict:
     dest_dir = LEADS_DIR / brand
     dest_dir.mkdir(parents=True, exist_ok=True)
     fname = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{lead_id}.yaml"
-    with open(dest_dir / fname, "w", encoding="utf-8") as f:
-        _yaml.dump(lead, f, allow_unicode=True, default_flow_style=False)
+    atomic_yaml_write(dest_dir / fname, lead)
     log.info(f"lead_create: {brand}/{fname}")
     return {"ok": True, "lead_id": lead_id, "file": fname}
 
@@ -1217,8 +1214,7 @@ def _h_escalate_lead(inp: dict, ctx: dict) -> dict:
         "created_at": datetime.now().isoformat(),
     }
     DECISION_DIR.mkdir(parents=True, exist_ok=True)
-    with open(DECISION_DIR / f"{ts}_lead_{lead_id}.yaml", "w", encoding="utf-8") as f:
-        _yaml.dump(entry, f, allow_unicode=True, default_flow_style=False)
+    atomic_yaml_write(DECISION_DIR / f"{ts}_lead_{lead_id}.yaml", entry)
     # Satoshi に LINE 通知
     owner_id = os.environ.get("OWNER_LINE_USER_ID", "")
     if owner_id:

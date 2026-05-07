@@ -6,10 +6,15 @@ python-dotenv==1.0.1
 pyyaml==6.0.1
 line-bot-sdk==3.21.0
 anthropic>=0.28.0
-# Google Drive 連携
+# Google Drive / GA4 / Search Console
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
 google-api-python-client==2.126.0
+google-analytics-data>=0.18.0
+# Stripe
+stripe>=7.0.0
+# Twitter/X
+tweepy>=4.14.0
 # 本番サーバー
 gunicorn==22.0.0
 

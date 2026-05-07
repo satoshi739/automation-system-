@@ -28,6 +28,7 @@ sys.path.insert(0, str(_ROOT))
 from dotenv import load_dotenv
 load_dotenv(_ROOT / ".env")
 
+from utils import atomic_yaml_write
 from repurpose.analyzer import BlogAnalyzer
 from repurpose.generators.x_generator import XGenerator
 from repurpose.generators.carousel_generator import CarouselGenerator
@@ -138,8 +139,7 @@ def run_repurpose(
         timestamp=timestamp,
     )
 
-    with open(out_path, "w", encoding="utf-8") as f:
-        yaml.dump(doc, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    atomic_yaml_write(out_path, doc)
 
     log.info(f"レビューYAML保存完了: {out_path}")
     return out_path
@@ -310,8 +310,7 @@ if __name__ == "__main__":
                 **{k: v for k, v in result.items() if k not in ("type",)},
             }],
         }
-        with open(out_path, "w", encoding="utf-8") as f:
-            yaml.dump(doc, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+        atomic_yaml_write(out_path, doc)
         print(f"生成完了: {out_path}")
 
     elif args.test:

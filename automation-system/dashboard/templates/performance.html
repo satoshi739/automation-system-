@@ -11,7 +11,7 @@
     color: var(--muted2); transition: all .15s; font-family: inherit;
   }
   .tab-btn.active {
-    background: rgba(201,162,39,.15); border-color: rgba(201,162,39,.4); color: var(--accent2);
+    background: rgba(139,92,246,.15); border-color: rgba(139,92,246,.4); color: var(--accent2);
   }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
@@ -48,7 +48,7 @@
 <div class="tabs">
   {% for bid in brands %}
   <button class="tab-btn {% if loop.first %}active{% endif %}" onclick="switchTab('{{ bid }}')">
-    <span style="width:8px;height:8px;border-radius:50%;background:{{ brands[bid].get('color','#c9a227') }};display:inline-block;margin-right:6px;"></span>
+    <span style="width:8px;height:8px;border-radius:50%;background:{{ brands[bid].get('color','#8B5CF6') }};display:inline-block;margin-right:6px;"></span>
     {{ brands[bid].get('name_short', bid) }}
   </button>
   {% endfor %}
@@ -164,8 +164,8 @@ function renderCharts() {
         datasets: [{
           label: 'エンゲージメント率 (%)',
           data: values,
-          backgroundColor: 'rgba(201,162,39,.55)',
-          borderColor: 'rgba(201,162,39,.9)',
+          backgroundColor: 'rgba(139,92,246,.55)',
+          borderColor: 'rgba(139,92,246,.9)',
           borderWidth: 1,
           borderRadius: 6,
         }]

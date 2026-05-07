@@ -190,7 +190,7 @@
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
         {% for b in brands %}
         <span class="brand-chip">
-          <span style="width:7px;height:7px;border-radius:50%;background:{{ b.color or '#c9a227' }};box-shadow:0 0 5px {{ b.color or '#c9a227' }};"></span>
+          <span style="width:7px;height:7px;border-radius:50%;background:{{ b.color or '#8B5CF6' }};box-shadow:0 0 5px {{ b.color or '#8B5CF6' }};"></span>
           {{ b.short_name or b.name }}{% if b.is_primary %} <span style="display:inline-flex;align-items:center;color:#fbbf24;"><i data-lucide="star"></i></span>{% endif %}
         </span>
         {% endfor %}

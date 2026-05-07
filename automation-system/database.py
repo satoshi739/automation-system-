@@ -932,7 +932,7 @@ def list_queue(brand: str = "", channel: str = "",
 
 def next_pending(brand: str, channel: str) -> dict | None:
     """次の投稿可能アイテムを返す（scheduled_at が未来のものはスキップ）"""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with get_conn() as conn:
         row = conn.execute("""
             SELECT * FROM queue_items

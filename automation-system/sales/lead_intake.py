@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
+from utils import atomic_yaml_write
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +89,7 @@ def create_lead_from_line(user_id: str, display_name: str, message: str, channel
 
     LEADS_DIR.mkdir(parents=True, exist_ok=True)
     out_path = LEADS_DIR / f"{lead_id}.yaml"
-    with open(out_path, "w", encoding="utf-8") as f:
-        yaml.dump(lead, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    atomic_yaml_write(out_path, lead)
 
     logger.info(f"リード起票完了: {out_path}")
     return out_path
@@ -126,8 +126,7 @@ def update_lead_stage(lead_id: str, new_stage: str, note: str = "") -> bool:
     if note:
         data["notes"] = (data.get("notes") or "") + f"\n{datetime.now().strftime('%Y-%m-%d')}: {note}"
 
-    with open(path, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    atomic_yaml_write(path, data)
 
     logger.info(f"リードステージ更新: {lead_id} → {new_stage}")
     return True

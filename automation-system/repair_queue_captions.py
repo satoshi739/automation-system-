@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 import yaml
+from utils import atomic_yaml_write
 
 QUEUE_DIR = Path(__file__).parent / "content_queue" / "instagram"
 
@@ -78,8 +79,7 @@ def repair_file(path: Path) -> bool:
     data["caption"] = full_caption
     data.pop("needs_review", None)
 
-    with open(path, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
+    atomic_yaml_write(path, data)
 
     print(f"  [OK] {path.name}")
     print(f"       → {full_caption[:60].replace(chr(10), ' ')}...")

@@ -22,7 +22,7 @@
   }
   .sev-alert-chip { background: rgba(239,68,68,.1);   color: var(--red);     border: 1px solid rgba(239,68,68,.25); }
   .sev-warn-chip  { background: rgba(245,158,11,.1);  color: var(--yellow2); border: 1px solid rgba(245,158,11,.25); }
-  .sev-info-chip  { background: rgba(201,162,39,.1);  color: var(--accent2); border: 1px solid rgba(201,162,39,.25); }
+  .sev-info-chip  { background: rgba(139,92,246,.1);  color: var(--accent2); border: 1px solid rgba(139,92,246,.25); }
 
   .metric-compare {
     display: flex; gap: 24px; margin: 10px 0; padding: 12px 14px;
@@ -89,7 +89,7 @@
   <div class="alert-card sev-{{ alert.severity }}">
     <div class="alert-header">
       <span class="alert-severity sev-{{ alert.severity }}-chip">
-        {% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span> 緊急{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span> 警告{% else %}<span style="color:#c9a227;">●</span> 情報{% endif %}
+        {% if alert.severity == 'alert' %}<span style="color:#ef4444;">●</span> 緊急{% elif alert.severity == 'warn' %}<span style="color:#f59e0b;">●</span> 警告{% else %}<span style="color:#8B5CF6;">●</span> 情報{% endif %}
       </span>
       {% if alert.brand %}
       <span style="width:7px;height:7px;border-radius:50%;background:{{ alert.brand_color }};box-shadow:0 0 5px {{ alert.brand_color }};flex-shrink:0;"></span>

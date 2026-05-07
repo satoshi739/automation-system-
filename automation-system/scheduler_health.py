@@ -134,7 +134,10 @@ def _check_instagram_posts_24h() -> tuple[bool, str]:
             if act.get("action") != "post" or act.get("platform") != "instagram":
                 continue
             try:
-                ts = datetime.strptime(act["created_at"][:19], "%Y-%m-%d %H:%M:%S")
+                created = (act.get("created_at") or "")[:19]
+                if not created:
+                    continue
+                ts = datetime.strptime(created, "%Y-%m-%d %H:%M:%S")
                 if ts >= cutoff:
                     posted_count += 1
             except Exception:

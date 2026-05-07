@@ -136,8 +136,8 @@ def post_instagram_queue() -> int:
             continue
         item = db.next_pending(brand_id, "instagram")
         if item:
-            if not item.get("image_url") and item.get("needs_review"):
-                logger.warning(f"Instagram投稿スキップ (needs_review): {brand_id} DB id={item['id']}")
+            if not item.get("image_url"):
+                logger.warning(f"Instagram投稿スキップ (image_url未設定): {brand_id} DB id={item['id']}")
                 continue
             try:
                 poster = InstagramPoster(brand_id)
@@ -182,19 +182,29 @@ def post_instagram_queue() -> int:
                 sched = data.get("scheduled_at")
                 if sched:
                     try:
-                        if datetime.strptime(str(sched), "%Y-%m-%d %H:%M") > now:
+                        sched_norm = str(sched).replace("Z", "+00:00")
+                        sched_dt = datetime.fromisoformat(sched_norm)
+                        sched_dt = sched_dt.replace(tzinfo=None) if sched_dt.tzinfo else sched_dt
+                        if sched_dt > now:
                             continue
                     except ValueError:
-                        pass
+                        logger.warning(f"Instagram scheduled_at パース失敗({f.name}): {sched!r} — スキップ")
+                        continue
                 try:
+                    # YAMLのbrandフィールドからPosterを生成（未定義防止）
+                    brand_id = data.get("brand", "")
+                    yaml_poster = InstagramPoster(brand_id) if brand_id else None
+                    if yaml_poster is None:
+                        logger.warning(f"Instagram投稿スキップ(YAML): brandが未設定 {f.name}")
+                        continue
                     media_type = data.get("media_type", "image")
                     if media_type == "reel":
-                        poster.post_reel(video_url=data.get("video_url",""),
-                                         caption=data.get("caption",""),
-                                         cover_url=data.get("cover_url",""))
+                        yaml_poster.post_reel(video_url=data.get("video_url",""),
+                                              caption=data.get("caption",""),
+                                              cover_url=data.get("cover_url",""))
                     else:
-                        poster.post_image(image_url=data.get("image_url",""),
-                                          caption=data.get("caption",""))
+                        yaml_poster.post_image(image_url=data.get("image_url",""),
+                                               caption=data.get("caption",""))
                     data["posted"] = True
                     _atomic_yaml_write(f, data)
                     posted_total += 1
@@ -273,15 +283,25 @@ def post_line_queue() -> int:
                 sched_line = data.get("scheduled_at")
                 if sched_line:
                     try:
-                        if datetime.strptime(str(sched_line), "%Y-%m-%d %H:%M") > now:
+                        sched_norm = str(sched_line).replace("Z", "+00:00")
+                        sched_dt = datetime.fromisoformat(sched_norm)
+                        sched_dt = sched_dt.replace(tzinfo=None) if sched_dt.tzinfo else sched_dt
+                        if sched_dt > now:
                             continue
                     except ValueError:
-                        pass
+                        logger.warning(f"LINE scheduled_at パース失敗({f.name}): {sched_line!r} — スキップ")
+                        continue
                 try:
+                    # YAMLのbrandフィールドからMessengerを生成（未定義防止）
+                    brand_id = data.get("brand", "")
+                    yaml_messenger = get_brand_messenger(brand_id) if brand_id else None
+                    if yaml_messenger is None or not yaml_messenger.enabled:
+                        logger.warning(f"LINE配信スキップ(YAML): brand未設定またはトークン未設定 {f.name}")
+                        continue
                     if data.get("image_url"):
-                        messenger.broadcast_with_image(data.get("message",""), data["image_url"])
+                        yaml_messenger.broadcast_with_image(data.get("message",""), data.get("image_url",""))
                     else:
-                        messenger.broadcast(data.get("message",""))
+                        yaml_messenger.broadcast(data.get("message",""))
                     data["posted"] = True
                     _atomic_yaml_write(f, data)
                     sent_total += 1
@@ -294,15 +314,17 @@ def post_line_queue() -> int:
     return sent_total
 
 
-def _add_to_decision_queue(type_: str, reason: str, detail: dict = {}):
+def _add_to_decision_queue(type_: str, reason: str, detail: dict | None = None):
     """判断待ちキューにアイテムを追加する（DB + YAML後方互換）"""
+    if detail is None:
+        detail = {}
     # DBに記録
     try:
         now = datetime.now()
         filename = f"{now.strftime('%Y%m%d_%H%M%S')}_{type_}.yaml"
         db.add_decision(reason=reason, type_=type_, context=detail, filename=filename)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"DB決定キュー追加失敗: {e}")
     # YAMLにも記録（後方互換）
     DECISION_QUEUE_DIR.mkdir(exist_ok=True)
     now = datetime.now()
@@ -316,8 +338,8 @@ def _add_to_decision_queue(type_: str, reason: str, detail: dict = {}):
             yaml.dump(item, allow_unicode=True, default_flow_style=False, sort_keys=False),
             encoding="utf-8",
         )
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error(f"YAML決定キュー書き込み失敗: {e}")
     logger.warning(f"判断待ちキューに追加: {type_} — {reason}")
 
 
