@@ -254,7 +254,7 @@ def post_line_queue() -> int:
                     logger.warning(f"LINE配信スキップ: {brand_id} のLINEトークン未設定")
                     continue
                 if item.get("image_url"):
-                    messenger.broadcast_with_image(item.get("message",""), item["image_url"])
+                    messenger.broadcast_with_image(item.get("message",""), item.get("image_url",""))
                 else:
                     messenger.broadcast(item.get("message",""))
                 db.mark_posted(item["id"])

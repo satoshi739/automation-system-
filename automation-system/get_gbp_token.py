@@ -166,8 +166,13 @@ if write_env == "y":
                     existing_keys.add(key)
 
     if lines:
-        with open(env_path, "w", encoding="utf-8") as fw:
-            fw.writelines(lines)
+        tmp_path = env_path.with_suffix(".tmp")
+        try:
+            tmp_path.write_text("".join(lines), encoding="utf-8")
+            tmp_path.replace(env_path)
+        except Exception:
+            tmp_path.unlink(missing_ok=True)
+            raise
 
     with open(env_path, "a", encoding="utf-8") as f:
         for key, val in [

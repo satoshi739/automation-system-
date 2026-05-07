@@ -559,7 +559,7 @@ def queue_add():
             entry["title"]       = request.form.get("title","")
             entry["description"] = request.form.get("description","")
             entry["video_url"]   = request.form.get("video_url","")
-            entry["tags"]        = request.form.get("tags","").split(",")
+            entry["tags"]        = [t.strip() for t in request.form.get("tags","").split(",") if t.strip()]
         elif ch == "tiktok":
             entry["title"]     = request.form.get("title","")
             entry["video_url"] = request.form.get("video_url","")
@@ -957,8 +957,8 @@ def _get_brand_cockpit(brand_id: str) -> dict:
             rows = conn.execute(
                 "SELECT COUNT(*), SUM(CASE WHEN status='online' THEN 1 ELSE 0 END) FROM agents"
             ).fetchone()
-            data["agents_total"] = rows[0] or 0
-            data["agents_online"] = rows[1] or 0
+            data["agents_total"] = (rows[0] if rows else None) or 0
+            data["agents_online"] = (rows[1] if rows else None) or 0
     except Exception:
         data["agents_total"] = 0
         data["agents_online"] = 0
@@ -1607,7 +1607,7 @@ def settings_page(brand_id):
         "anthropic":  bool(os.environ.get("ANTHROPIC_API_KEY") or env_data.get("ANTHROPIC_API_KEY")),
         "meta":       bool(env_data.get(f"{prefix}_META_ACCESS_TOKEN")),
         "twitter":    bool(env_data.get(f"{prefix}_TWITTER_API_KEY")),
-        "line":       bool(env_data.get("LINE_CHANNEL_ACCESS_TOKEN") or env_data.get(f"LINE_CHANNEL_ACCESS_TOKEN_{prefix.split('_')[0]}")),
+        "line":       bool(env_data.get(f"LINE_CHANNEL_ACCESS_TOKEN_CSF") if brand_id == "cashflowsupport" else env_data.get(f"LINE_CHANNEL_ACCESS_TOKEN_DSC") if brand_id == "dsc-marketing" else env_data.get(f"BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN") if brand_id == "bangkok-peach" else env_data.get("LINE_CHANNEL_ACCESS_TOKEN")),
         "wordpress":  bool(env_data.get(f"{prefix}_WP_APP_PASSWORD")),
         "youtube":    bool(env_data.get(f"{prefix}_YOUTUBE_CHANNEL_ID")),
         "tiktok":     bool(env_data.get(f"{prefix}_TIKTOK_ACCESS_TOKEN")),
@@ -1666,7 +1666,12 @@ def api_test_connection(brand_id, conn_type):
 
     elif conn_type == "line":
         try:
-            token_key = "LINE_CHANNEL_ACCESS_TOKEN" if brand_id == "dsc-marketing" else f"LINE_CHANNEL_ACCESS_TOKEN_{prefix.split('_')[0]}"
+            _LINE_KEY_MAP = {
+                "cashflowsupport": "LINE_CHANNEL_ACCESS_TOKEN_CSF",
+                "dsc-marketing":   "LINE_CHANNEL_ACCESS_TOKEN_DSC",
+                "bangkok-peach":   "BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN",
+            }
+            token_key = _LINE_KEY_MAP.get(brand_id, "LINE_CHANNEL_ACCESS_TOKEN")
             token = os.environ.get(token_key, "")
             if not token:
                 return jsonify({"ok": False, "error": "LINE_CHANNEL_ACCESS_TOKENが設定されていません"})
@@ -1894,7 +1899,8 @@ def weekly_page():
             try:
                 cal = yaml.safe_load(f.read_text(encoding="utf-8"))
                 if cal:
-                    brand_key = cal.get("brand", f.stem.split("_")[1] if "_" in f.stem else "unknown")
+                    parts = f.stem.split("_")
+                    brand_key = cal.get("brand", parts[1] if len(parts) > 1 else "unknown")
                     if brand_key not in calendars:
                         cal["_file"] = f.name
                         calendars[brand_key] = cal
