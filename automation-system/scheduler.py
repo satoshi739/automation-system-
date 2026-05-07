@@ -489,7 +489,7 @@ def followup_job():
         run_followup_check()
     except Exception as e:
         logger.error(f"フォローアップエラー: {e}", exc_info=True)
-        _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
+        _alert_owner(f"[followup_job] 失敗: {e}")
 
 
 def agent_tick_job():
@@ -501,7 +501,7 @@ def agent_tick_job():
         logger.info(f"エージェントtick完了: {summary}")
     except Exception as e:
         logger.error(f"エージェントtickエラー: {e}", exc_info=True)
-        _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
+        _alert_owner(f"[agent_tick_job] 失敗: {e}")
 
 
 def balance_check_job():
@@ -541,7 +541,7 @@ def ceo_dispatch_job():
         logger.info(f"サマリー: {result.get('summary', '')}")
     except Exception as e:
         logger.error(f"AI CEO ディスパッチエラー: {e}", exc_info=True)
-        _alert_owner(f"ジョブ失敗: {e}", dedup_key="job_fail")
+        _alert_owner(f"[ceo_dispatch_job] 失敗: {e}")
 
 
 BLOG_BRANDS = ["satoshi-blog", "upjapan", "dsc-marketing", "cashflowsupport", "bangkok-peach"]
@@ -675,7 +675,13 @@ def setup_schedule():
     logger.info("Google Drive同期: 1時間ごと")
 
     # 朝のオペレーター（毎朝5:00 JST = 20:00 UTC前日）
-    schedule.every().day.at("20:00").do(morning_run)
+    def _safe_morning_run():
+        try:
+            morning_run()
+        except Exception as exc:
+            logger.error("朝のオペレーターエラー: %s", exc, exc_info=True)
+            _alert_owner(f"[morning_operator] 失敗: {exc}")
+    schedule.every().day.at("20:00").do(_safe_morning_run)
     logger.info("朝のオペレーター: 毎朝5:00 JST (20:00 UTC)")
 
     # インサイト取得（毎朝6:00 JST = 21:00 UTC前日）
