@@ -375,7 +375,9 @@ def send_morning_summary(
         lines.append("対処: ./deploy.sh を実行してください")
 
     summary = "\n".join(lines)
-    messenger = LINEMessenger()
+    alert_token  = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
+    alert_secret = os.environ.get("ALERT_LINE_CHANNEL_SECRET", "")
+    messenger = LINEMessenger(token=alert_token, secret=alert_secret)
     messenger.push(OWNER_LINE_USER_ID, summary)
     logger.info("朝のサマリー送信完了")
 

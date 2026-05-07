@@ -242,8 +242,9 @@ def _handle_send_president_notification(args: dict) -> str:
         import os
         from sns.line_api import LINEMessenger
         # 社長通知専用: ALERT_LINE_CHANNEL_ACCESS_TOKEN を優先 (OWNER_LINE_USER_ID のフレンドチャンネル)
-        alert_token = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
-        messenger = LINEMessenger(token=alert_token) if alert_token else LINEMessenger()
+        alert_token  = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
+        alert_secret = os.environ.get("ALERT_LINE_CHANNEL_SECRET", "")
+        messenger = LINEMessenger(token=alert_token, secret=alert_secret)
         owner_id = os.environ.get("OWNER_LINE_USER_ID", "")
         if not owner_id:
             log.warning("OWNER_LINE_USER_ID未設定、LINE通知をスキップ")

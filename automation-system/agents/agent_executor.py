@@ -1428,8 +1428,10 @@ def _h_error_alert(inp: dict, ctx: dict) -> dict:
     owner_id = os.environ.get("OWNER_LINE_USER_ID", "")
     if not owner_id:
         return {"ok": False, "error": "OWNER_LINE_USER_ID が未設定です"}
+    alert_token  = os.environ.get("ALERT_LINE_CHANNEL_ACCESS_TOKEN", "")
+    alert_secret = os.environ.get("ALERT_LINE_CHANNEL_SECRET", "")
     full_msg = f"{icon} [{severity.upper()}] {message}"
-    ok = LINEMessenger().push(owner_id, full_msg)
+    ok = LINEMessenger(token=alert_token, secret=alert_secret).push(owner_id, full_msg)
     log.info(f"error_alert: severity={severity} ok={ok}")
     return {"ok": ok, "severity": severity}
 
