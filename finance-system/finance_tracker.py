@@ -32,6 +32,7 @@ _LOGS_DIR = _ROOT / "logs"
 load_dotenv(_AUTOMATION / ".env")
 
 sys.path.insert(0, str(_AUTOMATION))
+from utils import atomic_yaml_write
 
 
 def _current_month() -> str:
@@ -57,10 +58,8 @@ def _load_log(month: str) -> Optional[dict]:
 
 def _save_log(month: str, data: dict) -> None:
     _LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    p = _log_path(month)
-    with open(p, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
-    print(f"保存: {p}")
+    atomic_yaml_write(_log_path(month), data)
+    print(f"保存: {_log_path(month)}")
 
 
 def ensure_current_month_log() -> dict:
@@ -205,16 +204,69 @@ def alert_overdue() -> None:
     send_line_report("\n".join(lines))
 
 
+def sync_from_stripe(month: Optional[str] = None) -> dict:
+    """Stripe から MRR・チャーン・売上を取得して当月ログに上書きする。
+    STRIPE_SECRET_KEY 未設定の場合は何もしない。"""
+    try:
+        from finance.stripe_client import get_summary
+    except ImportError:
+        return {"status": "skip", "reason": "stripe_client not found"}
+
+    result = get_summary()
+    mrr_info = result.get("mrr", {})
+    churn_info = result.get("churn", {})
+
+    if mrr_info.get("status") == "unset":
+        return {"status": "skip", "reason": "STRIPE_SECRET_KEY unset"}
+    if mrr_info.get("status") == "error":
+        return {"status": "error", "reason": mrr_info.get("error_msg", "")}
+
+    month = month or _current_month()
+    data = _load_log(month)
+    if data is None:
+        data = _load_template()
+        data["month"] = month
+
+    # Stripe の値で上書き（ログ上の手入力値を Stripe 実績で補正する）
+    mrr_jpy = mrr_info.get("mrr_jpy", 0)
+    data["mrr_end"] = mrr_jpy
+    data["mrr_start"] = data.get("mrr_start") or mrr_jpy  # 初回は同値で初期化
+
+    churn_count = churn_info.get("churn_count", 0)
+    if churn_count and not data.get("churned_clients"):
+        data["churned_clients"] = [f"(Stripe集計: {churn_count}件)"]
+
+    rev_series = result.get("series", {})
+    if rev_series.get("status") == "ok":
+        total_30d = result.get("total_revenue_30d", 0)
+        if total_30d:
+            data["total_revenue_incl_tax"] = total_30d
+            data["total_revenue_excl_tax"] = round(total_30d / 1.1)
+            data["gross_profit"] = data["total_revenue_excl_tax"] - data.get("cogs", 0)
+
+    data.setdefault("notes", "")
+    data["notes"] = (data["notes"] + f"\n[Stripe sync: {datetime.now().strftime('%Y-%m-%d %H:%M')}]").strip()
+
+    _save_log(month, data)
+    print(f"Stripe sync 完了: MRR ¥{mrr_jpy:,}")
+    return {"status": "ok", "mrr_jpy": mrr_jpy}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--report", action="store_true", help="月次レポートをLINEに送信")
     parser.add_argument("--month", default=None, help="対象月 (YYYY-MM)")
     parser.add_argument("--alert-overdue", action="store_true", help="未回収請求があればLINEアラート")
+    parser.add_argument("--sync-stripe", action="store_true", help="Stripe から MRR を同期して保存")
     args = parser.parse_args()
 
     ensure_current_month_log()
 
-    if args.report:
+    if args.sync_stripe:
+        result = sync_from_stripe(args.month)
+        print(f"Stripe sync: {result}")
+    elif args.report:
+        sync_from_stripe(args.month)  # レポート前に最新値を取得
         report = build_report(args.month)
         print(report)
         send_line_report(report)

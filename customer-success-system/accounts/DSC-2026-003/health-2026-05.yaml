@@ -1,0 +1,26 @@
+project_id: DSC-2026-003
+brand: dsc-marketing
+client_name: 合同会社テストD
+review_month: "2026-05"
+
+payment_status: overdue
+meetings_held: 0
+sla_breaches: 0
+
+satisfaction: unknown
+relationship_owner_client: ""
+notes_on_relationship: 納品後、連絡が取れていない。支払い期日（4月末）超過。
+
+at_risk: true
+risk_signals:
+  - 支払い30日超過
+  - 連絡未応答
+
+actions_this_month:
+  - "2026-04-09: 請求書送付済み (¥110,000)。"
+  - "2026-05-01: 入金確認連絡 → 未返答。"
+  - "2026-05-07: 督促2回目が必要。"
+
+next_touch_date: "2026-05-09"
+
+notes: "単発案件のため継続リスクはないが、¥110,000の回収が必須。電話での督促を検討。"

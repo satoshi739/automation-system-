@@ -1,0 +1,40 @@
+project_id: DSC-2026-003
+brand: dsc-marketing
+type: one-time
+
+client_name: 合同会社テストD
+client_contact:
+  name: ""
+  email: ""
+  phone: ""
+  slack_or_line: ""
+
+project_name: 合同会社テストD Webサイト改善
+description: コーポレートサイトCVR改善・LP制作（単発）
+
+start_date: "2026-03-15"
+end_date: "2026-04-30"
+monthly_renewal: false
+
+monthly_fee_jpy: 0
+total_fee_jpy: 110000
+
+billing:
+  billing_cycle: 納品後即時払い
+  last_invoice_date: "2026-04-09"
+  last_payment_date: ""
+  payment_status: overdue
+
+phase: P4
+last_update: "2026-05-07"
+next_milestone: 入金確認・督促連絡
+next_milestone_date: "2026-05-09"
+
+project_manager: Satoshi
+
+deliverables:
+  - LP制作（納品済み）
+  - 改善レポート（納品済み）
+
+notes: ""
+issues: "請求書発行から30日超過。入金確認と督促が必要。"

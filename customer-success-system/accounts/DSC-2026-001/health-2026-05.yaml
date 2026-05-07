@@ -1,0 +1,23 @@
+project_id: DSC-2026-001
+brand: dsc-marketing
+client_name: 株式会社グロースメディア
+review_month: "2026-05"
+
+payment_status: current
+meetings_held: 1
+sla_breaches: 0
+
+satisfaction: high
+relationship_owner_client: 田中 誠
+notes_on_relationship: 担当者の反応良好。毎月定例MTGで方向性を確認している。
+
+at_risk: false
+risk_signals: []
+
+actions_this_month:
+  - "2026-05-02: 月次定例MTG実施。5月コンテンツ方針合意。"
+  - "2026-05-07: 5月1〜2週分の投稿キュー確認済み。"
+
+next_touch_date: "2026-05-20"
+
+notes: "3ヶ月継続。満足度高く、紹介の可能性を探っている。"

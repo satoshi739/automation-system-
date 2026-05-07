@@ -1385,7 +1385,7 @@ def _h_health_check(inp: dict, ctx: dict) -> dict:
     # ANTHROPIC_API_KEY
     checks["anthropic_api"] = {"ok": bool(os.environ.get("ANTHROPIC_API_KEY"))}
     # LINE
-    checks["line_api"] = {"ok": bool(os.environ.get("LINE_CHANNEL_ACCESS_TOKEN"))}
+    checks["line_api"] = {"ok": bool(os.environ.get("CASHFLOWSUPPORT_LINE_CHANNEL_ACCESS_TOKEN") or os.environ.get("BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN"))}
     # Meta
     checks["meta_api"] = {"ok": bool(os.environ.get("DSC_MARKETING_META_ACCESS_TOKEN"))}
     # キュー

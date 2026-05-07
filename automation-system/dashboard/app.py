@@ -1608,7 +1608,7 @@ def settings_page(brand_id):
         "anthropic":  bool(os.environ.get("ANTHROPIC_API_KEY") or env_data.get("ANTHROPIC_API_KEY")),
         "meta":       bool(env_data.get(f"{prefix}_META_ACCESS_TOKEN")),
         "twitter":    bool(env_data.get(f"{prefix}_TWITTER_API_KEY")),
-        "line":       bool(env_data.get(f"LINE_CHANNEL_ACCESS_TOKEN_CSF") if brand_id == "cashflowsupport" else env_data.get(f"LINE_CHANNEL_ACCESS_TOKEN_DSC") if brand_id == "dsc-marketing" else env_data.get(f"BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN") if brand_id == "bangkok-peach" else env_data.get("LINE_CHANNEL_ACCESS_TOKEN")),
+        "line":       bool(env_data.get(f"{prefix}_LINE_CHANNEL_ACCESS_TOKEN")),
         "wordpress":  bool(env_data.get(f"{prefix}_WP_APP_PASSWORD")),
         "youtube":    bool(env_data.get(f"{prefix}_YOUTUBE_CHANNEL_ID")),
         "tiktok":     bool(env_data.get(f"{prefix}_TIKTOK_ACCESS_TOKEN")),
@@ -1668,11 +1668,11 @@ def api_test_connection(brand_id, conn_type):
     elif conn_type == "line":
         try:
             _LINE_KEY_MAP = {
-                "cashflowsupport": "LINE_CHANNEL_ACCESS_TOKEN_CSF",
-                "dsc-marketing":   "LINE_CHANNEL_ACCESS_TOKEN_DSC",
+                "cashflowsupport": "CASHFLOWSUPPORT_LINE_CHANNEL_ACCESS_TOKEN",
+                "dsc-marketing":   "DSC_MARKETING_LINE_CHANNEL_ACCESS_TOKEN",
                 "bangkok-peach":   "BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN",
             }
-            token_key = _LINE_KEY_MAP.get(brand_id, "LINE_CHANNEL_ACCESS_TOKEN")
+            token_key = _LINE_KEY_MAP.get(brand_id, "")
             token = os.environ.get(token_key, "")
             if not token:
                 return jsonify({"ok": False, "error": "LINE_CHANNEL_ACCESS_TOKENが設定されていません"})

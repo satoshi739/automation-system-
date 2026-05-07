@@ -20,26 +20,13 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-
-def _atomic_yaml_write(file_path: Path, data: dict) -> None:
-    """YAML をアトミックに書き込む（temp → rename で途中クラッシュによる破損防止）"""
-    tmp = file_path.with_suffix(".tmp")
-    try:
-        tmp.write_text(
-            yaml.dump(data, allow_unicode=True, default_flow_style=False, sort_keys=False),
-            encoding="utf-8",
-        )
-        tmp.replace(file_path)
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
+load_dotenv(Path(__file__).parent / ".env")
 
 import database as db
 from sns.instagram import InstagramPoster
 from sns.line_api import LINEMessenger
 from sales.followup import run_followup_check
-
-load_dotenv(Path(__file__).parent / ".env")
+from utils import atomic_yaml_write as _atomic_yaml_write
 
 logging.basicConfig(
     level=logging.INFO,

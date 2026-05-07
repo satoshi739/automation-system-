@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 # ブランドスラッグ → (トークン環境変数名, シークレット環境変数名)
 _BRAND_LINE_ENV: dict[str, tuple[str, str]] = {
-    "cashflowsupport": ("LINE_CHANNEL_ACCESS_TOKEN_CSF",         "LINE_CHANNEL_SECRET_CSF"),
-    "dsc-marketing":   ("LINE_CHANNEL_ACCESS_TOKEN_DSC",         "LINE_CHANNEL_SECRET_DSC"),
-    "bangkok-peach":   ("BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN", "BANGKOK_PEACH_LINE_CHANNEL_SECRET"),
+    "cashflowsupport": ("CASHFLOWSUPPORT_LINE_CHANNEL_ACCESS_TOKEN", "CASHFLOWSUPPORT_LINE_CHANNEL_SECRET"),
+    "dsc-marketing":   ("DSC_MARKETING_LINE_CHANNEL_ACCESS_TOKEN",   "DSC_MARKETING_LINE_CHANNEL_SECRET"),
+    "bangkok-peach":   ("BANGKOK_PEACH_LINE_CHANNEL_ACCESS_TOKEN",   "BANGKOK_PEACH_LINE_CHANNEL_SECRET"),
 }
 
 
@@ -29,7 +29,7 @@ def get_brand_messenger(brand_slug: str) -> "LINEMessenger":
     （デフォルトチャンネルへのフォールバックはしない）。
     """
     token_key, secret_key = _BRAND_LINE_ENV.get(
-        brand_slug, ("LINE_CHANNEL_ACCESS_TOKEN", "LINE_CHANNEL_SECRET")
+        brand_slug, ("", "")
     )
     token  = os.environ.get(token_key, "")
     secret = os.environ.get(secret_key, "")
@@ -51,11 +51,11 @@ class LINEMessenger:
     BASE_URL = "https://api.line.me/v2/bot"
 
     def __init__(self, token: str = "", secret: str = ""):
-        self.token = token or os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
-        self.secret = secret or os.environ.get("LINE_CHANNEL_SECRET", "")
+        self.token = token or ""
+        self.secret = secret or ""
         self.dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
         if not self.token or not self.secret:
-            logger.warning("LINE_CHANNEL_ACCESS_TOKEN または LINE_CHANNEL_SECRET 未設定 — LINE機能を無効化")
+            logger.warning("LINEトークン未設定 — LINE機能を無効化")
             self.enabled = False
         else:
             self.enabled = True
@@ -77,7 +77,7 @@ class LINEMessenger:
     def reply(self, reply_token: str, message: str) -> bool:
         """Webhookイベントへの返信"""
         if not self.enabled:
-            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINE返信をスキップ")
+            logger.warning("LINEトークン未設定、LINE返信をスキップ")
             return False
         if self.dry_run:
             logger.info(f"[DRY RUN] LINE返信: {message[:40]}...")
@@ -105,7 +105,7 @@ class LINEMessenger:
     def push(self, user_id: str, message: str) -> bool:
         """特定ユーザーへのプッシュメッセージ"""
         if not self.enabled:
-            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINEプッシュをスキップ")
+            logger.warning("LINEトークン未設定、LINEプッシュをスキップ")
             return False
         if not user_id or not user_id.strip():
             logger.warning("LINEプッシュ: user_id が空のためスキップ")
@@ -149,7 +149,7 @@ class LINEMessenger:
     def broadcast(self, message: str) -> bool:
         """全友だちへの一斉配信"""
         if not self.enabled:
-            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINE一斉配信をスキップ")
+            logger.warning("LINEトークン未設定、LINE一斉配信をスキップ")
             return False
         if self.dry_run:
             logger.info(f"[DRY RUN] LINE一斉配信: {message[:40]}...")
@@ -175,7 +175,7 @@ class LINEMessenger:
     def broadcast_with_image(self, message: str, image_url: str, preview_url: str = "") -> bool:
         """画像付き一斉配信"""
         if not self.enabled:
-            logger.warning("LINE_CHANNEL_ACCESS_TOKEN未設定、LINE画像付き配信をスキップ")
+            logger.warning("LINEトークン未設定、LINE画像付き配信をスキップ")
             return False
         if not preview_url:
             preview_url = image_url

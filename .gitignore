@@ -26,4 +26,5 @@ Screenshot*.png
 
 # OAuth / API tokens (機密)
 automation-system/oauth_client_secret.json
-automation-system/scripts/ga4_admin_token.json
+automation-system/**/*_token.json
+automation-system/**/*_secret.json

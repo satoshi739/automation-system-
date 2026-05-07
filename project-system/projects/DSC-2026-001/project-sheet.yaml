@@ -1,0 +1,42 @@
+project_id: DSC-2026-001
+brand: dsc-marketing
+type: monthly
+
+client_name: 株式会社グロースメディア
+client_contact:
+  name: 田中 誠
+  email: tanaka@growthm.co.jp
+  phone: ""
+  slack_or_line: ""
+
+project_name: 株式会社グロースメディア SNS・LINE運用支援
+description: Instagram/Threads/Twitter の月次投稿代行 + LINE公式アカウント構築・運用
+
+start_date: "2026-02-01"
+end_date: ""
+monthly_renewal: true
+
+monthly_fee_jpy: 110880
+total_fee_jpy: 0
+
+billing:
+  billing_cycle: 月末締め翌月末払い
+  last_invoice_date: "2026-05-01"
+  last_payment_date: "2026-05-02"
+  payment_status: current
+
+phase: P4
+last_update: "2026-05-07"
+next_milestone: 5月投稿コンテンツ最終確認
+next_milestone_date: "2026-05-20"
+
+project_manager: Satoshi
+
+deliverables:
+  - Instagram月12本（リール含む）
+  - Threads・Twitter 月8本
+  - LINE配信月2回
+  - 月次レポート（インサイト集計）
+
+notes: ""
+issues: ""

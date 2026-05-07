@@ -54,6 +54,8 @@ _PROJECT_DASHBOARD = _ROOT.parent / "project-system"           / "project_dashbo
 _LEAD_PIPELINE     = _ROOT.parent / "sales-system"             / "lead_pipeline.py"
 _SHOP_SYNC         = _ROOT.parent / "shop-update-system"       / "sync_all_channels.py"
 _CONTENT_PLANNER   = _ROOT.parent / "marketing-system"         / "content_planner.py"
+_GENERATE_CONTENT  = _ROOT.parent / "marketing-system"         / "generate_content.py"
+_PROJECT_INTAKE    = _ROOT.parent / "project-system"           / "intake.py"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -760,6 +762,10 @@ def setup_schedule():
     schedule.every().sunday.at("23:00").do(lead_pipeline_job)
     logger.info("営業パイプラインチェック: 毎週月曜08:00 JST (日曜23:00 UTC)")
 
+    # 日次営業アクション確認（平日 09:00 JST = 00:00 UTC）
+    schedule.every().day.at("00:00").do(lead_daily_urgent_job)
+    logger.info("日次営業アクション確認: 毎日09:00 JST (00:00 UTC) ※土日は自動スキップ")
+
     # 店舗チャネル同期（毎週月曜 07:30 JST = 日曜 22:30 UTC）
     schedule.every().sunday.at("22:30").do(shop_sync_job)
     logger.info("店舗チャネル同期: 毎週月曜07:30 JST (日曜22:30 UTC)")
@@ -771,6 +777,10 @@ def setup_schedule():
     # DBバックアップ → Google Drive（毎日 03:00 JST = 18:00 UTC前日）
     schedule.every().day.at("18:00").do(db_backup_job)
     logger.info("DBバックアップ: 毎日03:00 JST (18:00 UTC)")
+
+    # Stripe MRR 日次 sync（毎日 09:00 JST = 00:00 UTC）
+    schedule.every().day.at("00:00").do(stripe_sync_job)
+    logger.info("Stripe sync: 毎日09:00 JST (00:00 UTC)")
 
     # 画像アップロードリトライ（毎時: image_url 空のキューを自動修復）
     schedule.every(1).hours.do(retry_upload_job)
@@ -813,6 +823,24 @@ def video_pipeline_job():
     except Exception as exc:
         _alert_owner(f"動画パイプラインジョブエラー: {exc}", dedup_key="video_pipeline_error")
         logger.error("動画パイプラインジョブエラー: %s", exc, exc_info=True)
+
+
+def stripe_sync_job():
+    """毎日 09:00 JST: Stripe から MRR・売上を取得して当月財務ログを更新する"""
+    logger.info("=== Stripe sync ジョブ開始 ===")
+    try:
+        if _FINANCE_TRACKER.exists():
+            result = subprocess.run(
+                ["python3", str(_FINANCE_TRACKER), "--sync-stripe"],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("Stripe sync 出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("Stripe sync エラー: %s", result.stderr)
+        else:
+            logger.warning("finance_tracker.py が見つかりません: %s", _FINANCE_TRACKER)
+    except Exception as exc:
+        logger.error("Stripe sync エラー: %s", exc, exc_info=True)
 
 
 def finance_monthly_job():
@@ -919,7 +947,7 @@ def content_planner_job():
         if _CONTENT_PLANNER.exists():
             result = subprocess.run(
                 ["python3", str(_CONTENT_PLANNER)],
-                capture_output=True, text=True, timeout=60,
+                capture_output=True, text=True, timeout=300,  # Claude API呼び出しを含むため300s
             )
             logger.info("コンテンツプランナー出力:\n%s", result.stdout)
             if result.returncode != 0:
@@ -929,6 +957,27 @@ def content_planner_job():
     except Exception as exc:
         _alert_owner(f"コンテンツプランナーエラー: {exc}", dedup_key="content_planner_error")
         logger.error("コンテンツプランナーエラー: %s", exc, exc_info=True)
+
+
+def lead_daily_urgent_job():
+    """平日09:00 JST (00:00 UTC): 今日・明日が期限のリードをLINEで通知する"""
+    now = datetime.now()
+    if now.weekday() >= 5:  # 土・日はスキップ
+        return
+    logger.info("=== 日次営業アクション確認開始 ===")
+    try:
+        if _LEAD_PIPELINE.exists():
+            result = subprocess.run(
+                ["python3", str(_LEAD_PIPELINE), "--daily"],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("日次アクション確認出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("日次アクション確認エラー: %s", result.stderr)
+        else:
+            logger.warning("lead_pipeline.py が見つかりません: %s", _LEAD_PIPELINE)
+    except Exception as exc:
+        logger.error("日次アクション確認エラー: %s", exc, exc_info=True)
 
 
 def story_autopilot_job():

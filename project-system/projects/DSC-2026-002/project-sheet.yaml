@@ -1,0 +1,41 @@
+project_id: DSC-2026-002
+brand: dsc-marketing
+type: monthly
+
+client_name: 合同会社スマートビズ
+client_contact:
+  name: 鈴木 彩
+  email: suzuki@smartbiz.jp
+  phone: ""
+  slack_or_line: ""
+
+project_name: 合同会社スマートビズ LP改善・MEO支援
+description: LP CVR改善コンサル + Googleビジネスプロフィール月次更新
+
+start_date: "2026-01-15"
+end_date: ""
+monthly_renewal: true
+
+monthly_fee_jpy: 89100
+total_fee_jpy: 0
+
+billing:
+  billing_cycle: 月末締め翌月末払い
+  last_invoice_date: "2026-05-01"
+  last_payment_date: "2026-05-03"
+  payment_status: current
+
+phase: P4
+last_update: "2026-05-07"
+next_milestone: LP A/Bテスト結果レポート
+next_milestone_date: "2026-05-31"
+
+project_manager: Satoshi
+
+deliverables:
+  - LP改善提案（月1回）
+  - GBP投稿・写真更新（月4回）
+  - 競合モニタリングレポート
+
+notes: ""
+issues: ""

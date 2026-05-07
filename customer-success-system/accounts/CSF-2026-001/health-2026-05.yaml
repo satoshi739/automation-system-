@@ -1,0 +1,23 @@
+project_id: CSF-2026-001
+brand: cashflowsupport
+client_name: 株式会社テクノビルド
+review_month: "2026-05"
+
+payment_status: current
+meetings_held: 1
+sla_breaches: 0
+
+satisfaction: high
+relationship_owner_client: 山本 健二
+notes_on_relationship: 半年継続。信頼関係が厚い。ファクタリング活用で資金繰りが安定してきたと評価を受けている。
+
+at_risk: false
+risk_signals: []
+
+actions_this_month:
+  - "2026-05-05: 月次CF計画レビューMTG実施。"
+  - "2026-05-07: 6月資金繰り計画シート共有。"
+
+next_touch_date: "2026-05-28"
+
+notes: "11月の契約更新に向けて、Q3の成果レポートを早めに準備する。紹介案件を打診できるタイミング。"

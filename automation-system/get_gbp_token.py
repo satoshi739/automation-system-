@@ -20,6 +20,7 @@ import os
 import sys
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
 
 try:
@@ -165,23 +166,22 @@ if write_env == "y":
                     lines[i] = f"{key}={val}\n"
                     existing_keys.add(key)
 
-    if lines:
-        tmp_path = env_path.with_suffix(".tmp")
-        try:
-            tmp_path.write_text("".join(lines), encoding="utf-8")
-            tmp_path.replace(env_path)
-        except Exception:
-            tmp_path.unlink(missing_ok=True)
-            raise
+    for key, val in [
+        ("GBP_CLIENT_ID",     client_id),
+        ("GBP_CLIENT_SECRET", client_secret),
+        ("GBP_REFRESH_TOKEN", refresh_token),
+    ]:
+        if key not in existing_keys:
+            lines.append(f"{key}={val}\n")
 
-    with open(env_path, "a", encoding="utf-8") as f:
-        for key, val in [
-            ("GBP_CLIENT_ID",     client_id),
-            ("GBP_CLIENT_SECRET", client_secret),
-            ("GBP_REFRESH_TOKEN", refresh_token),
-        ]:
-            if key not in existing_keys:
-                f.write(f"{key}={val}\n")
+    env_path = Path(env_path)
+    tmp_path = env_path.with_suffix(".tmp")
+    try:
+        tmp_path.write_text("".join(lines), encoding="utf-8")
+        tmp_path.replace(env_path)
+    except Exception:
+        tmp_path.unlink(missing_ok=True)
+        raise
 
     print(f".env に書き込みました: {env_path}")
 

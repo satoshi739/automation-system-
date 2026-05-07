@@ -148,5 +148,49 @@ def run() -> None:
         _notify(message)
 
 
+def run_daily_urgent() -> None:
+    """平日09:00 JST に実行。今日・明日が next_action_date のリードだけを通知する。"""
+    if not LEADS_DIR.exists():
+        return
+
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    leads = _load_leads()
+
+    urgent: list[dict] = []
+    for lead in leads:
+        if lead.get("outcome") in ("contracted", "lost"):
+            continue
+        nad = _parse_date(lead.get("next_action_date"))
+        if nad and nad <= tomorrow:
+            urgent.append(lead)
+
+    print(f"=== 本日のアクション確認 {today.isoformat()} ===")
+    if not urgent:
+        print("  本日・明日期限のリード: なし")
+        return
+
+    lines = [f"【営業アクション確認】{today.isoformat()}"]
+    for lead in sorted(urgent, key=lambda l: str(l.get("next_action_date", ""))):
+        name = lead.get("company") or lead.get("name", "不明")
+        stage = lead.get("stage", "?")
+        nad = lead.get("next_action_date", "")
+        action = lead.get("next_action", "")
+        flag = "🔴 期限超過" if _parse_date(nad) and _parse_date(nad) < today else "🟡 本日・明日"
+        lines.append(f"{flag} {name}（{stage}）{nad}")
+        if action:
+            lines.append(f"  → {action}")
+        print(f"  {flag} {name} ({stage}) {nad}")
+
+    _notify("\n".join(lines))
+
+
 if __name__ == "__main__":
-    run()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--daily", action="store_true", help="日次緊急チェックモード")
+    args = parser.parse_args()
+    if args.daily:
+        run_daily_urgent()
+    else:
+        run()
