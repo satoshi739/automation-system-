@@ -658,7 +658,18 @@ def _h_queue_push(inp: dict, ctx: dict) -> dict:
     caption  = inp.get("caption", "")
     hashtags = inp.get("hashtags", "")
     image_url = inp.get("image_url", "")
-    scheduled_at = inp.get("scheduled_at", "")
+    scheduled_at_raw = inp.get("scheduled_at", "")
+    scheduled_at = ""
+    if scheduled_at_raw:
+        try:
+            scheduled_at = datetime.strptime(str(scheduled_at_raw), "%Y-%m-%d %H:%M").strftime("%Y-%m-%d %H:%M")
+        except ValueError:
+            try:
+                norm = str(scheduled_at_raw).replace("Z", "+00:00")
+                dt = datetime.fromisoformat(norm)
+                scheduled_at = dt.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M")
+            except ValueError:
+                scheduled_at = str(scheduled_at_raw)
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     entry = {
