@@ -137,21 +137,41 @@ class SearchConsoleClient:
 
     def _service(self):
         from googleapiclient.discovery import build
-        from google.oauth2 import service_account
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
         from pathlib import Path
         import json, base64
-        creds_path = Path(__file__).parent.parent / "credentials.json"
-        b64 = os.environ.get("GOOGLE_CREDENTIALS_BASE64", "")
-        if b64 and not creds_path.exists():
-            creds_info = json.loads(base64.b64decode(b64))
-            creds = service_account.Credentials.from_service_account_info(
-                creds_info, scopes=["https://www.googleapis.com/auth/webmasters.readonly"]
-            )
+        # OAuth2 ユーザー認証（search_console_token.json 優先）
+        token_path = Path(__file__).parent.parent / "search_console_token.json"
+        b64 = os.environ.get("SEARCH_CONSOLE_TOKEN_BASE64", "")
+        if b64:
+            token_data = json.loads(base64.b64decode(b64))
+        elif token_path.exists():
+            token_data = json.loads(token_path.read_text())
         else:
-            creds = service_account.Credentials.from_service_account_file(
-                str(creds_path), scopes=["https://www.googleapis.com/auth/webmasters.readonly"]
+            raise FileNotFoundError(
+                "search_console_token.json が見つかりません。"
+                "python3 setup_search_console_token.py を実行してください。"
             )
-        return build("searchconsole","v1",credentials=creds)
+        creds = Credentials(
+            token=token_data.get("token"),
+            refresh_token=token_data.get("refresh_token"),
+            token_uri=token_data.get("token_uri", "https://oauth2.googleapis.com/token"),
+            client_id=token_data.get("client_id"),
+            client_secret=token_data.get("client_secret"),
+            scopes=token_data.get("scopes"),
+        )
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            token_path.write_text(json.dumps({
+                "token": creds.token,
+                "refresh_token": creds.refresh_token,
+                "token_uri": creds.token_uri,
+                "client_id": creds.client_id,
+                "client_secret": creds.client_secret,
+                "scopes": list(creds.scopes),
+            }, indent=2))
+        return build("searchconsole", "v1", credentials=creds)
 
     def get_overview(self, days: int = 28) -> dict:
         """クリック数・表示回数・CTR・平均掲載順位"""

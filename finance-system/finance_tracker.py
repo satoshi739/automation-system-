@@ -229,7 +229,8 @@ def sync_from_stripe(month: Optional[str] = None) -> dict:
 
     # Stripe の値で上書き（ログ上の手入力値を Stripe 実績で補正する）
     mrr_jpy = mrr_info.get("mrr_jpy", 0)
-    data["mrr_end"] = mrr_jpy
+    if mrr_jpy > 0:
+        data["mrr_end"] = mrr_jpy
     data["mrr_start"] = data.get("mrr_start") or mrr_jpy  # 初回は同値で初期化
 
     churn_count = churn_info.get("churn_count", 0)
@@ -245,7 +246,9 @@ def sync_from_stripe(month: Optional[str] = None) -> dict:
             data["gross_profit"] = data["total_revenue_excl_tax"] - data.get("cogs", 0)
 
     data.setdefault("notes", "")
-    data["notes"] = (data["notes"] + f"\n[Stripe sync: {datetime.now().strftime('%Y-%m-%d %H:%M')}]").strip()
+    sync_tag = f"[Stripe sync: {datetime.now().strftime('%Y-%m-%d %H:%M')}]"
+    if sync_tag not in data["notes"]:
+        data["notes"] = (data["notes"] + f"\n{sync_tag}").strip()
 
     _save_log(month, data)
     print(f"Stripe sync 完了: MRR ¥{mrr_jpy:,}")
