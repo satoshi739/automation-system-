@@ -120,8 +120,18 @@ def post_instagram_queue() -> int:
     except Exception:
         brands_cfg = {}
 
+    from sns.instagram import BRAND_ENV_PREFIX
     for brand_id, bcfg in brands_cfg.items():
         if not bcfg.get("channels", {}).get("instagram"):
+            continue
+        prefix = BRAND_ENV_PREFIX.get(brand_id, "")
+        token_env   = f"{prefix}_META_ACCESS_TOKEN"     if prefix else "META_ACCESS_TOKEN"
+        account_env = f"{prefix}_INSTAGRAM_ACCOUNT_ID"  if prefix else "INSTAGRAM_BUSINESS_ACCOUNT_ID"
+        if not (os.environ.get(token_env) and os.environ.get(account_env)):
+            logger.info(
+                "Instagram投稿スキップ (%s): 認証情報未設定 — %s / %s が未設定のため Meta Developer Portal 設定待ち",
+                brand_id, token_env, account_env,
+            )
             continue
         item = db.next_pending(brand_id, "instagram")
         if item:
