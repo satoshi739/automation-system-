@@ -1,34 +1,40 @@
 month: 2026-05
 mrr_start: 350000
-new_mrr: 80000
+new_mrr: 0
 churned_mrr: 0
-mrr_end: 430000
-one_time_revenue: 110000
-total_revenue_excl_tax: 490909
-total_revenue_incl_tax: 540000
+mrr_end: 350000
+one_time_revenue: 0
+total_revenue_excl_tax: 318182
+total_revenue_incl_tax: 350000
 cogs: 95000
-gross_profit: 395909
-invoices_sent: 5
+gross_profit: 223182
+invoices_sent: 4
 invoices_paid: 4
-invoices_overdue: 1
-overdue_amount: 110000
-overdue_invoices:
-- client: 合同会社テストD
-  amount: 110000
-  invoice_date: '2026-04-09'
+invoices_overdue: 0
+overdue_amount: 0
+overdue_invoices: []
 by_brand:
   dsc_marketing:
     mrr: 200000
-    one_time: 110000
+    one_time: 0
   cashflowsupport:
     mrr: 100000
     one_time: 0
   upjapan:
-    mrr: 130000
+    mrr: 50000
     one_time: 0
-new_clients:
-- 株式会社アルファ (MRR ¥80,000 / UPJ枠)
+new_clients: []
 churned_clients: []
-notes: 'アルファ社 新規契約。DSC案件単発入金未確認 (overdue 1件)
+notes: '[Stripe sync: 2026-05-09]
 
-  [Stripe sync: 2026-05-09 23:36]'
+  [Stripe sync: 2026-05-10]
+
+  [Stripe sync: 2026-05-11]
+
+  [Stripe sync: 2026-05-12]
+
+  [Stripe sync: 2026-05-14]
+
+  [Stripe sync: 2026-05-15]
+
+  [Stripe sync: 2026-05-16]'

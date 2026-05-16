@@ -246,7 +246,7 @@ def sync_from_stripe(month: Optional[str] = None) -> dict:
             data["gross_profit"] = data["total_revenue_excl_tax"] - data.get("cogs", 0)
 
     data.setdefault("notes", "")
-    sync_tag = f"[Stripe sync: {datetime.now().strftime('%Y-%m-%d %H:%M')}]"
+    sync_tag = f"[Stripe sync: {datetime.now().strftime('%Y-%m-%d')}]"
     if sync_tag not in data["notes"]:
         data["notes"] = (data["notes"] + f"\n{sync_tag}").strip()
 

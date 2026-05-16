@@ -2956,24 +2956,27 @@ def startup():
             log.info(f"YAML→DB移行完了: {migrated}")
     except Exception as e:
         log.warning(f"YAML移行スキップ: {e}")
-    # Asset Brain モックデータを投入（空の場合のみ）
-    try:
-        n = seed_mock_data()
-        if n:
-            log.info(f"Asset Brain: モックデータ {n} 件投入")
-    except Exception as e:
-        log.warning(f"Asset Brain シードスキップ: {e}")
-    # MEO 初期同期（DBが空の場合のみモックデータを投入）
-    try:
-        with db.get_conn() as _conn:
-            _cnt = _conn.execute("SELECT COUNT(*) FROM business_profiles").fetchone()[0]
-        if _cnt == 0:
-            from connectors.gbp_connector import MockGBPConnector
-            from repositories.meo_repo import sync_from_connector as _meo_sync
-            _counts = _meo_sync(MockGBPConnector())
-            log.info(f"MEO モックデータ投入: {_counts}")
-    except Exception as e:
-        log.warning(f"MEO 初期化スキップ: {e}")
+    # Asset Brain モックデータ投入は MOCK_MODE=true のときだけ実行する（本番ではスキップ）
+    if os.environ.get("MOCK_MODE", "false").lower() == "true":
+        try:
+            n = seed_mock_data()
+            if n:
+                log.info(f"Asset Brain: モックデータ {n} 件投入")
+        except Exception as e:
+            log.warning(f"Asset Brain シードスキップ: {e}")
+    # MEO 初期同期：MOCK_MODE のときだけ MockGBPConnector を呼ぶ。
+    # 本番では GBP_REFRESH_TOKEN 等の認証情報を見て GBPRealConnector を使う想定。
+    if os.environ.get("MOCK_MODE", "false").lower() == "true":
+        try:
+            with db.get_conn() as _conn:
+                _cnt = _conn.execute("SELECT COUNT(*) FROM business_profiles").fetchone()[0]
+            if _cnt == 0:
+                from connectors.gbp_connector import MockGBPConnector
+                from repositories.meo_repo import sync_from_connector as _meo_sync
+                _counts = _meo_sync(MockGBPConnector())
+                log.info(f"MEO モックデータ投入: {_counts}")
+        except Exception as e:
+            log.warning(f"MEO 初期化スキップ: {e}")
     # Org DB（エージェント実行フレームワーク）を初期シード
     try:
         import org_database as obd

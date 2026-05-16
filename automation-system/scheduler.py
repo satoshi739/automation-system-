@@ -782,6 +782,10 @@ def setup_schedule():
     schedule.every().day.at("00:00").do(stripe_sync_job)
     logger.info("Stripe sync: 毎日09:00 JST (00:00 UTC)")
 
+    # 未回収請求アラート（毎週月曜09:00 JST = 日曜00:01 UTC、他ジョブと時刻衝突を避けて+1分）
+    schedule.every().sunday.at("00:01").do(overdue_alert_job)
+    logger.info("未回収請求アラート: 毎週月曜09:00 JST (日曜00:01 UTC)")
+
     # 画像アップロードリトライ（毎時: image_url 空のキューを自動修復）
     schedule.every(1).hours.do(retry_upload_job)
     logger.info("画像アップロードリトライ: 毎時")
@@ -841,6 +845,25 @@ def stripe_sync_job():
             logger.warning("finance_tracker.py が見つかりません: %s", _FINANCE_TRACKER)
     except Exception as exc:
         logger.error("Stripe sync エラー: %s", exc, exc_info=True)
+
+
+def overdue_alert_job():
+    """毎週月曜09:00 JST: 未回収請求があればLINEアラート"""
+    logger.info("=== 未回収請求アラート開始 ===")
+    try:
+        if _FINANCE_TRACKER.exists():
+            result = subprocess.run(
+                ["python3", str(_FINANCE_TRACKER), "--alert-overdue"],
+                capture_output=True, text=True, timeout=60,
+            )
+            logger.info("未回収アラート出力:\n%s", result.stdout)
+            if result.returncode != 0:
+                logger.error("未回収アラートエラー: %s", result.stderr)
+        else:
+            logger.warning("finance_tracker.py が見つかりません: %s", _FINANCE_TRACKER)
+    except Exception as exc:
+        logger.error("未回収アラートエラー: %s", exc, exc_info=True)
+        _alert_owner(f"[overdue_alert_job] 失敗: {exc}")
 
 
 def finance_monthly_job():
